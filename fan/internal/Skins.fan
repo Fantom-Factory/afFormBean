@@ -1,31 +1,5 @@
 using afIoc
 using afBedSheet
-using afBeanUtils
-
-const class InputSkins {
-	
-	private const Str:InputSkin	skins
-	
-	new make(Str:InputSkin	skins, |This| in) {
-		this.skins = skins
-		in(this)
-	}
-
-	Str render(SkinCtx skinCtx) {
-		skin := skins[skinCtx.input.type] ?: throw ArgNotFoundErr("FormBean Skin not found: ${skinCtx.input.type}", skins.keys)
-		return skin.render(skinCtx)
-	}
-
-	InputSkin find(Str type) {
-		skins[type]
-	}
-}
-
-
-const mixin InputSkin {
-	
-	abstract Str render(SkinCtx skinCtx)
-}
 
 @NoDoc
 abstract const class DefaultInputSkin : InputSkin {
@@ -66,26 +40,26 @@ abstract const class DefaultInputSkin : InputSkin {
 	abstract Str renderElement(SkinCtx skinCtx)
 }
 
-const class TextInputSkin : DefaultInputSkin {
+internal const class TextInputSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
 		"""<input type="${skinCtx.input.type}" ${attributes(skinCtx)} value="${skinCtx.value}">"""
 	}	
 }
 
-const class TextAreaSkin : DefaultInputSkin {
+internal const class TextAreaSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
 		"""<textarea ${attributes(skinCtx)}>${skinCtx.value}</textarea>"""
 	}	
 }
 
-const class CheckboxSkin : DefaultInputSkin {
+internal const class CheckboxSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
 		checked := (skinCtx.value == "true" || skinCtx.value == "on") ? " checked" : Str.defVal
 		return """<input type="checkbox" ${attributes(skinCtx)}${checked}>"""
 	}
 }
 
-const class SelectSkin : DefaultInputSkin {
+internal const class SelectSkin : DefaultInputSkin {
 	@Inject private const	ValueEncoders		valueEncoders
 	@Inject private const	OptionsProviders	optionsProviders
 
@@ -113,4 +87,3 @@ const class SelectSkin : DefaultInputSkin {
 		return html
 	}
 }
-

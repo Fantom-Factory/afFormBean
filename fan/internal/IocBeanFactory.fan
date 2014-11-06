@@ -1,7 +1,7 @@
 using afBeanUtils
 using afIoc
 
-class IocBeanFactory : BeanFactory {
+internal class IocBeanFactory : BeanFactory {
 	
 	private Registry registry
 	
