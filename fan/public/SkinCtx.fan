@@ -1,5 +1,6 @@
 using afBedSheet
 
+** Passed to 'InputSkins' to provide all the information they need to render a form field.
 class SkinCtx {
 				Obj?			bean
 	const		Field			field
@@ -43,7 +44,7 @@ class SkinCtx {
 	}
 	
 	Str? msg(Str key) {
-		formBean.msg(key)?.toXml
+		formBean._msg(key)?.toXml
 	}
 	
 	Str toClient(Obj? value) {
