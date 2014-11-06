@@ -7,21 +7,24 @@ abstract const class DefaultInputSkin : InputSkin {
 	override Str render(SkinCtx skinCtx) {
 		html	:= Str.defVal
 		errCss	:= skinCtx.fieldInvalid ? " error" : Str.defVal
-		hint	:= skinCtx.msg("field.${skinCtx.name}.hint")
-		html	+= """<div class="formBean-row ${skinCtx.name}${errCss}">"""
+		hint	:= skinCtx.input.hint ?: skinCtx.msg("field.${skinCtx.name}.hint")
+		html	+= """<div class="formBean-row inputRow ${skinCtx.name}${errCss}">"""
 		html	+= """<label for="${skinCtx.name}">${skinCtx.label}</label>"""
 		html	+= renderElement(skinCtx)
 		if (hint != null)
 			html += """<div class="formBean-hint">${hint}</div>"""				
-		html	+= """</div>"""
+		html	+= """</div>\n"""
 		return html
 	}
 	
 	Str attributes(SkinCtx skinCtx) {
-		input	:= skinCtx.input		
+		input	:= skinCtx.input
+		pholder	:= skinCtx.input.placeholder ?: skinCtx.msg("field.${skinCtx.name}.placeholder")
 		attrs	:= "id=\"${skinCtx.name}\" name=\"${skinCtx.name}\""
-		if (input.required)
-			attrs += " required"
+		if (input.css != null)
+			attrs += " class=\"${input.css}\""
+		if (pholder != null)
+			attrs += " placeholder=\"${pholder}\""
 		if (input.minLength != null)
 			attrs += " minlength=\"${input.minLength}\" pattern=\".{${input.minLength},}\""
 		if (input.maxLength != null)
@@ -30,8 +33,16 @@ abstract const class DefaultInputSkin : InputSkin {
 			attrs += " min=\"${input.min}\""
 		if (input.max != null)
 			attrs += " max=\"${input.max}\""
+		if (input.step != null)
+			attrs += " step=\"${input.step}\""
 		if (input.regex != null)
 			attrs += " pattern=\"${input.regex.toXml}\""
+		if (input.required)
+			attrs += " required"
+		
+		// TODO: merge or override these attributes with what's just been processed
+		// - don't blindly render the same attribute twice
+		// - use Pegger to parse
 		if (input.attributes != null)
 			attrs += " ${input.attributes}"
 		return attrs

@@ -1,18 +1,22 @@
 Overview [#overview]
 ********************
-** Features:
-**  - Renders Fantom objects as editable HTML forms.
-**  - Customised Select options.
-**  - HTML5 client and server side validation.
-**  - Customised error messages.
-**  - Entities autobuilt with IoC.
-** 
-** Current limitations:
-**  - Maps, Lists and nested objects are not supported.
-**  - XHTML not supported. (Use HTML Parser to test.)
-**  - Radioboxes are not supported.
-**  - Only static enums supported for <select> options.
 
+'FormBean' renders and validates HTML forms from Fantom objects in a highly customisable manner. 
+
+Features:
+ - Renders Fantom objects as editable HTML forms.
+ - HTML5 client and server side validation.
+ - Customised Select options.
+ - Customised error messages.
+ - Customise HTML inputs.
+ - Entities autobuilt with IoC.
+
+Current limitations:
+ - Maps, Lists and nested objects are not supported.
+ - XHTML not supported. (Use HTML Parser to test.)
+ - Radioboxes are not supported.
+
+// crazy formatting: http://webdesign.tutsplus.com/tutorials/bring-your-forms-up-to-date-with-css3-and-html5-validation--webdesign-4738
 
 
 Install [#Install]

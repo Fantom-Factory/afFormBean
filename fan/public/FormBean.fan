@@ -1,32 +1,30 @@
 using afIoc
 using afBedSheet
-using web
 using afBeanUtils
+using web
 
-** Features:
-**  - Renders Fantom objects as editable HTML forms.
-**  - Customised Select options.
-**  - HTML5 client and server side validation.
-**  - Customised error messages.
-**  - Entities autobuilt with IoC.
-** 
-** Current limitations:
-**  - Maps, Lists and nested objects are not supported.
-**  - XHTML not supported. (Use HTML Parser to test.)
-**  - Radioboxes are not supported.
-**  - Only static enums supported for <select> options.
-// crazy formatting: http://webdesign.tutsplus.com/tutorials/bring-your-forms-up-to-date-with-css3-and-html5-validation--webdesign-4738
+
 class FormBean {	
 	@Inject private const	Registry		registry
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
 	@Inject private const	ValueEncoders 	valueEncoders
 	
+	** The bean type this 'FormBean' represents.
 					const	Type			beanType
-							Str:Str 		messages	:= Str:Str[:] { caseInsensitive=true }
-							Field:FormField	formFields	:= Field:FormField[:] { ordered=true }
-							Str[] 			errMsgs		:= Str[,]
 	
+	** The message map used to find strings for labels, placeholders, hints, and validation errors.  
+							Str:Str 		messages	:= Str:Str[:] { caseInsensitive=true }
+	
+	** The form fields that make up this form bean.
+	** The returned map is read only, but the 'FormFields' themselves may still be manipulated.
+							Field:FormField	formFields	:= Field:FormField[:] { ordered=true } { get { &formFields.ro } private set }
+	
+	** You may set any extra (cross field validation) error messages here. 
+	** They will be rendered along with the form field error messages.
+							Str[] 			errorMsgs	:= Str[,]
+	
+	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
 		this.beanType = beanType
 		
@@ -49,17 +47,27 @@ class FormBean {
 		}
 	}
 	
-	Str renderErrs() {
+	** Renders form field errors (if any) to an unordered list:
+	** 
+	**   <div class='formBean-errors'>
+	**     <div class='formBean-banner'>
+	**       <ul>
+	**         <li> Error 1 </li>
+	**         <li> Error 2 </li>
+	**       </ul>
+	**     </div>
+	**   </div>
+	Str renderErrors() {
 		if (!hasErrors) return Str.defVal
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
 		out.div("class='formBean-errors'")
-		out.div("class='formBean-banner'").w(msg("errors.banner")).divEnd
+		out.div("class='formBean-banner'").w(_msg("errors.banner")).divEnd
 		out.ul
 		
 		// don't encode err msgs, let the user specify HTML
-		errMsgs.each { 
+		errorMsgs.each { 
 			out.li.w(it).liEnd			
 		}
 		formFields.vals.each {
@@ -71,7 +79,10 @@ class FormBean {
 		return buf.toStr 
 	}
 
-	** 'bean' may be 'null' if you're re-rendering a form with validation errors.
+	** Renders the form bean to a HTML form.
+	** 
+	** If the given 'bean' is 'null' then values are taken from the form fields. 
+	** Do so if you're re-rendering a form with validation errors.
 	Str renderBean(Obj? bean) {
 		inErr	:= hasErrors
 		html	:= Str.defVal
@@ -90,21 +101,34 @@ class FormBean {
 		return html
 	}
 
+	** Renders a simple submit button.
+	** 
+	**   <div class='formBean-row submitRow'>
+	**     <input type='submit' name='formBeanSubmit' class='submit' value='label'>
+	**   </div>
+	** 
+	** The label is taken from the msg key 'field.submit.label' and defaults to 'Submit'.
 	Str renderSubmit() {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		label := msg("field.submit.label").toXml
-		out.div("class='formBean-submitRow'")
-		out.submit("name='formBeanSubmit' value='${label}'")
+		label := _msg("field.submit.label").toXml
+		out.div("class='formBean-row submitRow'")
+		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label}\"")
 		out.divEnd
 
 		return buf.toStr
 	}
 	
+	** Populates the form fields with values from the given 'form' map and performs server side validation.
+	** Error messages are saved to the form fields.
+	** 
+	** Returns 'true' if all the values are valid, 'false' if not.
+	**  
+	** It is safe to pass in 'HttpRequest.form()' directly.
 	Bool validateBean(Str:Str form) {
 		formFields.each |formField, field| {
-			input 		:= (HtmlInput) Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
+			input 		:= formField.input
 			formValue 	:= (Str?) form[field.name]?.trim
 			hasValue	:= formValue != null && !formValue.isEmpty
 
@@ -113,45 +137,53 @@ class FormBean {
 
 			if (input.required)
 				if (formValue == null || formValue.isEmpty)
-					return addErr(formField, formValue, "required", Str.defVal)
+					return _addErr(formField, formValue, "required", Str.defVal)
 			
 			if (hasValue && input.minLength != null)
 				if (formValue.size < input.minLength)
-					return addErr(formField, formValue, "minLength", input.minLength)
+					return _addErr(formField, formValue, "minLength", input.minLength)
 
 			if (hasValue && input.maxLength != null)
 				if (formValue.size > input.maxLength)
-					return addErr(formField, formValue, "maxLength", input.maxLength)
+					return _addErr(formField, formValue, "maxLength", input.maxLength)
 
 			if (hasValue && input.min != null) {
 				if (formValue.toInt(10, false) == null)
-					return addErr(formField, formValue, "notNum", Str.defVal)
+					return _addErr(formField, formValue, "notNum", Str.defVal)
 				if (formValue.toInt < input.min)
-					return addErr(formField, formValue, "min", input.min)
+					return _addErr(formField, formValue, "min", input.min)
 			}
 
 			if (hasValue && input.max != null) {
 				if (formValue.toInt(10, false) == null)
-					return addErr(formField, formValue, "notNum", Str.defVal)
+					return _addErr(formField, formValue, "notNum", Str.defVal)
 				if (formValue.toInt > input.max)
-					return addErr(formField, formValue, "max", input.max)
+					return _addErr(formField, formValue, "max", input.max)
 			}
 
 			if (hasValue && input.regex != null)
 				if (!"^${input.regex}\$".toRegex.matches(formValue))
-					return addErr(formField, formValue, "regex", input.regex)			
+					return _addErr(formField, formValue, "regex", input.regex)			
 		}
 		
 		return !hasErrors
 	}
 
+	** Creates an instance of 'beanType' with all the field values set to the form field values.
+	** Uses 'afBeanUtils::BeanProperties.create()'.
+	** 
+	** Any extra properties passed in will also be set.
 	Obj createBean([Str:Obj?]? extraProps := null) {
-		beanProps := gatherBeanProperties(extraProps)
+		beanProps := _gatherBeanProperties(extraProps)
 		return BeanProperties.create(beanType, beanProps, null) { IocBeanFactory(registry, it) }
 	}
 	
+	** Updates the given bean instance with form field values.
+	** Uses 'afBeanUtils::BeanProperties'.
+	** 
+	** Any extra properties passed in will also be set.
 	Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
-		beanProps := gatherBeanProperties(extraProps)
+		beanProps := _gatherBeanProperties(extraProps)
 
 		reg := registry
 		factory := BeanPropertyFactory {
@@ -163,19 +195,20 @@ class FormBean {
 		return bean
 	}
 	
+	** Returns 'true' if any form fields are in error, or if any extra error messages have been added to this
 	Bool hasErrors() {
-		!errMsgs.isEmpty || formFields.vals.any { it.invalid }
+		!errorMsgs.isEmpty || formFields.vals.any { it.invalid }
 	}
 	
-	internal Str? msg(Str key) {
+	internal Str? _msg(Str key) {
 		messages[key]
 	}
 
-	private Void addErr(FormField formField, Str? value, Str type, Obj constraint) {
+	private Void _addErr(FormField formField, Str? value, Str type, Obj constraint) {
 		field	:= formField.field
 		input 	:= (HtmlInput) Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
-		label	:= input.label ?: (msg("field.${field.name}.label") ?: field.name.toDisplayName)
-		errMsg 	:= this.msg("field.${field.name}.${type}") ?: this.msg("field.${type}")
+		label	:= input.label ?: (_msg("field.${field.name}.label") ?: field.name.toDisplayName)
+		errMsg 	:= _msg("field.${field.name}.${type}") ?: _msg("field.${type}")
 
 		errMsg = errMsg
 			.replace("\${label}", label)
@@ -185,7 +218,7 @@ class FormBean {
 		formField.errMsg = errMsg
 	}
 	
-	private Str:Obj? gatherBeanProperties([Str:Obj?]? extraProps) {
+	private Str:Obj? _gatherBeanProperties([Str:Obj?]? extraProps) {
 		beanProps := Str:Obj?[:]
 		formFields.each |formField, field| {
 			value := null
@@ -208,19 +241,3 @@ class FormBean {
 	}
 }
 
-class FormField {
-	Field				field
-	ValueEncoder?		valueEncoder
-	InputSkin?			inputSkin
-	OptionsProvider?	optionsProvider
-	Str?				errMsg	{ set { if (it != null) invalid = true; &errMsg = it } }
-	Str?				formValue
-	Bool				invalid { set { if (it == false) errMsg = null; &invalid = it } }
-
-	@NoDoc
-	new make(|This| in) { in(this) }
-	
-	HtmlInput input() {
-		Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
-	}
-}
