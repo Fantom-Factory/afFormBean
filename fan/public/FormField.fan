@@ -1,6 +1,6 @@
 using afBedSheet
 
-** Respresents a
+** Holds all the meta data required to convert a field on a Fantom object to HTML and back again.
 class FormField {
 	// TODO: have this hold services and push all the render / validate methods down on to this - make it more OO.
 	

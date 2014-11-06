@@ -3,7 +3,7 @@ using afBedSheet
 using afBeanUtils
 using web
 
-
+** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
 	@Inject private const	Registry		registry
 	@Inject private const	ObjCache		objCache
@@ -38,7 +38,7 @@ class FormBean {
 		// create formfields with default values
 		beanType.fields.findAll { it.hasFacet(HtmlInput#) }.each |field| {
 			input := (HtmlInput) Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
-			formFields[field] = FormField {
+			&formFields[field] = FormField {
 				it.field	 		= field
 				it.valueEncoder		= objCache[input.valueEncoder]
 				it.inputSkin		= objCache[input.inputSkin]
@@ -70,7 +70,7 @@ class FormBean {
 		errorMsgs.each { 
 			out.li.w(it).liEnd			
 		}
-		formFields.vals.each {
+		&formFields.vals.each {
 			if (it.errMsg != null)
 				out.li.w(it.errMsg).liEnd
 		}
@@ -86,7 +86,7 @@ class FormBean {
 	Str renderBean(Obj? bean) {
 		inErr	:= hasErrors
 		html	:= Str.defVal
-		formFields.each |formField, field| {
+		&formFields.each |formField, field| {
 			skinCtx := SkinCtx {
 				it.bean			= bean
 				it.field		= field
@@ -127,7 +127,7 @@ class FormBean {
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
 	Bool validateBean(Str:Str form) {
-		formFields.each |formField, field| {
+		&formFields.each |formField, field| {
 			input 		:= formField.input
 			formValue 	:= (Str?) form[field.name]?.trim
 			hasValue	:= formValue != null && !formValue.isEmpty
@@ -197,7 +197,7 @@ class FormBean {
 	
 	** Returns 'true' if any form fields are in error, or if any extra error messages have been added to this
 	Bool hasErrors() {
-		!errorMsgs.isEmpty || formFields.vals.any { it.invalid }
+		!errorMsgs.isEmpty || &formFields.vals.any { it.invalid }
 	}
 	
 	internal Str? _msg(Str key) {
@@ -220,7 +220,7 @@ class FormBean {
 	
 	private Str:Obj? _gatherBeanProperties([Str:Obj?]? extraProps) {
 		beanProps := Str:Obj?[:]
-		formFields.each |formField, field| {
+		&formFields.each |formField, field| {
 			value := null
 
 			// fugging checkboxes don't send unchecked data
