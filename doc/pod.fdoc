@@ -58,6 +58,32 @@ Usage [#usage]
 
 
 
+Messages [#messages]
+====================
+
+Labels, placeholders, hints + validation msgs
+
+messages looked for in pod, filename
+
+form field
+ @htmlinput facet
+formbean.msgs
+properites file  
+defauly toDisplayName
+
+
+Skins [#skins]
+==============
+Default skin renders the following:
+
+**   <div class='formBean-row submitRow'>
+**     <input type='submit' name='formBeanSubmit' class='submit' value='label'>
+**   </div>
+
+
+
+
+
 Release Notes [#releaseNotes]
 *****************************
 
