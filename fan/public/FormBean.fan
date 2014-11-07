@@ -28,10 +28,16 @@ class FormBean {
 	new make(Type beanType, |This| in) {
 		this.beanType = beanType
 		
-		// set messages
-		formMsgs := typeof  .pod.files.find { it.name == "FormBean.properties"         } .readProps
-		beanMsgs := beanType.pod.files.find { it.name == "${beanType.name}.properties" }?.readProps
-		this.messages.setAll(formMsgs).setAll(beanMsgs ?: [:])
+		try {
+			// set messages
+			// TODO: use Fantom's locale lookup
+			formMsgs := typeof  .pod.files.find { it.name == "FormBean.properties"         } .readProps
+			// TODO: lookup "FormBean.properties" in user pod to override default err messages
+			beanMsgs := beanType.pod.files.find { it.name == "${beanType.name}.properties" }?.readProps
+			this.messages.setAll(formMsgs).setAll(beanMsgs ?: [:])
+		} catch {
+			// Guard against being run in a script - an Err is thrown when not backed by a pod file
+		}
 
 		in(this)	// need the objCache
 		
@@ -50,18 +56,20 @@ class FormBean {
 	** Renders form field errors (if any) to an unordered list:
 	** 
 	**   <div class='formBean-errors'>
-	**     <div class='formBean-banner'>
+	**       <div class='formBean-banner'>#BANNER</div>
 	**       <ul>
-	**         <li> Error 1 </li>
-	**         <li> Error 2 </li>
+	**           <li> Error 1 </li>
+	**           <li> Error 2 </li>
 	**       </ul>
-	**     </div>
 	**   </div>
+	** 
+	** To change the banner message, set a message with the key 'errors.banner'.
 	Str renderErrors() {
 		if (!hasErrors) return Str.defVal
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
+		// TODO: look for errors.BEANNAME.banner
 		out.div("class='formBean-errors'")
 		out.div("class='formBean-banner'").w(_msg("errors.banner")).divEnd
 		out.ul
@@ -112,9 +120,9 @@ class FormBean {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		label := _msg("field.submit.label").toXml
+		label := _msg("field.submit.label") ?: "Submit"
 		out.div("class='formBean-row submitRow'")
-		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label}\"")
+		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label.toXml}\"")
 		out.divEnd
 
 		return buf.toStr
@@ -126,7 +134,7 @@ class FormBean {
 	** Returns 'true' if all the values are valid, 'false' if not.
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
-	Bool validateBean(Str:Str form) {
+	Bool validateForm(Str:Str form) {
 		&formFields.each |formField, field| {
 			input 		:= formField.input
 			formValue 	:= (Str?) form[field.name]?.trim
@@ -137,33 +145,33 @@ class FormBean {
 
 			if (input.required)
 				if (formValue == null || formValue.isEmpty)
-					return _addErr(formField, formValue, "required", Str.defVal)
+					{ _addErr(formField, formValue, "required", Str.defVal); return }
 			
 			if (hasValue && input.minLength != null)
 				if (formValue.size < input.minLength)
-					return _addErr(formField, formValue, "minLength", input.minLength)
+					{ _addErr(formField, formValue, "minLength", input.minLength); return }
 
 			if (hasValue && input.maxLength != null)
 				if (formValue.size > input.maxLength)
-					return _addErr(formField, formValue, "maxLength", input.maxLength)
+					{ _addErr(formField, formValue, "maxLength", input.maxLength); return }
 
 			if (hasValue && input.min != null) {
 				if (formValue.toInt(10, false) == null)
-					return _addErr(formField, formValue, "notNum", Str.defVal)
+					{ _addErr(formField, formValue, "notNum", Str.defVal); return }
 				if (formValue.toInt < input.min)
-					return _addErr(formField, formValue, "min", input.min)
+					{ _addErr(formField, formValue, "min", input.min); return }
 			}
 
 			if (hasValue && input.max != null) {
 				if (formValue.toInt(10, false) == null)
-					return _addErr(formField, formValue, "notNum", Str.defVal)
+					{ _addErr(formField, formValue, "notNum", Str.defVal); return }
 				if (formValue.toInt > input.max)
-					return _addErr(formField, formValue, "max", input.max)
+					{ _addErr(formField, formValue, "max", input.max); return }
 			}
 
-			if (hasValue && input.regex != null)
-				if (!"^${input.regex}\$".toRegex.matches(formValue))
-					return _addErr(formField, formValue, "regex", input.regex)			
+			if (hasValue && input.pattern != null)
+				if (!"^${input.pattern}\$".toRegex.matches(formValue))
+					{ _addErr(formField, formValue, "pattern", input.pattern); return }			
 		}
 		
 		return !hasErrors

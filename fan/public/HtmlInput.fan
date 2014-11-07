@@ -27,12 +27,14 @@ facet class HtmlInput {
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	const Str?	attributes
 	
-	** The 'ValueEncoder' used to convert the field value to and from a 'Str'.
+	** The 'ValueEncoder' (type) used to convert the field value to and from a 'Str'.
+	** 'ValueEncoders' are autobuilt and cached by IoC.
 	** 
 	** If 'null' then a default 'ValueEncoder' based on the field type is chosen from BedSheet's 'ValueEncoders' service. 
 	const Type?	valueEncoder
 	
-	** The 'InputSkin' used to render the field to HTML.
+	** The 'InputSkin' (type) used to render the field to HTML.
+	** 'InputSkins' are autobuilt and cached by IoC.
 	**  
 	** If 'null' then a default 'InputSkin' is chosen based on the '@HtmlInput.type' attribute. 	
 	const Type?	inputSkin
@@ -57,10 +59,12 @@ facet class HtmlInput {
 	const Int?	max
 	
 	** HTML5 validation. Sets a regular expression that the (stringified) value should match.
-	** Starting '^' and ending '$' are implicit and not required.
+	** Starting '^' and ending '$' characters are implicit and not required.
 	** 
-	** Expressed as a Str because Regex's aren't serialisable in Fantom 1.0.66.
-	const Str?	regex 
+	** Maps to the HTML5 'pattern' attribute.
+	** 
+	** Expressed as a Str because Regex's are not serialisable in Fantom 1.0.66.
+	const Str?	pattern 
 	
 	** HTML5 validation.
 	const Int?	step
@@ -80,7 +84,8 @@ facet class HtmlInput {
 	const Str?	blankLabel
 
 	** Used by the '<select>' renderer. 
-	** The 'optionsProvider' to use to provide, um, options!
+	** The 'OptionsProvider' to use to provide, um, options!
+	** 'OptionsProvider' are autobuilt and cached by IoC.
 	** 
 	** leave as null to use a default.
 	const Type?	optionsProvider
