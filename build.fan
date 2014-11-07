@@ -42,10 +42,10 @@ class Build : BuildPod {
 		resDirs = [`res/`]
 	}
 	
-	override Void compile() {
-		// remove test pods from final build
-		testPods := "afBounce afSizzle".split
-		depends = depends.exclude { testPods.contains(it.split.first) }
-		super.compile
-	}
+//	override Void compile() {
+//		// remove test pods from final build
+//		testPods := "afBounce afSizzle".split
+//		depends = depends.exclude { testPods.contains(it.split.first) }
+//		super.compile
+//	}
 }

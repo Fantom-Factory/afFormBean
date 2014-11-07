@@ -35,8 +35,8 @@ abstract const class DefaultInputSkin : InputSkin {
 			attrs += " max=\"${input.max}\""
 		if (input.step != null)
 			attrs += " step=\"${input.step}\""
-		if (input.regex != null)
-			attrs += " pattern=\"${input.regex.toXml}\""
+		if (input.pattern != null)
+			attrs += " pattern=\"${input.pattern.toXml}\""
 		if (input.required)
 			attrs += " required"
 		
