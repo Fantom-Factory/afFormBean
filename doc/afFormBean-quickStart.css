@@ -1,0 +1,138 @@
+/* Stylesheet for Alien-Factory's FormBean example */
+/* Stylesheet adapted from http://webdesign.tutsplus.com/tutorials/bring-your-forms-up-to-date-with-css3-and-html5-validation--webdesign-4738 */
+
+/* === Remove input autofocus webkit === */
+*:focus {outline: none;}
+
+/* === Form Typography === */
+body {font: 14px/21px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", sans-serif;}
+.contactForm h2, .contactForm label {font-family:Georgia, Times, "Times New Roman", serif;}
+.formBean-hint, .requiredNotification {font-size: 11px;}
+
+/* === List Styles === */
+body {
+	width:			640px;
+}
+.contactForm .formBean-row {
+	padding:		12px; 
+	border-bottom:	1px solid #eee;
+	position:		relative;
+} 
+.contactForm {
+	border-top:		1px solid #777;
+	border-bottom:	1px solid #777;
+}
+
+/* === Form Header === */
+.contactForm h2 {
+	margin:			0;
+	display:		inline;
+}
+.requiredNotification {
+	color:			#d45252; 
+	margin:			5px 0 0 0; 
+	display:		inline;
+	float:			right;
+}
+
+/* === Form Elements === */
+.contactForm label {
+	width:			80px;
+	margin-top:		3px;
+	display:		inline-block;
+	float:			left;
+	padding:		3px;
+}
+.contactForm input {
+	height:			20px; 
+	width:			180px; 
+	padding:		5px 8px;
+}
+.contactForm textarea {
+	padding:		8px;
+	width:			300px;
+}
+.contactForm .submitRow input {
+	margin-left:	86px;
+}
+
+/* form element visual styles */
+.contactForm .inputRow input,
+.contactForm .inputRow textarea { 
+	border:			1px solid #aaa;
+	box-shadow: 	0px 0px 3px #ccc, 0 10px 15px #eee inset;
+	border-radius:	2px;
+	padding-right:	30px;
+	transition:		padding .25s;
+	}
+.contactForm .inputRow input:focus,
+.contactForm .inputRow textarea:focus {
+	background:		#fff; 
+	border:			1px solid #555; 
+	box-shadow:		0 0 3px #aaa; 
+	padding-right:	70px;
+}
+
+/* === HTML5 validation styles === */	
+.contactForm input:required,
+.contactForm textarea:required {
+	background:		#fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJ1BMVEX////oYmP+9fX52Nj4zs7rdnfpbG374eLyp6jvkJHsgID86+vxnZ6ssOoVAAAANUlEQVQI12PAD5gLoAzGCRDanLXBG8xYGLpMAszYMlHCCcxgz8xSADNYkwwPgBlMBiwMJAIAdywH5znq7PIAAAAASUVORK5CYII=) no-repeat 98% center;
+}
+.contactForm input:required:valid,
+.contactForm textarea:required:valid {
+	background:		#fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAM1BMVEUAAABc0FNc0FNc0FNc0FNc0FNc0FNc0FNc0FNc0FNc0FNc0FP+/P/k7sTi7cD3+PL09+vFMtR6AAAAC3RSTlMAwCFd8OrPA+SxaX8ENAkAAABkSURBVBjTbY5ZDsAgCAXdcAO19z9tfVoak3Z+YIAA5p9qmdlWVQcF1m0PrIRVQV+x0z2f+GOg9T0S1KVhi0kQGdynA2MI4RLpy0l3jKZnvldSPDwmfEqv0/N71D584UvmXDzSG5rYB1bbsBK9AAAAAElFTkSuQmCC) no-repeat 98% center;
+	box-shadow:		0 0 5px #5cd053;
+	border-color:	#28921f;
+}
+.contactForm input:focus:invalid,
+.contactForm textarea:focus:invalid {
+	background:		#fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAeFBMVEUAAADUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlLUUlL+///qs7Pmnp7efX3ll5fikpLddnbbb2/XYGDUU1P49/fy0tLorKzpqKjloKDhh4fWWlp9mOHgAAAAFnRSTlMAv+7NIeO3GPjbxWleSwOuq6VURS0GaPUJsAAAAIdJREFUGNNtTtcOgzAMvCQQoAW6Q0sZnfD/f4h9iAckLlJu2HGMbexNCMHni43EEj6hv6ai+7GX20bib5kWu6ZVcqW8Z/ejupPPwG4VeMBSNNWPHAOBqN9Psl06um9NzgBD0f7n4ADkq6EFUDoVw4czDDePRb3kyB8JmOgqrKsniqNL3emicgKU6Q8h+8FKMgAAAABJRU5ErkJggg==) no-repeat 98% center;
+	box-shadow:		0 0 5px #d45252;
+	border-color:	#b03535
+}
+
+/* === Form hints === */
+.formBean-hint {
+	background:		#d45252;
+	border-radius:	3px 3px 3px 3px;
+	color:			white;
+	margin-left:	8px;
+	padding:		1px 6px;
+	z-index:		999;		/* hints stay above all other elements */
+	position:		absolute;	/* allows proper formatting if hint is two lines */
+	display:		none;
+}
+.formBean-hint::before {
+	content:		"\25C0";
+	color:			#d45252;
+	position:		absolute;
+	top:			1px;
+	left:			-6px;
+}
+.contactForm input:focus + .formBean-hint {display: inline;}
+.contactForm input:required:valid + .formBean-hint {background: #28921f;}
+.contactForm input:required:valid + .formBean-hint::before {color:#28921f;}
+	
+/* === Button Style === */
+input[type=submit] {
+	background-color: #68b12f;
+	background:		linear-gradient(top, #68b12f, #50911e);
+	border:			1px solid #509111;
+	border-bottom:	1px solid #5b992b;
+	border-radius:	3px;
+	box-shadow:		inset 0 1px 0 0 #9fd574;
+	color: 			white;
+	font-weight: 	bold;
+	padding: 		6px 20px;
+	text-align:		center;
+	text-shadow:	0 -1px 0 #396715;
+	height:			auto;
+}
+input[type=submit]:hover {
+	opacity:		.85;
+	cursor:			pointer; 
+}
+input[type=submit]:active {
+	border:			1px solid #20911e;
+	box-shadow:		0 0 10px 5px #356b0b inset;
+}

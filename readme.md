@@ -2,28 +2,21 @@
 
 *FormBean is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
-`FormBean` renders and validates HTML forms from Fantom objects in a highly customisable manner.
-
-`FormBean` allows Fantom objects to be rendered as HTML forms, to be validated on the client and the server, and
-
-uses Ioc and BedSheet
+`FormBean` is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects. Built on top of [IoC](http://www.fantomfactory.org/pods/afIoc) and [BedSheet](http://www.fantomfactory.org/pods/afBedSheet) `FormBean` allows you to customise every aspect of your HTML form generation.
 
 Features:
 
-- Renders Fantom objects as editable HTML forms.
-- HTML5 client and server side validation.
-- Customised Select options.
-- Customised error messages.
-- Customise HTML inputs.
-- Entities autobuilt with IoC.
+- Renders Fantom objects as HTML forms.
+- HTML5 client and server side validation
+- Uses BedSheet `ValueEncoders` for string conversion
+- Customise HTML generation with skins
+- Versatile means of generating select options
+- Customised error messages
 
 Current limitations:
 
 - Maps, Lists and nested objects are not supported.
-- XHTML not supported. (Use HTML Parser to test.)
-- Radioboxes are not supported.
-
-// crazy formatting: http://webdesign.tutsplus.com/tutorials/bring-your-forms-up-to-date-with-css3-and-html5-validation--webdesign-4738
+- Radioboxes are not natively supported.
 
 ## Install 
 
@@ -192,7 +185,7 @@ Or, as in the quick start example, you can `@Inject` a `FormBean` instance as a 
     @Inject { type=MyFormModel# } 
     FormBean formBean
 
-When created, a `FormBean` inspects the given type looking for fields annotated with [@HtmlInput](http://repo.status302.com/doc/afFormBean/HtmlInput.html). For each field found it creates a [FormField](http://repo.status302.com/doc/afFormBean/FormField.html) instance. `FormFields` hold all the information required to render the field as HTML, and back again.
+When created, a `FormBean` inspects the given type looking for fields annotated with [@HtmlInput](http://repo.status302.com/doc/afFormBean/HtmlInput.html). For each field found it creates a [FormField](http://repo.status302.com/doc/afFormBean/FormField.html) instance. `FormFields` hold all the information required to render the field as HTML, and convert it back again.
 
 To render the HTML form, just call `FormBean.renderBean(...)`. To pre-populate the HTML form with existing data, pass in a form bean instance and its field values will be rendered as the HTML `<input>` values.
 
@@ -214,7 +207,7 @@ Sometimes you don't always want to create a fresh form bean instance. For instan
 
 ### ValueEncoders 
 
-Representing values as strings (to be rendered as HTML) is not always as obvious as calling `.toStr()`. For instance, what about printing and formatting dates? On form submission, if a user leaves an input blank, should that be converted to `null` or an empty string?
+Representing values as strings (to be rendered as HTML) is not always as obvious as calling `toStr()`. For instance, what about printing and formatting dates? On form submission, if a user leaves an input blank, should that be converted to `null` or an empty string?
 
 Because there is no right answer for all occasions, FormBean leverages BedSheet's `ValueEncoders` service to convert different types to and from `Str` objects.
 
@@ -227,11 +220,13 @@ Or you can set an instance directly on the `FormField` itself.
 
     formBean.formFields[MyFormModel#field1].valueEncoder = MyValueEncoder() 
 
+Note, FormBean provides a `ValueEncoder` for `Bool` to get around HTML's dodgy `on` / not submitted syntax.
+
 ### Validation 
 
 HTML Form validation is boring and tedious at best.
 
-Yes, there are hundreds of javascript form validation frameworks out there, but not one is appropriate for everyone in all situations. They're a pain to configure, awkward to tweak and don't go anywhere near the fact that validation has to be replicated on the server to double check actual values submitted.
+Yes, there are hundreds of javascript form validation frameworks out there, but not one is appropriate for everyone in all situations. They're generally a pain to configure, awkward to tweak and don't go anywhere near the fact that validation has to be replicated on the server to double check actual values submitted.
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
@@ -255,6 +250,8 @@ Calling `FormBean.renderErrors()` will render the errors in a HTML list. The ren
 
 When rendering a form bean, any fields in error will have the `error` class set on the `inputRow` div.
 
+While listing the errors together in one place may seem old skool (as oppose to displaying the error with the field in question) it does help with gaining a AAA accessibility rating.
+
 To view the server side error messages (for styling) you may wish to switch off client side validation. Fortunately HTML5 gives us an easy way to do this, just add the `novalidate` attribute to the form:
 
     <form action='/contact' method='POST' novalidate>
@@ -263,23 +260,127 @@ To view the server side error messages (for styling) you may wish to switch off 
 
 ### Messages 
 
-Labels, placeholders, hints and validation messages are all customisable.
+Labels, placeholders, hints and validation messages are all customisable through messages. Messages boil down to a simple key / value map of strings on `FormBean`.
 
-messages looked for in pod, filename
+You may add to this map manually:
 
-add dir to res!
+    formBean.messages["field.firstName.label"] = "Christian Name:"
 
-form field
+Or you may use property files, which is usually easier. FormBean will look in your pod for a property file named after your form bean. Example, if your form bean is called `MyFormModel` then you would create a pod file called `MyFormModel.properies`. In there, you list all the messages specific to that bean.
 
-@htmlinput facet formbean.msgs properites file defauly toDisplayName
+The advantage of a property file is that it succinctly groups all the messages for a specific bean together in one easily recognisable place.
+
+Note that the properties file may lie anywhere but *must* be declared in a resource directory in the project's `build.fan`.
+
+    resDirs = [`fan/entities/MyFormModel.properies`]
+
+or
+
+    resDirs = [`fan/entities/`]
+
+#### Field Messages 
+
+Labels, placeholders and hints all have dedicated attributes on the `@HtmlInput` facet. If these are `null` then the messages map is consulted with the keys:
+
+    field.#NAME.label
+    field.#NAME.placeholder
+    field.#NAME.hint
+
+where `#NAME` is the name of the field. If label value can not be found then it defaults to `field.name.toDisplayName()`.
+
+#### Validation Messages 
+
+Validation messages are looked up with the key:
+
+    field.#NAME.#VALIDATION
+
+where `#NAME` is the name of the field and `#VALIDATION` is the validation type / attribute name. Example:
+
+    field.age.min = "Sorry, but you're not old enough for this ride!"
+
+All occurrences of the strings `${label}`, `${constraint}`, and `${value}` are replaced with appropriate values.
+
+    field.age.min = "Sorry kid, you need to be at least ${constraint} for this ride!"
+
+If a field specific message is not found then the key `field.#VALIDATION` is looked up.
+
+#### Defaults 
+
+In FormBean v0.0.2 the default messages are:
+
+    errors.banner       = Correct the following errors before continuing:
+    
+    field.required      = ${label} is required
+    field.minLength     = ${label} should be at least ${constraint} characters
+    field.maxLength     = ${label} should be at most ${constraint} characters
+    field.notNum        = ${label} should be a whole number
+    field.min           = ${label} should be at least ${constraint}
+    field.max           = ${label} should be at most ${constraint}
+    field.regex         = ${label} does not match the pattern ${constraint}
+    
+    field.submit.label  = Submit
 
 ### Skins 
 
-Default skin renders the following:
+Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement [InputSkin](http://repo.status302.com/doc/afFormBean/InputSkin.html).
 
-    <div class='formBean-row submitRow'>
-      <input type='submit' name='formBeanSubmit' class='submit' value='label'>
-    </div>
+Skins may be set on the `FormField` directly for a specific field:
 
-### Select Boxes
+    formBean.formFields[MyFormModel#field1].inputSkin = MySkin()
+
+Or they may be contributed to the `InputSkins` service where they are used by default for that specific type:
+
+    @Contribute { serviceType=InputSkins# }
+    static Void contributeInputSkins(Configuration config) {
+        config["custom"] = MySkin()
+    }
+    
+    // then on your form bean field:
+    @HtmlInput { type="custom" }
+    Str myValue
+
+Skins make it easy to render custom markup for date pickers.
+
+> **TIP:** Use [Duvet](http://www.fantomfactory.org/pods/duvet) in your skins to inject field specific javascript.
+
+For dates, I personally like to use [Bootstrap Datepicker](http://bootstrap-datepicker.readthedocs.org/en/release/index.html) - shame it's now [abandonware](https://github.com/eternicode/bootstrap-datepicker/issues/963).
+
+### Select Boxes 
+
+HTML `<select>` elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the `<option>` tags too! And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
+
+FormBean's default skin for `select` uses [OptionsProviders](http://repo.status302.com/doc/afFormBean/OptionsProvider.html) to provide the options to be rendered. Like `InputSkins` an `OptionsProvider` may be set on the `FormField` directly for a specific field:
+
+    formBean.formFields[MyFormModel#field1].optionsProvider = MyOptions()
+
+Or they may be contributed to the `OptionsProviders` service where they are used by default for that specific field type:
+
+    @Contribute { serviceType=OptionsProviders# }
+    static Void contributeOptionsProviders(Configuration config) {
+        config[MyValue#] = MyOptions()
+    }
+    
+    // then on your form bean field:
+    @HtmlInput
+    MyValue myValue
+
+The method `OptionsProvider.options()` returns a map of option values. The values are converted to strings via the usual `ValueEncoder` service in the same way as the select value. The keys of the map are used as message keys in the format:
+
+    option.#KEY.label
+
+If not found then the key itself is used as the option label.
+
+Note that a default `OptionsProvider` is already given for `Enums`. So to render a Enum field as a select element with custom display labels:
+
+    enum class Colours {
+        red, blue 
+    }
+    
+    // then on your form bean field:
+    @HtmlInput { type="select" }
+    Colours colour
+    
+    // then in your bean.properties:
+    option.red.label  = Roses are red
+    option.blue.label = Violets are blue
 

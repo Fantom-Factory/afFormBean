@@ -13,6 +13,6 @@ internal const class BoolEncoder : ValueEncoder {
 	override Obj? toValue(Str clientValue) {
 		if (clientValue.isEmpty)
 			return null
-		return (boolPatterns.index(clientValue.lower.trim) % 2) == 0
+		return (boolPatterns.index(clientValue.lower.trim) % 2) == 0	// defaults to false if value not listed
 	}
 }
