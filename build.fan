@@ -5,14 +5,14 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "A library to render Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("0.0.2")
+		version = Version("0.0.3")
 
 		meta = [
 			"proj.name"		: "FormBean",	
 			"afIoc.module"	: "afFormBean::FormBeanModule",
 			"internal"		: "true",			
 			"tags"			: "web",
-			"repo.private"	: "false"
+			"repo.private"	: "true"
 		]
 
 		index	= [	
