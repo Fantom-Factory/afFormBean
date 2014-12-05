@@ -79,7 +79,7 @@ class ContactUsPage  {
     Text onContact() {
         // perform server side validation
         // if invalid, re-render the page and show the errors
-        if (!formBean.validateBean(httpRequest.form))
+        if (!formBean.validateForm(httpRequest.form))
             return render
         
         // create an instance of our form object
