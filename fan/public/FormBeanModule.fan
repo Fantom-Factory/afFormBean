@@ -1,7 +1,5 @@
-using afPlastic
 using afIoc
 using afBedSheet
-using afEfanXtra
 
 @NoDoc
 const class FormBeanModule {
@@ -53,25 +51,5 @@ const class FormBeanModule {
 	@Contribute { serviceType=DependencyProviders# }
 	static Void contributeDependencyProviders(Configuration config) {
 		config.set("afFormBean.formBeanProvider", config.autobuild(FormBeanProvider#)).before("afIoc.serviceProvider")
-	}
-
-	@Contribute { serviceType=ComponentCompiler# }
-	static Void contributeComponentCompilerCallbacks(Configuration config) {
-		config["afFormBean"] = |Type comType, PlasticClassModel model| {
-			comType.fields.each |field| {
-				if (field.type.fits(FormBean#)) {
-					inject	:= (Inject) Slot#.method("facet").callOn(field, [Inject#])	// Stoopid F4
-					getCode :=	
-								"""formBean := _efan_comCtxMgr.peek.getVariable(${field.name.toCode})
-								   if (formBean == null) {
-								   	formBean = _afFormBean_registry.autobuild(afFormBean::FormBean#, [${inject.type.qname}#])
-								   	_efan_comCtxMgr.peek.setVariable(${field.name.toCode}, formBean)
-								   }
-								   return formBean"""					
-					model.overrideField(field, getCode, """throw Err("You can not set @Inject'ed fields: ${field.qname}")""")
-					model.addField(Registry#, "_afFormBean_registry").addFacet(Inject#)
-				}
-			}
-		}		
 	}
 }

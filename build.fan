@@ -5,14 +5,14 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "A library to render Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("0.0.3")
+		version = Version("0.0.4")
 
 		meta = [
 			"proj.name"		: "FormBean",	
 			"afIoc.module"	: "afFormBean::FormBeanModule",
 			"internal"		: "true",			
 			"tags"			: "web",
-			"repo.private"	: "true"
+			"repo.private"	: "false"
 		]
 
 		index	= [	
@@ -25,13 +25,11 @@ class Build : BuildPod {
 
 			// ---- Core ------------------------
 			"afBeanUtils  1.0.4  - 1.0",
-			"afPlastic    1.0.16 - 1.0",	// for EfanXtra FormBean provider
-			"afConcurrent 1.0.6  - 1.0",	// for CachingTypeLookup / OptionsProviders
-			"afIoc        2.0.0  - 2.0",
+			"afConcurrent 1.0.8  - 1.0",	// for CachingTypeLookup / OptionsProviders
+			"afIoc        2.0.2  - 2.0",
 			
 			// ---- Web -------------------------
-			"afBedSheet   1.4.0  - 1.4",			
-			"afEfanXtra   1.1.18 - 1.1",
+			"afBedSheet   1.4.2  - 1.4"
 
 			// ---- Test ------------------------
 //			"afBounce     1.0.18 - 1.0",

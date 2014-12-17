@@ -1,6 +1,5 @@
 using afIoc
 using afBedSheet
-using afEfanXtra
 using afFormBean
 
 class ContactUsPage  {
@@ -36,7 +35,7 @@ class ContactUsPage  {
     Text onContact() {
         // perform server side validation
         // if invalid, re-render the page and show the errors
-        if (!formBean.validateBean(httpRequest.form))
+        if (!formBean.validateForm(httpRequest.form))
             return render
         
         // create an instance of our form object
@@ -70,7 +69,7 @@ class ContactDetails {
 }
 
 // @SubModule only needed because this example is run as a script
-@SubModule { modules=[EfanXtraModule#, FormBeanModule#] }
+@SubModule { modules=[FormBeanModule#] }
 class AppModule {
     @Contribute { serviceType=Routes# }
     static Void contributeRoutes(Configuration conf) {
