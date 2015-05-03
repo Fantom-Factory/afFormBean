@@ -26,7 +26,7 @@ class Build : BuildPod {
 			// ---- Core ------------------------
 			"afBeanUtils  1.0.4  - 1.0",
 			"afConcurrent 1.0.8  - 1.0",	// for CachingTypeLookup / OptionsProviders
-			"afIoc        2.0.2  - 2.0",
+			"afIoc        2.0.7  - 2.0",
 			
 			// ---- Web -------------------------
 			"afBedSheet   1.4.2  - 1.4"

@@ -50,6 +50,6 @@ const class FormBeanModule {
 
 	@Contribute { serviceType=DependencyProviders# }
 	static Void contributeDependencyProviders(Configuration config) {
-		config.set("afFormBean.formBeanProvider", config.autobuild(FormBeanProvider#)).before("afIoc.serviceProvider")
+		config["afFormBean.formBeanProvider"] = config.autobuild(FormBeanProvider#)
 	}
 }

@@ -7,7 +7,12 @@ internal const class FormBeanProvider : DependencyProvider {
 	new make(|This| in) { in(this) }
 	
 	override Bool canProvide(InjectionCtx injectionCtx) {
-		injectionCtx.dependencyType.fits(FormBean#) && !injectionCtx.fieldFacets.findType(Inject#).isEmpty
+//		return injectionCtx.dependencyType.fits(FormBean#) && !injectionCtx.fieldFacets.findType(Inject#).isEmpty
+		
+		if (injectionCtx.dependencyType.fits(FormBean#))
+			if (!injectionCtx.fieldFacets.findType(Inject#).isEmpty)
+				return true
+		return false
 	}
 
 	override Obj? provide(InjectionCtx injectionCtx) {
