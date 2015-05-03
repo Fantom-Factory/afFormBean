@@ -1,4 +1,10 @@
-## Overview 
+#FormBean v0.0.4
+---
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
+[![pod: v0.0.4](http://img.shields.io/badge/pod-v0.0.4-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
+
+## Overview
 
 *FormBean is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
@@ -18,7 +24,7 @@ Current limitations:
 - Maps, Lists and nested objects are not supported.
 - Radioboxes are not natively supported.
 
-## Install 
+## Install
 
 Install `FormBean` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
@@ -28,11 +34,11 @@ To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan
 
     depends = ["sys 1.0", ..., "afFormBean 0.0"]
 
-## Documentation 
+## Documentation
 
 Full API & fandocs are available on the [Status302 repository](http://repo.status302.com/doc/afFormBean/).
 
-## Quick Start 
+## Quick Start
 
 1). Create a text file called `Example.fan`
 
@@ -44,12 +50,12 @@ using afFormBean
 class ContactUsPage  {
     @Inject
     HttpRequest httpRequest
-    
-    @Inject { type=ContactDetails# } 
+
+    @Inject { type=ContactDetails# }
     FormBean formBean
-    
+
     new make(|This|in) { in(this) }
-    
+
     Text render() {
         Text.fromHtml(
             "<!DOCTYPE html>
@@ -61,7 +67,7 @@ class ContactUsPage  {
              <body>
                  <h2>Contact Us</h2>
                  <span class='requiredNotification'>* Denotes Required Field</span>
-             
+
                  <form class='contactForm' action='/contact' method='POST'>
                      ${ formBean.renderErrors()   }
                      ${ formBean.renderBean(null) }
@@ -76,16 +82,16 @@ class ContactUsPage  {
         // if invalid, re-render the page and show the errors
         if (!formBean.validateForm(httpRequest.form))
             return render
-        
+
         // create an instance of our form object
         contactDetails := (ContactDetails) formBean.createBean
-        
+
         echo("Contact made!")
         echo(" - name:    ${contactDetails.name}")
         echo(" - email:   ${contactDetails.email}")
         echo(" - website: ${contactDetails.website}")
         echo(" - message: ${contactDetails.message}")
-        
+
         // display a simple message
         return Text.fromPlain("Thank you ${contactDetails.name}, we'll be in touch.")
     }
@@ -100,7 +106,7 @@ class ContactDetails {
 
     @HtmlInput { type="url"; required=true; placeholder="http://www.example.com"; hint="Proper format 'http://someaddress.com'" }
     Str website
-    
+
     @HtmlInput { type="textarea"; required=true; attributes="rows='6'"}
     Str message
 
@@ -114,7 +120,7 @@ class AppModule {
     static Void contributeRoutes(Configuration conf) {
         conf.add(Route(`/`, ContactUsPage#render))
         conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
-        
+
         // to save you typing in a stylesheet, we'll just redirect to one I made earlier
         // conf.add(Route(`/styles.css`, `styles.css`.toFile))
         conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://static.alienfactory.co.uk/fantom-docs/afFormBean-quickStart.css`)))
@@ -169,19 +175,19 @@ Contact made!
  - message: Hello Mum!
 ```
 
-## Usage 
+## Usage
 
-### To and From HTML Forms 
+### To and From HTML Forms
 
 HTML forms are the backbone of data entry in any web application. It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form. We call such objects *form beans*. The [FormBean](http://repo.status302.com/doc/afFormBean/FormBean.html) class then does the necessary hard work of converting form beans to HTML and back again.
 
 `FormBeans` should be autobuilt by IoC, passing in the type of object it should model.
 
-    formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#]) 
+    formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#])
 
 Or, as in the quick start example, you can `@Inject` a `FormBean` instance as a field using the `type` facet attribute:
 
-    @Inject { type=MyFormModel# } 
+    @Inject { type=MyFormModel# }
     FormBean formBean
 
 When created, a `FormBean` inspects the given type looking for fields annotated with [@HtmlInput](http://repo.status302.com/doc/afFormBean/HtmlInput.html). For each field found it creates a [FormField](http://repo.status302.com/doc/afFormBean/FormField.html) instance. `FormFields` hold all the information required to render the field as HTML, and convert it back again.
@@ -198,13 +204,13 @@ The standard template to render a HTML input looks like:
         <div class="formBean-hint">#HINT</div>
     </div>
 
-(Note that the hint `div` is only rendered if hint is non-null.) See [Input Skins](http://repo.status302.com/doc/afFormBean/#skins.html) if you wish to render your own bespoke HTML.
+(Note that the hint `div` is only rendered if hint is non-null.) See [Input Skins](#skins) if you wish to render your own bespoke HTML.
 
 When the HTML form is submitted to the server, use `FormBean.createBean()` to convert the submitted form values into a form bean instance.
 
 Sometimes you don't always want to create a fresh form bean instance. For instance, your beans may be entities in a database and only some of the fields may be editable. In that case, upon form submission, retrieve a bean instance from the database and call `FormBean.updateBean()` to do just that.
 
-### ValueEncoders 
+### ValueEncoders
 
 Representing values as strings (to be rendered as HTML) is not always as obvious as calling `toStr()`. For instance, what about printing and formatting dates? On form submission, if a user leaves an input blank, should that be converted to `null` or an empty string?
 
@@ -213,15 +219,15 @@ Because there is no right answer for all occasions, FormBean leverages BedSheet'
 A `ValueEncoder` is initially selected based on the type of the form field. This may be overridden by specifying the `ValueEncoder` type on the `@HtmlInput`. (Instances are created and cached by IoC.)
 
     @HtmlInput { valueEncoder=MyValueEncoder# }
-    public MyValue? myValue 
+    public MyValue? myValue
 
 Or you can set an instance directly on the `FormField` itself.
 
-    formBean.formFields[MyFormModel#field1].valueEncoder = MyValueEncoder() 
+    formBean.formFields[MyFormModel#field1].valueEncoder = MyValueEncoder()
 
 Note, FormBean provides a `ValueEncoder` for `Bool` to get around HTML's dodgy `on` / not submitted syntax.
 
-### Validation 
+### Validation
 
 HTML Form validation is boring and tedious at best.
 
@@ -257,7 +263,7 @@ To view the server side error messages (for styling) you may wish to switch off 
         ...
     </form>
 
-### Messages 
+### Messages
 
 Labels, placeholders, hints and validation messages are all customisable through messages. Messages boil down to a simple key / value map of strings on `FormBean`.
 
@@ -277,7 +283,7 @@ or
 
     resDirs = [`fan/entities/`]
 
-#### Field Messages 
+#### Field Messages
 
 Labels, placeholders and hints all have dedicated attributes on the `@HtmlInput` facet. If these are `null` then the messages map is consulted with the keys:
 
@@ -287,7 +293,7 @@ Labels, placeholders and hints all have dedicated attributes on the `@HtmlInput`
 
 where `#NAME` is the name of the field. If label value can not be found then it defaults to `field.name.toDisplayName()`.
 
-#### Validation Messages 
+#### Validation Messages
 
 Validation messages are looked up with the key:
 
@@ -303,7 +309,7 @@ All occurrences of the strings `${label}`, `${constraint}`, and `${value}` are r
 
 If a field specific message is not found then the key `field.#VALIDATION` is looked up.
 
-#### Defaults 
+#### Defaults
 
 In FormBean v0.0.2 the default messages are:
 
@@ -319,7 +325,7 @@ In FormBean v0.0.2 the default messages are:
     
     field.submit.label  = Submit
 
-### Skins 
+### Skins
 
 Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement [InputSkin](http://repo.status302.com/doc/afFormBean/InputSkin.html).
 
@@ -340,11 +346,11 @@ Or they may be contributed to the `InputSkins` service where they are used by de
 
 Skins make it easy to render custom markup for date pickers.
 
-> **TIP:** Use [Duvet](http://www.fantomfactory.org/pods/duvet) in your skins to inject field specific javascript.
+> **TIP:** Use [Duvet](http://www.fantomfactory.org/pods/afDuvet) in your skins to inject field specific javascript.
 
 For dates, I personally like to use [Bootstrap Datepicker](http://bootstrap-datepicker.readthedocs.org/en/release/index.html) - shame it's now [abandonware](https://github.com/eternicode/bootstrap-datepicker/issues/963).
 
-### Select Boxes 
+### Select Boxes
 
 HTML `<select>` elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the `<option>` tags too! And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
 
@@ -372,7 +378,7 @@ If not found then the key itself is used as the option label.
 Note that a default `OptionsProvider` is already given for `Enums`. So to render a Enum field as a select element with custom display labels:
 
     enum class Colours {
-        red, blue 
+        red, blue
     }
     
     // then on your form bean field:
