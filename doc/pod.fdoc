@@ -434,6 +434,11 @@ Note that a default 'OptionsProvider' is already given for 'Enums'. So to render
 
 Release Notes [#releaseNotes]
 *****************************
+v0.0.6 [#v0.0.6]
+================
+ - New: Customisable 'ErrorSkin' for form errors.
+ - New: Added 'SkinCtx.renderAttributes()'
+
 v0.0.4 [#v0.0.4]
 ================
  - Chg: Removed dependency on efanXtra.

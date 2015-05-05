@@ -16,7 +16,7 @@
 ** 
 **   @Contribute { serviceType=InputSkins# }
 **   static Void contributeInputSkins(Configuration config) {
-**       config.overrideValue("text", "text", MyTextSkin())
+**       config.overrideValue("text", MyTextSkin())
 **   }
 ** 
 const mixin InputSkin {
