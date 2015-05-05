@@ -59,4 +59,41 @@ class SkinCtx {
 		strVal := (formField.valueEncoder != null) ? formField.valueEncoder.toClient(value) : valueEncoders.toClient(field.type, value)
 		return strVal.toXml
 	}
+	
+	** Returns a rendered string of common attributes to be placed in the <input> HTML tag.
+	** Note the string does *not* contain the 'type' or 'value' attributes as these are dependent on the input type.
+	** 
+	** The given 'extraAttributes' are merged in, allowing you to pass in extra css styles:
+	** 
+	**   attrs := skinCtx.renderAttributes(["class" : "hot-pink"])
+	** 
+	** Note that empty string values are rendered as HTML5 empty attributes.     
+	Str renderAttributes([Str:Str]? extraAttributes := null) {
+		attrs	:= Str:Str?[:] { it.ordered = true }
+		attrs["id"]				= name
+		attrs["class"]			= input.css
+		attrs["name"]			= name
+		attrs["placeholder"]	= input.placeholder ?: msg("field.${name}.placeholder")
+		attrs["minLength"]		= input.minLength?.toStr
+		attrs["maxlength"]		= input.maxLength?.toStr
+		attrs["min"]			= input.min?.toStr
+		attrs["max"]			= input.max?.toStr
+		attrs["step"]			= input.step?.toStr
+		attrs["pattern"]		= input.pattern
+		attrs["required"]		= input.required ? "" : null
+		
+		if (input.minLength != null && input.pattern == null)
+			attrs["pattern"]	= ".{${input.minLength},}"
+		
+		extraAttributes?.each |v, k| {
+			attrs[k] = (attrs[k] == null) ? v : attrs[k] + " " + v 
+		}
+
+		// TODO: merge or override these attributes with what's just been processed
+		// - don't blindly render the same attribute twice
+		// - use Pegger to parse
+		extra := (input.attributes == null) ? "" : " ${input.attributes}"
+
+		return attrs.exclude { it == null }.join(" ") |v, k| { v.isEmpty ? k : "${k}=\"${v.toXml}\"" } + extra
+	}
 }

@@ -1,5 +1,6 @@
 using afIoc
 using afBedSheet
+using web
 
 @NoDoc
 abstract const class DefaultInputSkin : InputSkin {
@@ -17,56 +18,25 @@ abstract const class DefaultInputSkin : InputSkin {
 		return html
 	}
 	
-	Str attributes(SkinCtx skinCtx) {
-		input	:= skinCtx.input
-		pholder	:= skinCtx.input.placeholder ?: skinCtx.msg("field.${skinCtx.name}.placeholder")
-		attrs	:= "id=\"${skinCtx.name}\" name=\"${skinCtx.name}\""
-		if (input.css != null)
-			attrs += " class=\"${input.css}\""
-		if (pholder != null)
-			attrs += " placeholder=\"${pholder}\""
-		if (input.minLength != null)
-			attrs += " minlength=\"${input.minLength}\" pattern=\".{${input.minLength},}\""
-		if (input.maxLength != null)
-			attrs += " maxlength=\"${input.maxLength}\""
-		if (input.min != null)
-			attrs += " min=\"${input.min}\""
-		if (input.max != null)
-			attrs += " max=\"${input.max}\""
-		if (input.step != null)
-			attrs += " step=\"${input.step}\""
-		if (input.pattern != null)
-			attrs += " pattern=\"${input.pattern.toXml}\""
-		if (input.required)
-			attrs += " required"
-		
-		// TODO: merge or override these attributes with what's just been processed
-		// - don't blindly render the same attribute twice
-		// - use Pegger to parse
-		if (input.attributes != null)
-			attrs += " ${input.attributes}"
-		return attrs
-	}
-	
 	abstract Str renderElement(SkinCtx skinCtx)
 }
 
 internal const class TextInputSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
-		"""<input type="${skinCtx.input.type}" ${attributes(skinCtx)} value="${skinCtx.value}">"""
+		"""<input type="${skinCtx.input.type}" ${skinCtx.renderAttributes} value="${skinCtx.value}">"""
 	}	
 }
 
 internal const class TextAreaSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
-		"""<textarea ${attributes(skinCtx)}>${skinCtx.value}</textarea>"""
+		"""<textarea ${skinCtx.renderAttributes}>${skinCtx.value}</textarea>"""
 	}	
 }
 
 internal const class CheckboxSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
 		checked := (skinCtx.value == "true" || skinCtx.value == "on") ? " checked" : Str.defVal
-		return """<input type="checkbox" ${attributes(skinCtx)}${checked}>"""
+		return """<input type="checkbox" ${skinCtx.renderAttributes}${checked}>"""
 	}
 }
 
@@ -77,7 +47,7 @@ internal const class SelectSkin : DefaultInputSkin {
 	new make(|This| in) { in(this) }
 	
 	override Str renderElement(SkinCtx skinCtx) {
-		html	:= "<select ${attributes(skinCtx)}>"
+		html	:= "<select ${skinCtx.renderAttributes}>"
 
 		optionsProvider := skinCtx.formField.optionsProvider ?: optionsProviders.find(skinCtx.field.type)
 
@@ -96,5 +66,31 @@ internal const class SelectSkin : DefaultInputSkin {
 
 		html	+= "</select>"
 		return html
+	}
+}
+
+internal const class DefaultErrorSkin : ErrorSkin {
+	
+	override Str render(FormBean formBean) {
+		if (!formBean.hasErrors) return Str.defVal
+		buf := StrBuf()
+		out := WebOutStream(buf.out)
+
+		// TODO: look for errors.BEANNAME.banner
+		out.div("class='formBean-errors'")
+		out.div("class='formBean-banner'").w(formBean.messages["errors.banner"]).divEnd
+		out.ul
+		
+		// don't encode err msgs, let the user specify HTML
+		formBean.errorMsgs.each { 
+			out.li.w(it).liEnd			
+		}
+		formBean.formFields.vals.each {
+			if (it.errMsg != null)
+				out.li.w(it.errMsg).liEnd
+		}
+		out.ulEnd
+		out.divEnd
+		return buf.toStr
 	}
 }

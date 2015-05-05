@@ -5,6 +5,8 @@ using web
 
 ** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
+	@Inject { optional = true}
+			private const	ErrorSkin?		errorSkin
 	@Inject private const	Registry		registry
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
@@ -53,7 +55,8 @@ class FormBean {
 		}
 	}
 	
-	** Renders form field errors (if any) to an unordered list:
+	** Renders form field errors (if any) to an unordered list.
+	** Delegates to a default instance of 'ErrorSkin' which renders the following HTML:
 	** 
 	**   <div class='formBean-errors'>
 	**       <div class='formBean-banner'>#BANNER</div>
@@ -65,26 +68,7 @@ class FormBean {
 	** 
 	** To change the banner message, set a message with the key 'errors.banner'.
 	Str renderErrors() {
-		if (!hasErrors) return Str.defVal
-		buf := StrBuf()
-		out := WebOutStream(buf.out)
-
-		// TODO: look for errors.BEANNAME.banner
-		out.div("class='formBean-errors'")
-		out.div("class='formBean-banner'").w(_msg("errors.banner")).divEnd
-		out.ul
-		
-		// don't encode err msgs, let the user specify HTML
-		errorMsgs.each { 
-			out.li.w(it).liEnd			
-		}
-		&formFields.vals.each {
-			if (it.errMsg != null)
-				out.li.w(it.errMsg).liEnd
-		}
-		out.ulEnd
-		out.divEnd
-		return buf.toStr 
+		((ErrorSkin) (errorSkin ?: DefaultErrorSkin())).render(this)
 	}
 
 	** Renders the form bean to a HTML form.
