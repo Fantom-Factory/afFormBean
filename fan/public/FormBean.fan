@@ -73,6 +73,8 @@ class FormBean {
 	** If the given 'bean' is 'null' then values are taken from the form fields. 
 	** Do so if you're re-rendering a form with validation errors.
 	Str renderBean(Obj? bean) {
+		if (!bean.typeof.fits(beanType))
+			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		inErr	:= hasErrors
 		html	:= Str.defVal
 		&formFields.each |formField, field| {
@@ -172,6 +174,8 @@ class FormBean {
 	** 
 	** Any extra properties passed in will also be set.
 	Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
+		if (!bean.typeof.fits(beanType))
+			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		beanProps := _gatherBeanProperties(extraProps)
 
 		reg := registry
@@ -179,7 +183,9 @@ class FormBean {
 			it.makeFunc	 = |Type type->Obj| { IocBeanFactory(reg, type).create }.toImmutable
 		}
 		beanProps.each |value, expression| {
-			factory.parse(expression).set(bean, value)
+			// value is null if it wasn't submitted - therefore don't try to set it
+			if (value != null)
+				factory.parse(expression).set(bean, value)
 		}
 		return bean
 	}
