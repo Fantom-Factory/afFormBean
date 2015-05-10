@@ -8,8 +8,9 @@ class FormField {
 	Field				field
 
 	** The 'Str' value that will be rendered in the HTML form. 
-	** If 'null' then the field value is converted by the 'valueEncoder'.
 	** You may set this value before the form is rendered to set a default value.
+	** 
+	** If the 'formValue' is 'null' then the field value is used instead and converted by 'valueEncoder'.
 	** 
 	** This 'formValue' is also set during form validation so any user entered values are re-rendered should the form be re-displayed.   
 	Str?				formValue

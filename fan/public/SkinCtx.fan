@@ -24,7 +24,7 @@ class SkinCtx {
 	** Returns the preferred string value to be rendered in the '<input>'. 
 	Str value() {
 		// if bean is null, check the formValue - we may have set a default!
-		value := bean == null ? formField?.formValue : field.get(bean)
+		value := (bean == null) ? formField?.formValue : field.get(bean)
 		// if the bean has *any* errors, always render the formValues
 		return inErr ? (formField?.formValue ?: Str.defVal) : toClient(value)
 	}

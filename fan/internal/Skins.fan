@@ -76,9 +76,9 @@ internal const class DefaultErrorSkin : ErrorSkin {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		// TODO: look for errors.BEANNAME.banner
+		banner := (formBean.messages["errors.${formBean.beanType.name}.banner"] ?: formBean.messages["errors.${formBean.beanType.name.decapitalize}.banner"]) ?: formBean.messages["errors.banner"]
 		out.div("class='formBean-errors'")
-		out.div("class='formBean-banner'").w(formBean.messages["errors.banner"]).divEnd
+		out.div("class='formBean-banner'").w(banner).divEnd
 		out.ul
 		
 		// don't encode err msgs, let the user specify HTML
