@@ -5,8 +5,6 @@ using web
 
 ** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
-	@Inject { optional = true}
-			private const	ErrorSkin?		errorSkin
 	@Inject private const	Registry		registry
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
@@ -16,6 +14,10 @@ class FormBean {
 					const	Type			beanType
 	
 	** The message map used to find strings for labels, placeholders, hints, and validation errors.  
+	** Messages are read from (and overridden by) the following pod resource files: 
+	**  - '<beanType.name>.properties' 
+	**  - 'FormBean.properties'
+	** Note that property files must be in the same pod as the defining bean. 
 							Str:Str 		messages	:= Str:Str[:] { caseInsensitive=true }
 	
 	** The form fields that make up this form bean.
@@ -26,17 +28,21 @@ class FormBean {
 	** They will be rendered along with the form field error messages.
 							Str[] 			errorMsgs	:= Str[,]
 	
+	** The 'ErrorSkin' used to render error messages.
+	@Inject { optional = true}
+							ErrorSkin?		errorSkin
+	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
 		this.beanType = beanType
 		
 		try {
 			// set messages
-			// TODO: use Fantom's locale lookup
-			formMsgs := typeof  .pod.files.find { it.name == "FormBean.properties"         } .readProps
-			// TODO: lookup "FormBean.properties" in user pod to override default err messages
-			beanMsgs := beanType.pod.files.find { it.name == "${beanType.name}.properties" }?.readProps
-			this.messages.setAll(formMsgs).setAll(beanMsgs ?: [:])
+			// TODO: use Fantom's locale lookup... somehow
+			defaultMsgs  := typeof  .pod.files.find { it.name == "FormBean.properties"			} .readProps
+			formBeanMsgs := beanType.pod.files.find { it.name == "FormBean.properties"			}?.readProps ?: [:]
+			beanTypeMsgs := beanType.pod.files.find { it.name == "${beanType.name}.properties"	}?.readProps ?: [:]
+			this.messages.setAll(defaultMsgs).setAll(formBeanMsgs).setAll(beanTypeMsgs)
 		} catch {
 			// Guard against being run in a script - an Err is thrown when not backed by a pod file
 		}

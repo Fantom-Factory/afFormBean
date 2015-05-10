@@ -345,9 +345,9 @@ If a field specific message is not found then the key 'field.#VALIDATION' is loo
 
 Defaults [#defaults]
 --------------------
-In FormBean v0.0.2 the default messages are:
+The default FormBean messages are:
 
-  errors.banner       = Correct the following errors before continuing:
+  errors.banner       = There were problems with the submitted data:
 
   field.required      = ${label} is required
   field.minLength     = ${label} should be at least ${constraint} characters

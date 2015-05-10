@@ -25,6 +25,9 @@ facet class HtmlInput {
 	const Str?	css
 	
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
+	** Example:
+	** 
+	**   attributes = "autocomplete='off'"
 	const Str?	attributes
 	
 	** The 'ValueEncoder' (type) used to convert the field value to and from a 'Str'.

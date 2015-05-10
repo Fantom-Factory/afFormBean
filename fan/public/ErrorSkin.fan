@@ -17,7 +17,7 @@
 **       </ul>
 **   </div>
 ** 
-** To change the banner message, set a message with the key 'errors.banner'.
+** To change the banner message, set a message with the key 'errors.<beanType.name>.banner' or 'errors.banner'.
 const mixin ErrorSkin {
 	
 	** Renders form bean errors to HTML.
