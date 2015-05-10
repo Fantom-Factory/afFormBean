@@ -9,6 +9,7 @@ class FormBean {
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
 	@Inject private const	ValueEncoders 	valueEncoders
+	@Inject private const	Messages		_messages
 	
 	** The bean type this 'FormBean' represents.
 					const	Type			beanType
@@ -35,19 +36,9 @@ class FormBean {
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
 		this.beanType = beanType
-		
-		try {
-			// set messages
-			// TODO: use Fantom's locale lookup... somehow
-			defaultMsgs  := typeof  .pod.files.find { it.name == "FormBean.properties"			} .readProps
-			formBeanMsgs := beanType.pod.files.find { it.name == "FormBean.properties"			}?.readProps ?: [:]
-			beanTypeMsgs := beanType.pod.files.find { it.name == "${beanType.name}.properties"	}?.readProps ?: [:]
-			this.messages.setAll(defaultMsgs).setAll(formBeanMsgs).setAll(beanTypeMsgs)
-		} catch {
-			// Guard against being run in a script - an Err is thrown when not backed by a pod file
-		}
-
 		in(this)	// need the objCache
+
+		this.messages = _messages.getMessages(beanType)
 		
 		// create formfields with default values
 		beanType.fields.findAll { it.hasFacet(HtmlInput#) }.each |field| {

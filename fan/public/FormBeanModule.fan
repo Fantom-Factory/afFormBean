@@ -7,6 +7,7 @@ const class FormBeanModule {
 	static Void defineServices(ServiceDefinitions defs) {
 		defs.add(InputSkins#)
 		defs.add(OptionsProviders#)
+		defs.add(Messages#)
 	}
 	
 	@Contribute { serviceType=InputSkins# }

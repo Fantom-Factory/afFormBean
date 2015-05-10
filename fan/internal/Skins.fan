@@ -76,7 +76,7 @@ internal const class DefaultErrorSkin : ErrorSkin {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		banner := (formBean.messages["errors.${formBean.beanType.name}.banner"] ?: formBean.messages["errors.${formBean.beanType.name.decapitalize}.banner"]) ?: formBean.messages["errors.banner"]
+		banner := formBean.messages["errors.banner"]
 		out.div("class='formBean-errors'")
 		out.div("class='formBean-banner'").w(banner).divEnd
 		out.ul
