@@ -347,7 +347,7 @@ Defaults [#defaults]
 --------------------
 The default FormBean messages are:
 
-  errors.banner       = There were problems with the submitted data:
+  errors.banner       = There were problems with the form data:
 
   field.required      = ${label} is required
   field.minLength     = ${label} should be at least ${constraint} characters
@@ -385,7 +385,7 @@ Skins make it easy to render custom markup for date pickers.
 
 > **TIP:** Use [Duvet]`pod:afDuvet` in your skins to inject field specific javascript.
 
-For dates, I personally like to use [Bootstrap Datepicker]`http://bootstrap-datepicker.readthedocs.org/en/release/index.html` - shame it's now [abandonware]`https://github.com/eternicode/bootstrap-datepicker/issues/963`.
+For dates, I personally like to use [Bootstrap Datepicker]`http://bootstrap-datepicker.readthedocs.org/en/release/index.html` - see the [DatePicker for FormBean]`http://www.fantomfactory.org/articles/datepicker-for-formbean` article for details.
 
 
 
@@ -436,6 +436,7 @@ Release Notes [#releaseNotes]
 *****************************
 v0.0.6 [#v0.0.6]
 ================
+ - New: Messages are a lot more customisable.
  - New: Customisable 'ErrorSkin' for form errors.
  - New: Added 'SkinCtx.renderAttributes()'
 
