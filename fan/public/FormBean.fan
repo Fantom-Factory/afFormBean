@@ -73,7 +73,7 @@ class FormBean {
 	** If the given 'bean' is 'null' then values are taken from the form fields. 
 	** Do so if you're re-rendering a form with validation errors.
 	Str renderBean(Obj? bean) {
-		if (!bean.typeof.fits(beanType))
+		if (bean != null && !bean.typeof.fits(beanType))
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		inErr	:= hasErrors
 		html	:= Str.defVal
