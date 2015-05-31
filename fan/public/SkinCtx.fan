@@ -5,7 +5,7 @@ class SkinCtx {
 				Obj?			bean
 	const		Field			field
 	internal	FormBean		formBean
-	internal	FormField?		formField
+	internal	FormField		formField
 	internal	Bool			inErr
 	internal	ValueEncoders	valueEncoders
 	
@@ -24,9 +24,9 @@ class SkinCtx {
 	** Returns the preferred string value to be rendered in the '<input>'. 
 	Str value() {
 		// if bean is null, check the formValue - we may have set a default!
-		value := (bean == null) ? formField?.formValue : field.get(bean)
+		value := (bean == null) ? formField.formValue : field.get(bean)
 		// if the bean has *any* errors, always render the formValues
-		return inErr ? (formField?.formValue ?: Str.defVal) : toClient(value)
+		return inErr ? (formField.formValue ?: "") : toClient(value)
 	}
 	
 	** Returns the '@HtmlInput' facet on the field.
@@ -34,9 +34,9 @@ class SkinCtx {
 		Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4		
 	}
 	
-	** Returns 'true' if the field has an error message.
+	** Returns 'true' if the field is invalid. Note that if invalid, the field may not have an error msg.
 	Bool fieldInvalid() {
-		errMsg != null
+		formField.invalid
 	}
 
 	** Returns 'true' if the *bean* is invalid; that is, if *any* field is in error.
@@ -46,7 +46,7 @@ class SkinCtx {
 
 	** Returns the error message associated with this field.
 	Str? errMsg() {
-		formField?.errMsg?.toXml
+		formField.errMsg.toXml
 	}
 	
 	** Returns the message (if any) associated with the given key.

@@ -183,9 +183,8 @@ class FormBean {
 			it.makeFunc	 = |Type type->Obj| { IocBeanFactory(reg, type).create }.toImmutable
 		}
 		beanProps.each |value, expression| {
-			// value is null if it wasn't submitted - therefore don't try to set it
-			if (value != null)
-				factory.parse(expression).set(bean, value)
+			// if a value wasn't submitted, it's not in the list, therefore set all beanProps
+			factory.parse(expression).set(bean, value)
 		}
 		return bean
 	}
@@ -223,10 +222,10 @@ class FormBean {
 				value = false
 
 			// other fields that weren't submitted are also null
-			if (formField.formValue != null)
+			if (formField.formValue != null) {
 				value = (formField.valueEncoder != null) ? formField.valueEncoder.toValue(formField.formValue) : valueEncoders.toValue(field.type, formField.formValue)
-
-			beanProps[field.name] = value
+				beanProps[field.name] = value
+			}
 		}
 
 		if (extraProps != null)
