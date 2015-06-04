@@ -5,14 +5,14 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "Renders Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("0.0.5")
+		version = Version("0.0.4")
 
 		meta = [
 			"proj.name"		: "FormBean",	
 			"afIoc.module"	: "afFormBean::FormBeanModule",
-			"internal"		: "true",			
-			"tags"			: "web",
-			"repo.private"	: "true"
+			"repo.internal"	: "true",			
+			"repo.tags"		: "web",
+			"repo.public"	: "true"
 		]
 
 		index	= [	
@@ -37,7 +37,7 @@ class Build : BuildPod {
 		]
 
 		srcDirs = [`fan/`, `fan/public/`, `fan/internal/`, `fan/advanced/`]
-		resDirs = [`res/`]
+		resDirs = [`doc/`, `res/`]
 	}
 	
 //	override Void compile() {
@@ -47,3 +47,4 @@ class Build : BuildPod {
 //		super.compile
 //	}
 }
+

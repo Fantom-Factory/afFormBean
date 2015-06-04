@@ -7,12 +7,16 @@
 ** Skins may be either be set directly on a form field or contributed to the 'InputSkins' service.
 ** Skins are selected based on the field's '@HtmlInput.type' attribute.
 ** 
+**   syntax: fantom
+** 
 **   @Contribute { serviceType=InputSkins# }
 **   static Void contributeInputSkins(Configuration config) {
 **       config["tinytext"] = TinyTextSkin()
 **   }
 ** 
 ** Default skins are provided for most of the HTML5 input types (text, email, select, etc...) and need to be overriden:
+** 
+**   syntax: fantom
 ** 
 **   @Contribute { serviceType=InputSkins# }
 **   static Void contributeInputSkins(Configuration config) {

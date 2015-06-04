@@ -7,6 +7,8 @@
 ** Options providers may be either be set directly on a form field or contributed to the 'OptionsProviders' service.
 ** Options providers are selected based on the field's type.
 ** 
+**   syntax: fantom
+** 
 **   @Contribute { serviceType=OptionsProviders# }
 **   static Void contributeOptionsProviders(Configuration config) {
 **       config[MyValue#] = MyValueOptionsProvider()

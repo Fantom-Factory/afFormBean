@@ -65,6 +65,7 @@ class SkinCtx {
 	** 
 	** The given 'extraAttributes' are merged in, allowing you to pass in extra css styles:
 	** 
+	**   syntax: fantom
 	**   attrs := skinCtx.renderAttributes(["class" : "hot-pink"])
 	** 
 	** Note that empty string values are rendered as HTML5 empty attributes.     

@@ -1,0 +1,17 @@
+Versions
+********
+
+v0.0.6
+======
+ - New: Messages are a lot more customisable.
+ - New: Customisable 'ErrorSkin' for form errors.
+ - New: Added 'SkinCtx.renderAttributes()'
+
+v0.0.4
+======
+ - Chg: Removed dependency on efanXtra.
+
+v0.0.2
+======
+ - New: Preview release.
+
