@@ -1,7 +1,6 @@
-Overview [#overview]
-********************
-'FormBean' is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects.
-Built on top of [IoC]`pod:afIoc` and [BedSheet]`pod:afBedSheet` 'FormBean' allows you to customise every aspect of your HTML form generation.
+Overview
+********
+FormBean is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects. Built on top of [IoC]`pod:afIoc` and [BedSheet]`pod:afBedSheet` FormBean allows you to customise every aspect of your HTML form generation.
 
 Features:
  - Renders Fantom objects as HTML forms.
@@ -17,148 +16,126 @@ Current limitations:
 
 
 
-Install [#Install]
-******************
-Install '@{project.name}' with the Fantom Repository Manager ( [fanr]`docFanr::Tool.install` ):
+Quick Start
+***********
+1. Create a text file called 'Example.fan'
+    syntax: fantom
 
-  C:\> fanr install -r http://repo.status302.com/fanr/ @{pod.name}
+    using afIoc
+    using afBedSheet
+    using afFormBean
 
-To use in a [Fantom]`http://fantom.org/` project, add a dependency to 'build.fan':
+    class ContactUsPage  {
+        @Inject
+        HttpRequest httpRequest
 
-  depends = ["sys 1.0", ..., "@{pod.name} @{pod.version}"]
+        @Inject { type=ContactDetails# }
+        FormBean formBean
 
+        new make(|This|in) { in(this) }
 
+        Text render() {
+            Text.fromHtml(
+                "<!DOCTYPE html>
+                 <html>
+                 <head>
+                     <title>FormBean Demo</title>
+                     <link rel='stylesheet' href='/styles.css' >
+                 </head>
+                 <body>
+                     <h2>Contact Us</h2>
+                     <span class='requiredNotification'>* Denotes Required Field</span>
 
-Documentation [#documentation]
-******************************
-Full API & fandocs are available on the [Status302 repository]`http://repo.status302.com/doc/@{pod.name}/`.
+                     <form class='contactForm' action='/contact' method='POST'>
+                         ${ formBean.renderErrors()   }
+                         ${ formBean.renderBean(null) }
+                         ${ formBean.renderSubmit()   }
+                     </form>
+                 </body>
+                 </html>")
+        }
 
+        Text onContact() {
+            // perform server side validation
+            // if invalid, re-render the page and show the errors
+            if (!formBean.validateForm(httpRequest.form))
+                return render
 
+            // create an instance of our form object
+            contactDetails := (ContactDetails) formBean.createBean
 
-Quick Start [#quickStart]
-*************************
-1). Create a text file called 'Example.fan'
-pre>
-syntax: fantom
+            echo("Contact made!")
+            echo(" - name:    ${contactDetails.name}")
+            echo(" - email:   ${contactDetails.email}")
+            echo(" - website: ${contactDetails.website}")
+            echo(" - message: ${contactDetails.message}")
 
-using afIoc
-using afBedSheet
-using afFormBean
-
-class ContactUsPage  {
-    @Inject
-    HttpRequest httpRequest
-
-    @Inject { type=ContactDetails# }
-    FormBean formBean
-
-    new make(|This|in) { in(this) }
-
-    Text render() {
-        Text.fromHtml(
-            "<!DOCTYPE html>
-             <html>
-             <head>
-                 <title>FormBean Demo</title>
-                 <link rel='stylesheet' href='/styles.css' >
-             </head>
-             <body>
-                 <h2>Contact Us</h2>
-                 <span class='requiredNotification'>* Denotes Required Field</span>
-
-                 <form class='contactForm' action='/contact' method='POST'>
-                     ${ formBean.renderErrors()   }
-                     ${ formBean.renderBean(null) }
-                     ${ formBean.renderSubmit()   }
-                 </form>
-             </body>
-             </html>")
+            // display a simple message
+            return Text.fromPlain("Thank you ${contactDetails.name}, we'll be in touch.")
+        }
     }
 
-    Text onContact() {
-        // perform server side validation
-        // if invalid, re-render the page and show the errors
-        if (!formBean.validateForm(httpRequest.form))
-            return render
+    class ContactDetails {
+        @HtmlInput { required=true; attributes="placeholder='Fred Bloggs'" }
+        Str name
 
-        // create an instance of our form object
-        contactDetails := (ContactDetails) formBean.createBean
+        @HtmlInput { type="email"; required=true; placeholder="fred.bloggs@example.com"; hint="Proper format 'name@something.com'" }
+        Uri email
 
-        echo("Contact made!")
-        echo(" - name:    ${contactDetails.name}")
-        echo(" - email:   ${contactDetails.email}")
-        echo(" - website: ${contactDetails.website}")
-        echo(" - message: ${contactDetails.message}")
+        @HtmlInput { type="url"; required=true; placeholder="http://www.example.com"; hint="Proper format 'http://someaddress.com'" }
+        Str website
 
-        // display a simple message
-        return Text.fromPlain("Thank you ${contactDetails.name}, we'll be in touch.")
+        @HtmlInput { type="textarea"; required=true; attributes="rows='6'"}
+        Str message
+
+        new make(|This|in) { in(this) }
     }
-}
 
-class ContactDetails {
-    @HtmlInput { required=true; attributes="placeholder='Fred Bloggs'" }
-    Str name
+    // @SubModule only needed because this example is run as a script
+    @SubModule { modules=[FormBeanModule#] }
+    class AppModule {
+        @Contribute { serviceType=Routes# }
+        static Void contributeRoutes(Configuration conf) {
+            conf.add(Route(`/`, ContactUsPage#render))
+            conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
 
-    @HtmlInput { type="email"; required=true; placeholder="fred.bloggs@example.com"; hint="Proper format 'name@something.com'" }
-    Uri email
-
-    @HtmlInput { type="url"; required=true; placeholder="http://www.example.com"; hint="Proper format 'http://someaddress.com'" }
-    Str website
-
-    @HtmlInput { type="textarea"; required=true; attributes="rows='6'"}
-    Str message
-
-    new make(|This|in) { in(this) }
-}
-
-// @SubModule only needed because this example is run as a script
-@SubModule { modules=[FormBeanModule#] }
-class AppModule {
-    @Contribute { serviceType=Routes# }
-    static Void contributeRoutes(Configuration conf) {
-        conf.add(Route(`/`, ContactUsPage#render))
-        conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
-
-        // to save you typing in a stylesheet, we'll just redirect to one I made earlier
-        // conf.add(Route(`/styles.css`, `styles.css`.toFile))
-        conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://static.alienfactory.co.uk/fantom-docs/afFormBean-quickStart.css`)))
+            // to save you typing in a stylesheet, we'll just redirect to one I made earlier
+            // conf.add(Route(`/styles.css`, `styles.css`.toFile))
+            conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.css`)))
+        }
     }
-}
 
-class Main {
-    Int main() {
-        afBedSheet::Main().main([AppModule#.qname, "8069"])
+    class Main {
+        Int main() {
+            afBedSheet::Main().main([AppModule#.qname, "8069"])
+        }
     }
-}
-<pre
 
-2). Run 'Example.fan' as a Fantom script from the command prompt:
-pre>
-C:\> fan Example.fan
+2. Run 'Example.fan' as a Fantom script from the command prompt:
+    C:\> fan Example.fan
 
-[info] [afBedSheet] Starting Bed App 'Example_0::AppModule' on port 8069
-[info] [web] WispService started on port 8069
-[info] [afBedSheet] Found mod 'Example_0::AppModule'
-[info] [afIoc] Adding module definitions from pod 'Example_0'
-[info] [afIoc] Adding module definition for Example_0::AppModule
-[info] [afIoc] Adding module definition for afBedSheet::BedSheetModule
-[info] [afIoc] Adding module definition for afIocConfig::ConfigModule
-[info] [afIoc] Adding module definition for afIocEnv::IocEnvModule
-[info] [afIoc]
-   ___    __                 _____        _
-  / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
- / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
-/_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
-               How do I set a laser pointer to stun? /___/
+    [info] [afBedSheet] Starting Bed App 'Example_0::AppModule' on port 8069
+    [info] [web] WispService started on port 8069
+    [info] [afBedSheet] Found mod 'Example_0::AppModule'
+    [info] [afIoc] Adding module definitions from pod 'Example_0'
+    [info] [afIoc] Adding module definition for Example_0::AppModule
+    [info] [afIoc] Adding module definition for afBedSheet::BedSheetModule
+    [info] [afIoc] Adding module definition for afIocConfig::ConfigModule
+    [info] [afIoc] Adding module definition for afIocEnv::IocEnvModule
+    [info] [afIoc]
+       ___    __                 _____        _
+      / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
+     / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
+    /_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
+                   How do I set a laser pointer to stun? /___/
 
-IoC Registry built in 323ms and started up in 39ms
+    IoC Registry built in 323ms and started up in 39ms
 
-Bed App 'Unknown' listening on http://localhost:8069/
-<pre
+    Bed App 'Unknown' listening on http://localhost:8069/
 
-3). Point your web browser to 'http://localhost:8069/' and you'll see a basic HTML contact form:
+3. Point your web browser to 'http://localhost:8069/' and you'll see a basic HTML contact form:
 
-![Screenshot of the afFormBean Quick Start example]`http://static.alienfactory.co.uk/fantom-docs/afFormBean-quickStart.png`
+  ![Screenshot of the afFormBean Quick Start example]`quickStart.png`
 
 *(Note the pretty styling was lifted from [Bring Your Forms Up to Date With CSS3 and HTML5 Validation]`http://webdesign.tutsplus.com/tutorials/bring-your-forms-up-to-date-with-css3-and-html5-validation--webdesign-4738` )*
 
@@ -175,11 +152,11 @@ pre>
 
 
 
-Usage [#usage]
-**************
+Usage
+*****
 
-To and From HTML Forms [#htmlForms]
-===================================
+To and From HTML Forms
+======================
 HTML forms are the backbone of data entry in any web application.
 It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form.
 We call such objects *form beans*. The `FormBean` class then does the necessary hard work of converting form beans to HTML and back again.
@@ -205,7 +182,7 @@ Note that the '<form>' tag itself is not rendered, giving you more control over 
 
 The standard template to render a HTML input looks like:
 
-  syntax: HTML
+  syntax: html
   <div class='formBean-row inputRow #NAME [ERROR]'>
       <label for="#NAME">#LABEL</label>
       <input type='submit' id='#NAME' name="#NAME" ... >
@@ -221,8 +198,8 @@ In that case, upon form submission, retrieve a bean instance from the database a
 
 
 
-ValueEncoders [#valueEncoders]
-==============================
+ValueEncoders
+=============
 Representing values as strings (to be rendered as HTML) is not always as obvious as calling 'toStr()'. For instance, what about printing and formatting dates?
 On form submission, if a user leaves an input blank, should that be converted to 'null' or an empty string?
 
@@ -244,8 +221,8 @@ Note, FormBean provides a 'ValueEncoder' for 'Bool' to get around HTML's dodgy '
 
 
 
-Validation [#validation]
-========================
+Validation
+==========
 HTML Form validation is boring and tedious at best.
 
 Yes, there are hundreds of javascript form validation frameworks out there, but not one is appropriate for everyone in all situations.
@@ -289,13 +266,14 @@ Fortunately HTML5 gives us an easy way to do this, just add the 'novalidate' att
 
 
 
-Messages [#messages]
-====================
+Messages
+========
 Labels, placeholders, hints and validation messages are all customisable through messages.
 Messages boil down to a simple key / value map of strings on 'FormBean'.
 
 You may add to this map manually:
 
+  syntax: fantom
   formBean.messages["field.firstName.label"] = "Christian Name:"
 
 Or you may use property files, which is usually easier. FormBean will look in your pod for a property file named after your form bean.
@@ -305,16 +283,18 @@ The advantage of a property file is that it succinctly groups all the messages f
 
 Note that the properties file may lie anywhere but *must* be declared in a resource directory in the project's 'build.fan'.
 
+  syntax: fantom
   resDirs = [`fan/entities/MyFormModel.properies`]
 
 or
 
+  syntax: fantom
   resDirs = [`fan/entities/`]
 
 
 
-Field Messages [#fieldMessages]
-------------------------------
+Field Messages
+--------------
 Labels, placeholders and hints all have dedicated attributes on the '@HtmlInput' facet. If these are 'null' then the messages map is consulted with the keys:
 
   field.#NAME.label
@@ -325,27 +305,31 @@ where '#NAME' is the name of the field. If label value can not be found then it 
 
 
 
-Validation Messages [#validationMessages]
------------------------------------------
+Validation Messages
+-------------------
 Validation messages are looked up with the key:
 
   field.#NAME.#VALIDATION
 
 where '#NAME' is the name of the field and '#VALIDATION' is the validation type / attribute name. Example:
 
+  syntax: fantom
   field.age.min = "Sorry, but you're not old enough for this ride!"
 
 All occurrences of the strings '${label}', '${constraint}', and '${value}' are replaced with appropriate values.
 
+  syntax: fantom
   field.age.min = "Sorry kid, you need to be at least ${constraint} for this ride!"
 
 If a field specific message is not found then the key 'field.#VALIDATION' is looked up.
 
 
 
-Defaults [#defaults]
---------------------
+Defaults
+--------
 The default FormBean messages are:
+
+  syntax: fantom
 
   errors.banner       = There were problems with the form data:
 
@@ -367,6 +351,7 @@ Because the default HTML template is not suitable for every purpose, you can sub
 
 Skins may be set on the 'FormField' directly for a specific field:
 
+  syntax: fantom
   formBean.formFields[MyFormModel#field1].inputSkin = MySkin()
 
 Or they may be contributed to the 'InputSkins' service where they are used by default for that specific type:
@@ -389,17 +374,19 @@ For dates, I personally like to use [Bootstrap Datepicker]`http://bootstrap-date
 
 
 
-Select Boxes [#selectBoxes]
-===========================
+Select Boxes
+============
 HTML '<select>' elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the '<option>' tags too!
 And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
 
 FormBean's default skin for 'select' uses [OptionsProviders]`OptionsProvider` to provide the options to be rendered. Like 'InputSkins' an 'OptionsProvider' may be set on the 'FormField' directly for a specific field:
 
+  syntax: fantom
   formBean.formFields[MyFormModel#field1].optionsProvider = MyOptions()
 
 Or they may be contributed to the 'OptionsProviders' service where they are used by default for that specific field type:
 
+  syntax: fantom
   @Contribute { serviceType=OptionsProviders# }
   static Void contributeOptionsProviders(Configuration config) {
       config[MyValue#] = MyOptions()
@@ -418,6 +405,7 @@ If not found then the key itself is used as the option label.
 
 Note that a default 'OptionsProvider' is already given for 'Enums'. So to render a Enum field as a select element with custom display labels:
 
+  syntax: fantom
   enum class Colours {
       red, blue
   }
@@ -430,20 +418,3 @@ Note that a default 'OptionsProvider' is already given for 'Enums'. So to render
   option.red.label  = Roses are red
   option.blue.label = Violets are blue
 
-
-
-Release Notes [#releaseNotes]
-*****************************
-v0.0.6 [#v0.0.6]
-================
- - New: Messages are a lot more customisable.
- - New: Customisable 'ErrorSkin' for form errors.
- - New: Added 'SkinCtx.renderAttributes()'
-
-v0.0.4 [#v0.0.4]
-================
- - Chg: Removed dependency on efanXtra.
-
-v0.0.2 [#v0.0.2]
-================
- - New: Preview release.
