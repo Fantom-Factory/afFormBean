@@ -122,7 +122,7 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
         
                 // to save you typing in a stylesheet, we'll just redirect to one I made earlier
                 // conf.add(Route(`/styles.css`, `styles.css`.toFile))
-                conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`fandoc:/afFormBean/doc/quickStart.css`)))
+                conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.css`)))
             }
         }
         
@@ -159,7 +159,7 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
 
 3. Point your web browser to `http://localhost:8069/` and you'll see a basic HTML contact form:
 
-  ![Screenshot of the afFormBean Quick Start example](quickStart.png)
+  ![Screenshot of the afFormBean Quick Start example](http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.png)
 
 
 
