@@ -163,14 +163,18 @@ class FormBean {
 	** Creates an instance of 'beanType' with all the field values set to the form field values.
 	** Uses 'afBeanUtils::BeanProperties.create()'.
 	** 
+	** This should only be called after 'validateForm()'.
+	** 
 	** Any extra properties passed in will also be set.
 	Obj createBean([Str:Obj?]? extraProps := null) {
 		beanProps := _gatherBeanProperties(extraProps)
 		return BeanProperties.create(beanType, beanProps, null) { IocBeanFactory(registry, it) }
 	}
-	
+
 	** Updates the given bean instance with form field values.
 	** Uses 'afBeanUtils::BeanProperties'.
+	** 
+	** This should only be called after 'validateForm()'.
 	** 
 	** Any extra properties passed in will also be set.
 	Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
@@ -219,7 +223,7 @@ class FormBean {
 
 			// fugging checkboxes don't send unchecked data
 			if (formField.formValue == null && formField.input.type.equalsIgnoreCase("checkbox"))
-				value = false
+				beanProps[field.name] = false
 
 			// other fields that weren't submitted are also null
 			if (formField.formValue != null) {
