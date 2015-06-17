@@ -1,12 +1,10 @@
-#FormBean v0.0.4
+#FormBean v1.0.0
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v0.0.4](http://img.shields.io/badge/pod-v0.0.4-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![pod: v1.0.0](http://img.shields.io/badge/pod-v1.0.0-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
-
-*FormBean is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
 FormBean is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects. Built on top of [IoC](http://pods.fantomfactory.org/pods/afIoc) and [BedSheet](http://pods.fantomfactory.org/pods/afBedSheet) FormBean allows you to customise every aspect of your HTML form generation.
 
@@ -17,7 +15,7 @@ Features:
 - Uses BedSheet `ValueEncoders` for string conversion
 - Customise HTML generation with skins
 - Versatile means of generating select options
-- Customised error messages
+- Customised (error) messages
 
 Current limitations:
 
@@ -32,7 +30,7 @@ Install `FormBean` with the Fantom Repository Manager ( [fanr](http://fantom.org
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afFormBean 0.0"]
+    depends = ["sys 1.0", ..., "afFormBean 1.0"]
 
 ## Documentation
 
@@ -175,9 +173,7 @@ Contact made!
  - message: Hello Mum!
 ```
 
-## Usage
-
-### To and From HTML Forms
+## To and From HTML Forms
 
 HTML forms are the backbone of data entry in any web application. It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form. We call such objects *form beans*. The [FormBean](http://pods.fantomfactory.org/pods/afFormBean/api/FormBean) class then does the necessary hard work of converting form beans to HTML and back again.
 
@@ -210,7 +206,7 @@ When the HTML form is submitted to the server, use `FormBean.createBean()` to co
 
 Sometimes you don't always want to create a fresh form bean instance. For instance, your beans may be entities in a database and only some of the fields may be editable. In that case, upon form submission, retrieve a bean instance from the database and call `FormBean.updateBean()` to do just that.
 
-### ValueEncoders
+## ValueEncoders
 
 Representing values as strings (to be rendered as HTML) is not always as obvious as calling `toStr()`. For instance, what about printing and formatting dates? On form submission, if a user leaves an input blank, should that be converted to `null` or an empty string?
 
@@ -227,7 +223,7 @@ Or you can set an instance directly on the `FormField` itself.
 
 Note, FormBean provides a `ValueEncoder` for `Bool` to get around HTML's dodgy `on` / not submitted syntax.
 
-### Validation
+## Validation
 
 HTML Form validation is boring and tedious at best.
 
@@ -263,25 +259,59 @@ To view the server side error messages (for styling) you may wish to switch off 
         ...
     </form>
 
-### Messages
+## Messages
+
+### Message Locations
 
 Labels, placeholders, hints and validation messages are all customisable through messages. Messages boil down to a simple key / value map of strings on `FormBean`.
 
-You may add to this map manually:
+Each `FormBean` instance creates its own map of messages by merging together property files. If your form bean is of type `acme::MyFormModel` then the following files are looked up:
 
-    formBean.messages["field.firstName.label"] = "Christian Name:"
+- `FormBean.properties` in pod `afFormBean`
+- `FormBean.properties` in pod `acme`
+- `MyFormModel.properties` in pod `acme`
 
-Or you may use property files, which is usually easier. FormBean will look in your pod for a property file named after your form bean. Example, if your form bean is called `MyFormModel` then you would create a pod file called `MyFormModel.properies`. In there, you list all the messages specific to that bean.
+With messages in each file overriding the messages defined previously.
 
-The advantage of a property file is that it succinctly groups all the messages for a specific bean together in one easily recognisable place.
-
-Note that the properties file may lie anywhere but *must* be declared in a resource directory in the project's `build.fan`.
+Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the `build.fan`. This ensures they are included in the pod file. Example:
 
     resDirs = [`fan/entities/MyFormModel.properies`]
 
 or
 
     resDirs = [`fan/entities/`]
+
+There are generally 2 strategies for handling bean messages; per bean or per pod, or you could mix the two!
+
+#### Messages per Bean
+
+Because FormBean looks for a property file named after the form bean, you can collect all the properties for the bean there. This is a good strategy if you only have a few beans but with lots of properties.
+
+Example, if your form bean is called `MyFormModel` then you would create a pod file called `MyFormModel.properies`. In there, you list all the messages specific to that bean.
+
+#### Messages per Pod
+
+Messages may optionally be prefixed with the bean name. This lets you group all your messages for all your beans in the one property file - `FormBean.properties`.
+
+Example, if you had form beans called `LoginDetails` and `SignupDetails` your `FormBean.properties` may look like:
+
+    loginDetails.field.username.label  = Username:
+    loginDetails.field.password.label  = Password:
+    
+    signupDetails.field.username.label  = Username:
+    signupDetails.field.password.label  = Password:
+
+The advantage of this strategy is that it succinctly groups all the messages for all your beans together in the one place; handy if you have lots of beans with only a few messages each.
+
+#### Manual Messages
+
+You may also manually set messages on a `FormBean` instance:
+
+    formBean.messages["field.firstName.label"] = "Christian Name:"
+
+In all, FormBean Messages are very versatile.
+
+### Message Types
 
 #### Field Messages
 
@@ -325,7 +355,9 @@ The default FormBean messages are:
     
     field.submit.label  = Submit
 
-### Skins
+## Skins
+
+### Input Skins
 
 Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement [InputSkin](http://pods.fantomfactory.org/pods/afFormBean/api/InputSkin).
 
@@ -350,7 +382,19 @@ Skins make it easy to render custom markup for date pickers.
 
 For dates, I personally like to use [Bootstrap Datepicker](http://bootstrap-datepicker.readthedocs.org/en/release/index.html) - see the [DatePicker for FormBean](http://www.fantomfactory.org/articles/datepicker-for-formbean) article for details.
 
-### Select Boxes
+### Error Skins
+
+Implement [ErrorSkin](http://pods.fantomfactory.org/pods/afFormBean/api/ErrorSkin) to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your `ErrorSkin` as an IoC service:
+
+    static Void defineServices(ServiceDefinitions defs) {
+        defs.add(ErrorSkin#, MyErrorSkin#)
+    }
+
+Or you can set it directly on the `FormBean` instance:
+
+    formBean.errorSkin = MyErrorSkin()
+
+## Select Boxes
 
 HTML `<select>` elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the `<option>` tags too! And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
 

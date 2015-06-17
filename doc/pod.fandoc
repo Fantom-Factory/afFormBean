@@ -8,7 +8,7 @@ Features:
  - Uses BedSheet 'ValueEncoders' for string conversion
  - Customise HTML generation with skins
  - Versatile means of generating select options
- - Customised error messages
+ - Customised (error) messages
 
 Current limitations:
  - Maps, Lists and nested objects are not supported.
@@ -152,11 +152,8 @@ pre>
 
 
 
-Usage
-*****
-
 To and From HTML Forms
-======================
+**********************
 HTML forms are the backbone of data entry in any web application.
 It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form.
 We call such objects *form beans*. The `FormBean` class then does the necessary hard work of converting form beans to HTML and back again.
@@ -199,7 +196,7 @@ In that case, upon form submission, retrieve a bean instance from the database a
 
 
 ValueEncoders
-=============
+*************
 Representing values as strings (to be rendered as HTML) is not always as obvious as calling 'toStr()'. For instance, what about printing and formatting dates?
 On form submission, if a user leaves an input blank, should that be converted to 'null' or an empty string?
 
@@ -222,7 +219,7 @@ Note, FormBean provides a 'ValueEncoder' for 'Bool' to get around HTML's dodgy '
 
 
 Validation
-==========
+**********
 HTML Form validation is boring and tedious at best.
 
 Yes, there are hundreds of javascript form validation frameworks out there, but not one is appropriate for everyone in all situations.
@@ -267,21 +264,21 @@ Fortunately HTML5 gives us an easy way to do this, just add the 'novalidate' att
 
 
 Messages
-========
+********
+Message Locations
+=================
 Labels, placeholders, hints and validation messages are all customisable through messages.
 Messages boil down to a simple key / value map of strings on 'FormBean'.
 
-You may add to this map manually:
+Each 'FormBean' instance creates its own map of messages by merging together property files. If your form bean is of type 'acme::MyFormModel' then the following files are looked up:
 
-  syntax: fantom
-  formBean.messages["field.firstName.label"] = "Christian Name:"
+ - 'FormBean.properties' in pod 'afFormBean'
+ - 'FormBean.properties' in pod 'acme'
+ - 'MyFormModel.properties' in pod 'acme'
 
-Or you may use property files, which is usually easier. FormBean will look in your pod for a property file named after your form bean.
-Example, if your form bean is called 'MyFormModel' then you would create a pod file called 'MyFormModel.properies'. In there, you list all the messages specific to that bean.
+With messages in each file overriding the messages defined previously.
 
-The advantage of a property file is that it succinctly groups all the messages for a specific bean together in one easily recognisable place.
-
-Note that the properties file may lie anywhere but *must* be declared in a resource directory in the project's 'build.fan'.
+Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the 'build.fan'. This ensures they are included in the pod file. Example:
 
   syntax: fantom
   resDirs = [`fan/entities/MyFormModel.properies`]
@@ -291,8 +288,47 @@ or
   syntax: fantom
   resDirs = [`fan/entities/`]
 
+There are generally 2 strategies for handling bean messages; per bean or per pod, or you could mix the two!
 
 
+
+Messages per Bean
+-----------------
+Because FormBean looks for a property file named after the form bean, you can collect all the properties for the bean there. This is a good strategy if you only have a few beans but with lots of properties.
+
+Example, if your form bean is called 'MyFormModel' then you would create a pod file called 'MyFormModel.properies'. In there, you list all the messages specific to that bean.
+
+
+
+Messages per Pod
+-----------------
+Messages may optionally be prefixed with the bean name. This lets you group all your messages for all your beans in the one property file - 'FormBean.properties'.
+
+Example, if you had form beans called 'LoginDetails' and 'SignupDetails' your 'FormBean.properties' may look like:
+
+  loginDetails.field.username.label  = Username:
+  loginDetails.field.password.label  = Password:
+
+  signupDetails.field.username.label  = Username:
+  signupDetails.field.password.label  = Password:
+
+The advantage of this strategy is that it succinctly groups all the messages for all your beans together in the one place; handy if you have lots of beans with only a few messages each.
+
+
+
+Manual Messages
+---------------
+You may also manually set messages on a 'FormBean' instance:
+
+  syntax: fantom
+  formBean.messages["field.firstName.label"] = "Christian Name:"
+
+In all, FormBean Messages are very versatile.
+
+
+
+Message Types
+=============
 Field Messages
 --------------
 Labels, placeholders and hints all have dedicated attributes on the '@HtmlInput' facet. If these are 'null' then the messages map is consulted with the keys:
@@ -346,7 +382,9 @@ The default FormBean messages are:
 
 
 Skins [#skins]
-==============
+**************
+Input Skins
+===========
 Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement `InputSkin`.
 
 Skins may be set on the 'FormField' directly for a specific field:
@@ -374,8 +412,24 @@ For dates, I personally like to use [Bootstrap Datepicker]`http://bootstrap-date
 
 
 
+Error Skins
+===========
+Implement `ErrorSkin` to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your 'ErrorSkin' as an IoC service:
+
+  syntax: fantom
+  static Void defineServices(ServiceDefinitions defs) {
+      defs.add(ErrorSkin#, MyErrorSkin#)
+  }
+
+Or you can set it directly on the 'FormBean' instance:
+
+  syntax: fantom
+  formBean.errorSkin = MyErrorSkin()
+
+
+
 Select Boxes
-============
+************
 HTML '<select>' elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the '<option>' tags too!
 And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
 
