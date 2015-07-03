@@ -5,9 +5,11 @@ class SkinCtx {
 				Obj?			bean
 	const		Field			field
 	internal	FormBean		formBean
-	internal	FormField		formField
 	internal	Bool			inErr
 	internal	ValueEncoders	valueEncoders
+	
+	** The 'FormField' being rendered.
+				FormField		formField
 	
 	internal new make(|This| in) { in(this) }
 
@@ -20,7 +22,7 @@ class SkinCtx {
 	Str label() {
 		input.label?.toXml ?: (msg("field.${field.name}.label") ?: field.name.toDisplayName.toXml)		
 	}
-	
+
 	** Returns the preferred string value to be rendered in the '<input>'. 
 	Str value() {
 		// if bean is null, check the formValue - we may have set a default!
@@ -60,7 +62,9 @@ class SkinCtx {
 		return strVal.toXml
 	}
 	
-	** Returns a rendered string of common attributes to be placed in the <input> HTML tag.
+	** Returns a rendered string of common attributes to be placed in the '<input>' HTML tag.
+	** This includes 'id', 'name' and any validation attributes defined on the 'HtmlInput' facet.
+	** 
 	** Note the string does *not* contain the 'type' or 'value' attributes as these are dependent on the input type.
 	** 
 	** The given 'extraAttributes' are merged in, allowing you to pass in extra css styles:
@@ -68,7 +72,7 @@ class SkinCtx {
 	**   syntax: fantom
 	**   attrs := skinCtx.renderAttributes(["class" : "hot-pink"])
 	** 
-	** Note that empty string values are rendered as HTML5 empty attributes.     
+	** Note that empty string values are rendered as HTML5 empty attributes.
 	Str renderAttributes([Str:Str]? extraAttributes := null) {
 		attrs	:= Str:Str?[:] { it.ordered = true }
 		attrs["id"]				= name

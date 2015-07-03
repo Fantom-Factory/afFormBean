@@ -35,9 +35,9 @@ class FormBean {
 	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
-		this.beanType = beanType
-		in(this)	// need the objCache
+		in(this)	// IoC Injection
 
+		this.beanType = beanType
 		this.messages = _messages.getMessages(beanType)
 		
 		// create formfields with default values
