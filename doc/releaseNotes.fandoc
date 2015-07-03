@@ -1,7 +1,11 @@
 Versions
 ********
+v1.0.2
+======
+ - Chg: Exposed 'SkinCtx.formField' as the current field being rendered.
+ - Bug: Could not render validation messages when run from a script.
 
-v0.0.6
+v1.0.0
 ======
  - New: Messages are a lot more customisable.
  - New: Customisable 'ErrorSkin' for form errors.
