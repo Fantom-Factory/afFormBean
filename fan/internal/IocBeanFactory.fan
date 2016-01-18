@@ -3,10 +3,10 @@ using afIoc
 
 internal class IocBeanFactory : BeanFactory {
 	
-	private Registry registry
+	private |->Scope|	scope
 	
-	new make(Registry registry, Type type) : super(type) { 
-		this.registry = registry
+	new make(Type type, |This|in) : super(type) { 
+		in(this)
 	}
 
 	override Obj doCreate(Method? ctor := null) {
@@ -20,7 +20,7 @@ internal class IocBeanFactory : BeanFactory {
 		if (ctor != null)
 			return super.doCreate(ctor)
 			
-		return registry.autobuild(type, ctorArgs, fieldVals)
+		return scope().build(type, ctorArgs, fieldVals)
 	}
 	
 	private Obj? setFieldVals(Obj? obj) {

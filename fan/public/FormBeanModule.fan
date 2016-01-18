@@ -4,14 +4,14 @@ using afBedSheet
 @NoDoc
 const class FormBeanModule {
 	
-	static Void defineServices(ServiceDefinitions defs) {
-		defs.add(InputSkins#)
-		defs.add(OptionsProviders#)
-		defs.add(Messages#)
+	Void defineServices(RegistryBuilder defs) {
+		defs.addService(InputSkins#)
+		defs.addService(OptionsProviders#)
+		defs.addService(Messages#)
 	}
 	
 	@Contribute { serviceType=InputSkins# }
-	static Void contributeInputSkins(Configuration config) {
+	Void contributeInputSkins(Configuration config) {
 		textInputSkin		:= TextInputSkin()
 		config["text"] 		= textInputSkin
 		config["date"] 		= textInputSkin
@@ -29,7 +29,7 @@ const class FormBeanModule {
 		config["week"] 		= textInputSkin
 		config["checkbox"]	= CheckboxSkin()
 		config["textarea"]	= TextAreaSkin()
-		config["select"]	= config.autobuild(SelectSkin#)
+		config["select"]	= config.build(SelectSkin#)
 //		config["button"]	= 
 //		config["color"]		= 
 //		config["file"]		= 
@@ -40,17 +40,17 @@ const class FormBeanModule {
 	}
 	
 	@Contribute { serviceType=OptionsProviders# }
-	static Void contributeOptionsProviders(Configuration config) {
+	Void contributeOptionsProviders(Configuration config) {
 		config[Enum#] = EnumOptionsProvider(true, "")
 	}
 
 	@Contribute { serviceType=ValueEncoders# }
-	static Void contributeValueEncoders(Configuration config) {
+	Void contributeValueEncoders(Configuration config) {
 		config[Bool#] = BoolEncoder()
 	}
 
 	@Contribute { serviceType=DependencyProviders# }
-	static Void contributeDependencyProviders(Configuration config) {
-		config["afFormBean.formBeanProvider"] = config.autobuild(FormBeanProvider#)
+	Void contributeDependencyProviders(Configuration config) {
+		config["afFormBean.formBeanProvider"] = config.build(FormBeanProvider#)
 	}
 }
