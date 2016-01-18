@@ -1,5 +1,10 @@
 Versions
 ********
+v1.1.0
+======
+ - Chg: Updated to work with [IoC v3.0]`pod:afIoc`.
+ - Chg: 'HtmlInput.required' defaults to 'true' if the field is non-nullable.
+
 v1.0.2
 ======
  - Chg: Exposed 'SkinCtx.formField' as the current field being rendered.

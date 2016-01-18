@@ -47,7 +47,8 @@ facet class HtmlInput {
 	// TODO: move to @Validation?
 	
 	** HTML5 validation. Set to 'true' to mark the input as required.
-	const Bool	required
+	** If 'null' then the input is required if the field is non-nullable.
+	const Bool?	required
 
 	** HTML5 validation. Sets the minimum length (inclusive) a string should be. 
 	const Int?	minLength

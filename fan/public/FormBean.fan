@@ -5,7 +5,7 @@ using web
 
 ** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
-	@Inject private const	Registry		registry
+	@Inject private const	Scope			scope
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
 	@Inject private const	ValueEncoders 	valueEncoders
@@ -126,7 +126,7 @@ class FormBean {
 			// save the value in-case we have error and have to re-render
 			formField.formValue = formValue
 
-			if (input.required)
+			if (input.required ?: field.type.isNullable.not)
 				if (formValue == null || formValue.isEmpty)
 					{ _addErr(formField, formValue, "required", Str.defVal); return }
 			
@@ -168,7 +168,7 @@ class FormBean {
 	** Any extra properties passed in will also be set.
 	Obj createBean([Str:Obj?]? extraProps := null) {
 		beanProps := _gatherBeanProperties(extraProps)
-		return BeanProperties.create(beanType, beanProps, null) { IocBeanFactory(registry, it) }
+		return BeanProperties.create(beanType, beanProps, null) { scope.build(IocBeanFactory#, [it]) }
 	}
 
 	** Updates the given bean instance with form field values.
@@ -182,9 +182,8 @@ class FormBean {
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		beanProps := _gatherBeanProperties(extraProps)
 
-		reg := registry
 		factory := BeanPropertyFactory {
-			it.makeFunc	 = |Type type->Obj| { IocBeanFactory(reg, type).create }.toImmutable
+			it.makeFunc	 = |Type type->Obj| { ((IocBeanFactory) scope.build(IocBeanFactory#, [type])).create }.toImmutable
 		}
 		beanProps.each |value, expression| {
 			// if a value wasn't submitted, it's not in the list, therefore set all beanProps
