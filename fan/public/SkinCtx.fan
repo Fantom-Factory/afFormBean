@@ -1,7 +1,11 @@
+using afIoc
+using afIocConfig
 using afBedSheet
 
 ** Passed to 'InputSkins' to provide all the information they need to render a form field.
 class SkinCtx {
+	@Config @Inject
+	private 	Int?			defaultMaxLength
 				Obj?			bean
 	const		Field			field
 	internal	FormBean		formBean
@@ -11,7 +15,10 @@ class SkinCtx {
 	** The 'FormField' being rendered.
 				FormField		formField
 	
-	internal new make(|This| in) { in(this) }
+	internal new make(Int? defaultMaxLength,|This| in) {
+		this.defaultMaxLength = defaultMaxLength
+		in(this)
+	}
 
 	** Returns the name of the field. Safe for use as a CSS class name.
 	Str name() {
@@ -80,11 +87,11 @@ class SkinCtx {
 		attrs["name"]			= name
 		attrs["placeholder"]	= input.placeholder ?: msg("field.${name}.placeholder")
 		attrs["minLength"]		= input.minLength?.toStr
-		attrs["maxlength"]		= input.maxLength?.toStr
+		attrs["maxlength"]		= input.maxLength?.toStr ?: defaultMaxLength?.toStr
 		attrs["min"]			= input.min?.toStr
 		attrs["max"]			= input.max?.toStr
 		attrs["step"]			= input.step?.toStr
-		attrs["pattern"]		= input.pattern
+		attrs["pattern"]		= input.pattern?.toStr
 		attrs["required"]		= (input.required  ?: field.type.isNullable.not) ? "" : null
 		
 		if (input.minLength != null && input.pattern == null)

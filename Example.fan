@@ -35,7 +35,7 @@ class ContactUsPage  {
     Text onContact() {
         // perform server side validation
         // if invalid, re-render the page and show the errors
-        if (!formBean.validateForm(httpRequest.form))
+        if (!formBean.validateForm(httpRequest.body.form))
             return render
         
         // create an instance of our form object
@@ -70,9 +70,9 @@ class ContactDetails {
 
 // @SubModule only needed because this example is run as a script
 @SubModule { modules=[FormBeanModule#] }
-class AppModule {
+const class AppModule {
     @Contribute { serviceType=Routes# }
-    static Void contributeRoutes(Configuration conf) {
+    Void contributeRoutes(Configuration conf) {
         conf.add(Route(`/`, ContactUsPage#render))
         conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
         
@@ -84,6 +84,6 @@ class AppModule {
 
 class Main {
     Int main() {
-        afBedSheet::Main().main([AppModule#.qname, "8069"])
+		BedSheetBuilder("Example_0").startWisp(8089)
     }
 }
