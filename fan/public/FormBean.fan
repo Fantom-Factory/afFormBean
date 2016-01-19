@@ -1,10 +1,13 @@
 using afIoc
+using afIocConfig::Config
 using afBedSheet
 using afBeanUtils
 using web
 
 ** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
+	@Config
+	@Inject private const	Int?			defaultMaxLength
 	@Inject private const	Scope			scope
 	@Inject private const	ObjCache		objCache
 	@Inject private const	InputSkins		inputSkins
@@ -78,7 +81,7 @@ class FormBean {
 		inErr	:= hasErrors
 		html	:= Str.defVal
 		&formFields.each |formField, field| {
-			skinCtx := SkinCtx {
+			skinCtx := SkinCtx(defaultMaxLength) {
 				it.bean			= bean
 				it.field		= field
 				it.formBean		= this
@@ -128,33 +131,34 @@ class FormBean {
 
 			if (input.required ?: field.type.isNullable.not)
 				if (formValue == null || formValue.isEmpty)
-					{ _addErr(formField, formValue, "required", Str.defVal); return }
+					return _addErr(formField, formValue, "required", Str.defVal)
 			
 			if (hasValue && input.minLength != null)
 				if (formValue.size < input.minLength)
-					{ _addErr(formField, formValue, "minLength", input.minLength); return }
+					return _addErr(formField, formValue, "minLength", input.minLength)
 
-			if (hasValue && input.maxLength != null)
-				if (formValue.size > input.maxLength)
-					{ _addErr(formField, formValue, "maxLength", input.maxLength); return }
+			maxLength := input.maxLength ?: defaultMaxLength
+			if (hasValue && maxLength != null)
+				if (formValue.size > maxLength)
+					return _addErr(formField, formValue, "maxLength", maxLength)
 
 			if (hasValue && input.min != null) {
 				if (formValue.toInt(10, false) == null)
-					{ _addErr(formField, formValue, "notNum", Str.defVal); return }
+					return _addErr(formField, formValue, "notNum", Str.defVal)
 				if (formValue.toInt < input.min)
-					{ _addErr(formField, formValue, "min", input.min); return }
+					return _addErr(formField, formValue, "min", input.min)
 			}
 
 			if (hasValue && input.max != null) {
 				if (formValue.toInt(10, false) == null)
-					{ _addErr(formField, formValue, "notNum", Str.defVal); return }
+					return _addErr(formField, formValue, "notNum", Str.defVal)
 				if (formValue.toInt > input.max)
-					{ _addErr(formField, formValue, "max", input.max); return }
+					return _addErr(formField, formValue, "max", input.max)
 			}
 
 			if (hasValue && input.pattern != null)
 				if (!"^${input.pattern}\$".toRegex.matches(formValue))
-					{ _addErr(formField, formValue, "pattern", input.pattern); return }			
+					return _addErr(formField, formValue, "pattern", input.pattern)			
 		}
 		
 		return !hasErrors
@@ -176,12 +180,15 @@ class FormBean {
 	** 
 	** This should only be called after 'validateForm()'.
 	** 
-	** Any extra properties passed in will also be set.
+	** The given extra properties will also be set on the bean.
+	** 
+	** Returns the given bean instance.
 	Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
 		if (!bean.typeof.fits(beanType))
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		beanProps := _gatherBeanProperties(extraProps)
 
+		scope	:= scope
 		factory := BeanPropertyFactory {
 			it.makeFunc	 = |Type type->Obj| { ((IocBeanFactory) scope.build(IocBeanFactory#, [type])).create }.toImmutable
 		}

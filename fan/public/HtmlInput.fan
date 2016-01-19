@@ -14,7 +14,7 @@ facet class HtmlInput {
 	**  
 	** If 'null' then the key 'field.${fieldName}.placeholder' is used to look for a message. 
 	const Str?	placeholder
-	
+
 	** If non-null an extra '<div>' is rendered after the '<input>' to supply a helpful hint.
 	** The hint is usually rendered with the 'formBean-hint' CSS class.
 	** 
@@ -47,15 +47,17 @@ facet class HtmlInput {
 	// TODO: move to @Validation?
 	
 	** HTML5 validation. Set to 'true' to mark the input as required.
-	** If 'null' then the input is required if the field is non-nullable.
+	** If 'null' (the default) then the input is required if the field is non-nullable.
 	const Bool?	required
 
 	** HTML5 validation. Sets the minimum length (inclusive) a string should be. 
 	const Int?	minLength
 	
 	** HTML5 validation. Sets the maximum length (inclusive) a string should be.
+	** 
+	** If 'null' (the default) then the 'maxLength' is set to a predefined value - see `FormBeanConfigIds.defaultMaxLength` for details. 
 	const Int?	maxLength
-	
+
 	** HTML5 validation. Sets the minimum value (inclusive) an 'Int' should have.
 	const Int?	min
 	
@@ -66,11 +68,9 @@ facet class HtmlInput {
 	** Starting '^' and ending '$' characters are implicit and not required.
 	** 
 	** Maps to the HTML5 'pattern' attribute.
-	** 
-	** Expressed as a Str because Regex's are not serialisable in Fantom 1.0.66.
-	const Str?	pattern 
+	const Regex?	pattern 
 	
-	** HTML5 validation.
+	** HTML5 validation. Defines number intervals for a numeric input.
 	const Int?	step
 
 	

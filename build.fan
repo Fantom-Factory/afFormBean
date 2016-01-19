@@ -19,13 +19,14 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys 1.0",
-			"web 1.0",
+			"sys 1.0.68 - 1.0",
+			"web 1.0.68 - 1.0",
 
 			// ---- Core ------------------------
 			"afBeanUtils  1.0.6  - 1.0",
 			"afConcurrent 1.0.12 - 1.0",	// for CachingTypeLookup / OptionsProviders
 			"afIoc        3.0.0  - 3.0",
+			"afIocConfig  1.1.0  - 1.1",
 
 			// ---- Web -------------------------
 			"afBedSheet   1.5.0  - 1.5"

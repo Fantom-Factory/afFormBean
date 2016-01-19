@@ -58,7 +58,7 @@ Quick Start
         Text onContact() {
             // perform server side validation
             // if invalid, re-render the page and show the errors
-            if (!formBean.validateForm(httpRequest.form))
+            if (!formBean.validateForm(httpRequest.body.form))
                 return render
 
             // create an instance of our form object
@@ -93,9 +93,9 @@ Quick Start
 
     // @SubModule only needed because this example is run as a script
     @SubModule { modules=[FormBeanModule#] }
-    class AppModule {
+    const class AppModule {
         @Contribute { serviceType=Routes# }
-        static Void contributeRoutes(Configuration conf) {
+        Void contributeRoutes(Configuration conf) {
             conf.add(Route(`/`, ContactUsPage#render))
             conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
 
@@ -107,31 +107,32 @@ Quick Start
 
     class Main {
         Int main() {
-            afBedSheet::Main().main([AppModule#.qname, "8069"])
+            BedSheetBuilder("Example_0").startWisp(8069)
         }
     }
 
 2. Run 'Example.fan' as a Fantom script from the command prompt:
     C:\> fan Example.fan
 
-    [info] [afBedSheet] Starting Bed App 'Example_0::AppModule' on port 8069
-    [info] [web] WispService started on port 8069
+    [info] [afBedSheet] Found pod 'Example_0'
     [info] [afBedSheet] Found mod 'Example_0::AppModule'
+    [info] [afBedSheet] Starting Bed App 'Example_0' on port 8069
     [info] [afIoc] Adding module definitions from pod 'Example_0'
-    [info] [afIoc] Adding module definition for Example_0::AppModule
-    [info] [afIoc] Adding module definition for afBedSheet::BedSheetModule
-    [info] [afIoc] Adding module definition for afIocConfig::ConfigModule
-    [info] [afIoc] Adding module definition for afIocEnv::IocEnvModule
-    [info] [afIoc]
+    [info] [afIoc] Adding module Example_0::AppModule
+    [info] [afIoc] Adding module afBedSheet::BedSheetModule
+    [info] [afIoc] Adding module afFormBean::FormBeanModule
+    [info] [afIoc] Adding module afIocConfig::IocConfigModule
+    [info] [afIoc] Adding module afBedSheet::BedSheetEnvModule
+    [info] [afIoc] Adding module afConcurrent::ConcurrentModule
        ___    __                 _____        _
       / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
      / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
     /_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
                    How do I set a laser pointer to stun? /___/
 
-    IoC Registry built in 323ms and started up in 39ms
+    IoC Registry built in 142ms and started up in 139ms
 
-    Bed App 'Unknown' listening on http://localhost:8069/
+    Bed App 'Example_0' listening on http://localhost:8069/
 
 3. Point your web browser to 'http://localhost:8069/' and you'll see a basic HTML contact form:
 
@@ -396,7 +397,7 @@ Or they may be contributed to the 'InputSkins' service where they are used by de
 
   syntax: fantom
   @Contribute { serviceType=InputSkins# }
-  static Void contributeInputSkins(Configuration config) {
+  Void contributeInputSkins(Configuration config) {
       config["custom"] = MySkin()
   }
 
@@ -417,8 +418,8 @@ Error Skins
 Implement `ErrorSkin` to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your 'ErrorSkin' as an IoC service:
 
   syntax: fantom
-  static Void defineServices(ServiceDefinitions defs) {
-      defs.add(ErrorSkin#, MyErrorSkin#)
+  Void defineServices(RegistryBuilder bob) {
+      bob.add(ErrorSkin#, MyErrorSkin#)
   }
 
 Or you can set it directly on the 'FormBean' instance:
@@ -442,7 +443,7 @@ Or they may be contributed to the 'OptionsProviders' service where they are used
 
   syntax: fantom
   @Contribute { serviceType=OptionsProviders# }
-  static Void contributeOptionsProviders(Configuration config) {
+  Void contributeOptionsProviders(Configuration config) {
       config[MyValue#] = MyOptions()
   }
 
