@@ -92,7 +92,7 @@ class SkinCtx {
 		attrs["max"]			= input.max?.toStr
 		attrs["step"]			= input.step?.toStr
 		attrs["pattern"]		= input.pattern?.toStr
-		attrs["required"]		= (input.required  ?: field.type.isNullable.not) ? "" : null
+		attrs["required"]		= (input.required ?: (field.type == Bool# ? false : field.type.isNullable.not)) ? "" : null
 		
 		if (input.minLength != null && input.pattern == null)
 			attrs["pattern"]	= ".{${input.minLength},}"
