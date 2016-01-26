@@ -129,7 +129,7 @@ class FormBean {
 			// save the value in-case we have error and have to re-render
 			formField.formValue = formValue
 
-			if (input.required ?: field.type.isNullable.not)
+			if (input.required ?: (field.type == Bool# ? false : field.type.isNullable.not))
 				if (formValue == null || formValue.isEmpty)
 					return _addErr(formField, formValue, "required", Str.defVal)
 			
