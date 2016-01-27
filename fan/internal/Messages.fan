@@ -33,9 +33,12 @@ internal const class Messages {
 						msgs[k] = v
 				}
 				return msgs
-			} catch {
+
+			} catch (Err err) {
 				// Guard against being run in a script - an Err is thrown when not backed by a pod file
-				return Str:Str[:] { caseInsensitive = true }.addAll(defaultMsgs)
+				if (err.msg.startsWith("Not backed by pod file"))
+					return Str:Str[:] { caseInsensitive = true }.addAll(defaultMsgs)
+				throw err
 			}
 		}).rw
 	}

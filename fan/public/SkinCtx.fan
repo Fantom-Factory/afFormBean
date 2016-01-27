@@ -33,10 +33,14 @@ class SkinCtx {
 
 	** Returns the preferred string value to be rendered in the '<input>'. 
 	Str value() {
-		// if bean is null, check the formValue - we may have set a default!
-		value := (bean == null) ? formField.formValue : field.get(bean)
 		// if the bean has *any* errors, always render the formValues
-		return beanInvalid ? (formField.formValue ?: "") : toClient(value)
+		return beanInvalid ? (formField.formValue ?: "") : toClient(fieldValue)
+	}
+	
+	** Returns the field value. 
+	Obj? fieldValue() {
+		// if bean is null, check the formValue - we may have set a default!
+		bean == null ? formField.formValue : field.get(bean)
 	}
 	
 	** Returns 'true' if the field is invalid. Note that if invalid, the field may not have an error msg.
