@@ -52,28 +52,29 @@ class FormBean {
 				FormField#field	 	: field,
 				FormField#formBean	: this
 			])) {
-				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: _msg("field.${field.name}.type"))
-				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: _msg("field.${field.name}.inputSkin"))
-				it.optionsProvider	= fromObjCache(input.optionsProvider ?: _msg("field.${field.name}.optionsProvider"))
-				it.type				= input.type		?: _msg("field.${field.name}.type"		)
-				it.label			= input.label		?: _msg("field.${field.name}.label"		)
-				it.placeholder		= input.placeholder	?: _msg("field.${field.name}.placeholder")
-				it.hint				= input.hint		?: _msg("field.${field.name}.hint"		)
-				it.css				= input.css			?: _msg("field.${field.name}.css"		)
-				it.attributes		= input.attributes	?: _msg("field.${field.name}.attributes")
-				it.required			= input.required	?: _msg("field.${field.name}.required"	)?.toBool
-				it.minLength		= input.minLength	?: _msg("field.${field.name}.minLength"	)?.toInt
-				it.maxLength		= input.maxLength	?: _msg("field.${field.name}.maxLength"	)?.toInt
-				it.min				= input.min			?: _msg("field.${field.name}.min"		)?.toInt
-				it.max				= input.max			?: _msg("field.${field.name}.max"		)?.toInt
-				it.pattern			= input.pattern		?: _msg("field.${field.name}.pattern"	)?.toRegex
-				it.step				= input.step		?: _msg("field.${field.name}.step"		)?.toInt
-				it.showBlank		= input.showBlank	?: _msg("field.${field.name}.showBlank"	)?.toBool
-				it.blankLabel		= input.blankLabel	?: _msg("field.${field.name}.blankLabel")
+				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(field, "type"))
+				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: fieldMsg(field, "inputSkin"))
+				it.optionsProvider	= fromObjCache(input.optionsProvider ?: fieldMsg(field, "optionsProvider"))
+				it.type				= input.type		?: fieldMsg(field, "type"		)
+				it.label			= input.label		?: fieldMsg(field, "label"		)
+				it.placeholder		= input.placeholder	?: fieldMsg(field, "placeholder")
+				it.hint				= input.hint		?: fieldMsg(field, "hint"		)
+				it.css				= input.css			?: fieldMsg(field, "css"		)
+				it.attributes		= input.attributes	?: fieldMsg(field, "attributes"	)
+				it.required			= input.required	?: fieldMsg(field, "required"	)?.toBool
+				it.minLength		= input.minLength	?: fieldMsg(field, "minLength"	)?.toInt
+				it.maxLength		= input.maxLength	?: fieldMsg(field, "maxLength"	)?.toInt
+				it.min				= input.min			?: fieldMsg(field, "min"		)?.toInt
+				it.max				= input.max			?: fieldMsg(field, "max"		)?.toInt
+				it.pattern			= input.pattern		?: fieldMsg(field, "pattern"	)?.toRegex
+				it.step				= input.step		?: fieldMsg(field, "step"		)?.toInt
+				it.showBlank		= input.showBlank	?: fieldMsg(field, "showBlank"	)?.toBool
+				it.blankLabel		= input.blankLabel	?: fieldMsg(field, "blankLabel"	)
 				
 				// apply semi-defaults
 				// TODO add contributions to do this in an inspection hook
 				
+				// a 'required' checkbox means it *has* to be checked - usually not what we want by default
 				if (required == null && field.type.isNullable.not && field.type != Bool#)
 					required = true
 				
@@ -128,12 +129,12 @@ class FormBean {
 	**     <input type='submit' name='formBeanSubmit' class='submit' value='label'>
 	**   </div>
 	** 
-	** The label is taken from the msg key 'field.submit.label' and defaults to 'Submit'.
+	** The label is taken from the msg key 'submit.label' and defaults to 'Submit'.
 	Str renderSubmit() {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		label := _msg("field.submit.label") ?: "Submit"
+		label := messages["submit.label"] ?: "Submit"
 		out.div("class='formBean-row submitRow'")
 		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label.toXml}\"")
 		out.divEnd
@@ -198,21 +199,28 @@ class FormBean {
 		!errorMsgs.isEmpty || &formFields.vals.any { it.invalid }
 	}
 	
-	internal Str? _msg(Str key) {
-		messages[key]
+	** Returns a message for the given field. Messages are looked up in the following order:
+	** 
+	**   - '<bean>.<field>.<key>'
+	**   - '<field>.<key>'
+	**   - '<key>'
+	Str? fieldMsg(Field field, Str key) {
+		// bean messages have already been merged
+		messages["${field.name}.${key}"] ?: messages["${key}"]
 	}
 
 	private Void _addErr(FormField formField, Str type, Obj? constraint := null) {
 		field	:= formField.field
 		value	:= formField.formValue
 		input 	:= (HtmlInput) field.facet(HtmlInput#)
-		label	:= input.label ?: (_msg("field.${field.name}.label") ?: field.name.toDisplayName)
-		errMsg 	:= _msg("field.${field.name}.${type}") ?: _msg("field.${type}")
+		
+		label	:= formField.label ?: field.name.toDisplayName
+		errMsg 	:= fieldMsg(field, "${type}.msg")
 
 		errMsg = errMsg
-			.replace("\${label}", label)
-			.replace("\${constraint}", constraint?.toStr ?: "")
-			.replace("\${value}", value ?: Str.defVal)
+			.replace("\${label}", 		label)
+			.replace("\${constraint}",	constraint?.toStr ?: "")
+			.replace("\${value}",		value ?: "")
 
 		formField.errMsg = errMsg
 	}

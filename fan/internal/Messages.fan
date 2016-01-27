@@ -1,19 +1,24 @@
 using afConcurrent
 
 internal const class Messages {
-	private const AtomicMap messages := AtomicMap { keyType=Type#; valType=[Str:Str]# }
+	private const AtomicMap messages	:= AtomicMap { keyType=Type#; valType=[Str:Str]# }
+	private const Str:Str 	defaultMsgs
 	
-	new make(|This| in) { in(this) }
+	new make(|This| in) {
+		in(this)
+		defaultMsgs = this.typeof.pod.files.find { matches(it, "FormBean") } .readProps		
+	}
 	
 	Str:Str getMessages(Type beanType) {
 		((Str:Str) messages.getOrAdd(beanType) |->Str:Str| {
 			msgs 		:= Str:Str[:] { caseInsensitive = true }
-			// FIXME find formbean.props
-			defaultMsgs := this.typeof.pod.files.find { it.name == "FormBean.properties" } .readProps
 			try {
-				// TODO: use Fantom's locale lookup... somehow
-				formBeanMsgs :=    beanType.pod.files.find { it.name == "FormBean.properties"			}?.readProps ?: [:]
-				beanTypeMsgs :=    beanType.pod.files.find { it.name == "${beanType.name}.properties"	}?.readProps ?: [:]
+				// TODO use Fantom's locale lookup... somehow, see http://fantom.org/doc/sys/Env#locale
+				// can only get single props, not the whole file, so add locale to getMessage
+				// or just look for more files using the same rules (better)
+				// pass in Locale locale := Locale.cur()
+				formBeanMsgs :=    beanType.pod.files.find { matches(it, "FormBean")		}?.readProps ?: [:]
+				beanTypeMsgs :=    beanType.pod.files.find { matches(it, "beanType.name")	}?.readProps ?: [:]
 				tempMsgs	 := Str:Str[:] { caseInsensitive=true }.setAll(defaultMsgs).setAll(formBeanMsgs).setAll(beanTypeMsgs)
 				beanName 	 := beanType.name.lower + "."
 
@@ -33,5 +38,9 @@ internal const class Messages {
 				return Str:Str[:] { caseInsensitive = true }.addAll(defaultMsgs)
 			}
 		}).rw
+	}
+	
+	private Bool matches(File file, Str baseName) {
+		file.basename.equalsIgnoreCase(baseName) && (file.ext.equalsIgnoreCase("props") || file.ext.equalsIgnoreCase("properties"))
 	}
 }
