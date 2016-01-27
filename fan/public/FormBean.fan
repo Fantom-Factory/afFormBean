@@ -151,10 +151,13 @@ class FormBean {
 	Bool validateForm(Str:Str form) {
 		addErrFunc := #_addErr.func.bind([this])
 		&formFields.each |formField, field| {
+			
 			// save the value in-case we have error and have to re-render
 			formValue := (Str?) form[field.name]?.trim
 			formField.formValue = formValue
-			formField.validate(addErrFunc)
+			
+			fieldFunc := addErrFunc.bind([formField])
+			formField.validate(fieldFunc)
 		}
 		return !hasErrors
 	}

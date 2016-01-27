@@ -158,37 +158,37 @@ class FormField {
 	** 
 	** Override to perform custom field validation.
 	** Use the given 'addErr' func to report errors; note that 'constraint' is optional.   
-	virtual Void validate(|FormField formField, Str type, Obj? constraint| addErr) {
+	virtual Void validate(|Str type, Obj? constraint| addErr) {
 		hasValue := formValue != null && !formValue.isEmpty
 
 		if (required ?: false)
 			if (formValue == null || formValue.isEmpty)
-				return addErr(this, "required", Str.defVal)
+				return addErr("required", Str.defVal)
 		
 		if (hasValue && minLength != null)
 			if (formValue.size < minLength)
-				return addErr(this, "minLength", minLength)
+				return addErr("minLength", minLength)
 
 		if (hasValue && maxLength != null)
 			if (formValue.size > maxLength)
-				return addErr(this, "maxLength", maxLength)
+				return addErr("maxLength", maxLength)
 
 		if (hasValue && min != null) {
 			if (formValue.toInt(10, false) == null)
-				return addErr(this, "notNum", Str.defVal)
+				return addErr("notNum", Str.defVal)
 			if (formValue.toInt < min)
-				return addErr(this, "min", min)
+				return addErr("min", min)
 		}
 
 		if (hasValue && max != null) {
 			if (formValue.toInt(10, false) == null)
-				return addErr(this, "notNum", Str.defVal)
+				return addErr("notNum", Str.defVal)
 			if (formValue.toInt > max)
-				return addErr(this, "max", max)
+				return addErr("max", max)
 		}
 
 		if (hasValue && pattern != null)
 			if (!"^${pattern}\$".toRegex.matches(formValue))
-				return addErr(this, "pattern", pattern)			
+				return addErr("pattern", pattern)			
 	}
 }
