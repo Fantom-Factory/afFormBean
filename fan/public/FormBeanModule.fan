@@ -54,9 +54,4 @@ const class FormBeanModule {
 	Void contributeDependencyProviders(Configuration config) {
 		config["afFormBean.formBeanProvider"] = config.build(FormBeanProvider#)
 	}
-	
-	@Contribute { serviceType=FactoryDefaults# } 
-	Void configureFactoryDefaults(Configuration config) {
-		config[FormBeanConfigIds.defaultMaxLength] = 512
-	}
 }

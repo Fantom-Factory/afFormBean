@@ -4,21 +4,22 @@ using afBedSheet
 
 ** Passed to 'InputSkins' to provide all the information they need to render a form field.
 class SkinCtx {
-	@Config @Inject
-	private 	Int?			defaultMaxLength
+	internal	ValueEncoders	_valueEncoders
+
+	** The bean instance being rendered.
 				Obj?			bean
+	
+	** The corresponding bean field.
 	const		Field			field
-	internal	FormBean		formBean
-	internal	Bool			inErr
-	internal	ValueEncoders	valueEncoders
+	
 	
 	** The 'FormField' being rendered.
 				FormField		formField
 	
-	internal new make(Int? defaultMaxLength,|This| in) {
-		this.defaultMaxLength = defaultMaxLength
-		in(this)
-	}
+	** The containing 'FormBean' instance.
+				FormBean		formBean
+	
+	internal new make(|This|in) { in(this)	}
 
 	** Returns the name of the field. Safe for use as a CSS class name.
 	Str name() {
@@ -27,7 +28,7 @@ class SkinCtx {
 
 	** Returns the preferred display label associated with the field.
 	Str label() {
-		input.label?.toXml ?: (msg("field.${field.name}.label") ?: field.name.toDisplayName.toXml)		
+		formField.label ?: field.name.toDisplayName
 	}
 
 	** Returns the preferred string value to be rendered in the '<input>'. 
@@ -35,12 +36,7 @@ class SkinCtx {
 		// if bean is null, check the formValue - we may have set a default!
 		value := (bean == null) ? formField.formValue : field.get(bean)
 		// if the bean has *any* errors, always render the formValues
-		return inErr ? (formField.formValue ?: "") : toClient(value)
-	}
-	
-	** Returns the '@HtmlInput' facet on the field.
-	HtmlInput input() {
-		Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4		
+		return beanInvalid ? (formField.formValue ?: "") : toClient(value)
 	}
 	
 	** Returns 'true' if the field is invalid. Note that if invalid, the field may not have an error msg.
@@ -50,22 +46,26 @@ class SkinCtx {
 
 	** Returns 'true' if the *bean* is invalid; that is, if *any* field is in error.
 	Bool beanInvalid() {
-		inErr
+		formBean.hasErrors
 	}
 
 	** Returns the error message associated with this field.
+	** 
+	** The returned message is XML escaped and safe for embedding in HTML.
 	Str? errMsg() {
 		formField.errMsg.toXml
 	}
 	
 	** Returns the message (if any) associated with the given key.
+	** 
+	** The returned message is XML escaped and safe for embedding in HTML.
 	Str? msg(Str key) {
 		formBean._msg(key)?.toXml
 	}
 	
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
 	Str toClient(Obj? value) {
-		strVal := (formField.valueEncoder != null) ? formField.valueEncoder.toClient(value) : valueEncoders.toClient(field.type, value)
+		strVal := (formField.valueEncoder != null) ? formField.valueEncoder.toClient(value) : _valueEncoders.toClient(field.type, value)
 		return strVal.toXml
 	}
 	
@@ -81,22 +81,19 @@ class SkinCtx {
 	** 
 	** Note that empty string values are rendered as HTML5 empty attributes.
 	Str renderAttributes([Str:Str]? extraAttributes := null) {
-		attrs	:= Str:Str?[:] { it.ordered = true }
+		attrs := Str:Str?[:] { it.ordered = true }
 		attrs["id"]				= name
-		attrs["class"]			= input.css
+		attrs["class"]			= formField.css
 		attrs["name"]			= name
-		attrs["placeholder"]	= input.placeholder ?: msg("field.${name}.placeholder")
-		attrs["minLength"]		= input.minLength?.toStr
-		attrs["maxlength"]		= input.maxLength?.toStr ?: defaultMaxLength?.toStr
-		attrs["min"]			= input.min?.toStr
-		attrs["max"]			= input.max?.toStr
-		attrs["step"]			= input.step?.toStr
-		attrs["pattern"]		= input.pattern?.toStr
-		attrs["required"]		= (input.required ?: (field.type == Bool# ? false : field.type.isNullable.not)) ? "" : null
-		
-		if (input.minLength != null && input.pattern == null)
-			attrs["pattern"]	= ".{${input.minLength},}"
-		
+		attrs["placeholder"]	= formField.placeholder
+		attrs["minLength"]		= formField.minLength?.toStr
+		attrs["maxlength"]		= formField.maxLength?.toStr
+		attrs["min"]			= formField.min?.toStr
+		attrs["max"]			= formField.max?.toStr
+		attrs["step"]			= formField.step?.toStr
+		attrs["pattern"]		= formField.pattern?.toStr
+		attrs["required"]		= (formField.required ?: false) ? "" : null
+
 		extraAttributes?.each |v, k| {
 			attrs[k] = (attrs[k] == null) ? v : attrs[k] + " " + v 
 		}
@@ -104,7 +101,7 @@ class SkinCtx {
 		// TODO: merge or override these attributes with what's just been processed
 		// - don't blindly render the same attribute twice
 		// - use Pegger to parse
-		extra := (input.attributes == null) ? "" : " ${input.attributes}"
+		extra := (formField.attributes == null) ? "" : " ${formField.attributes}"
 
 		return attrs.exclude { it == null }.join(" ") |v, k| { v.isEmpty ? k : "${k}=\"${v.toXml}\"" } + extra
 	}

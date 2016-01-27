@@ -8,6 +8,7 @@ internal const class Messages {
 	Str:Str getMessages(Type beanType) {
 		((Str:Str) messages.getOrAdd(beanType) |->Str:Str| {
 			msgs 		:= Str:Str[:] { caseInsensitive = true }
+			// FIXME find formbean.props
 			defaultMsgs := this.typeof.pod.files.find { it.name == "FormBean.properties" } .readProps
 			try {
 				// TODO: use Fantom's locale lookup... somehow

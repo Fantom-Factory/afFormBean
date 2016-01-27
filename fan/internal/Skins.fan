@@ -8,7 +8,7 @@ abstract const class DefaultInputSkin : InputSkin {
 	override Str render(SkinCtx skinCtx) {
 		html	:= Str.defVal
 		errCss	:= skinCtx.fieldInvalid ? " error" : Str.defVal
-		hint	:= skinCtx.input.hint ?: skinCtx.msg("field.${skinCtx.name}.hint")
+		hint	:= skinCtx.formField.hint ?: skinCtx.msg("field.${skinCtx.name}.hint")
 		html	+= """<div class="formBean-row inputRow ${skinCtx.name}${errCss}">"""
 		html	+= """<label for="${skinCtx.name}">${skinCtx.label}</label>"""
 		html	+= renderElement(skinCtx)
@@ -23,7 +23,7 @@ abstract const class DefaultInputSkin : InputSkin {
 
 internal const class TextInputSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
-		"""<input type="${skinCtx.input.type}" ${skinCtx.renderAttributes} value="${skinCtx.value}">"""
+		"""<input type="${skinCtx.formField.type}" ${skinCtx.renderAttributes} value="${skinCtx.value}">"""
 	}	
 }
 
@@ -51,9 +51,9 @@ internal const class SelectSkin : DefaultInputSkin {
 
 		optionsProvider := skinCtx.formField.optionsProvider ?: optionsProviders.find(skinCtx.field.type)
 
-		showBlank := skinCtx.input.showBlank ?: optionsProvider.showBlank  
+		showBlank := skinCtx.formField.showBlank ?: optionsProvider.showBlank  
 		if (showBlank) {
-			blankLabel := skinCtx.input.blankLabel ?: optionsProvider.blankLabel  
+			blankLabel := skinCtx.formField.blankLabel ?: optionsProvider.blankLabel  
 			html += """<option value="">${blankLabel?.toXml}</option>"""
 		}
 		

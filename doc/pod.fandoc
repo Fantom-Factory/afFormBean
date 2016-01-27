@@ -282,7 +282,7 @@ With messages in each file overriding the messages defined previously.
 Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the 'build.fan'. This ensures they are included in the pod file. Example:
 
   syntax: fantom
-  resDirs = [`fan/entities/MyFormModel.properies`]
+  resDirs = [`fan/entities/MyFormModel.properties`]
 
 or
 
