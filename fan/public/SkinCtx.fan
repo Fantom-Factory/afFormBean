@@ -50,17 +50,18 @@ class SkinCtx {
 	}
 
 	** Returns the error message associated with this field.
-	** 
-	** The returned message is XML escaped and safe for embedding in HTML.
 	Str? errMsg() {
-		formField.errMsg.toXml
+		formField.errMsg
 	}
 	
 	** Returns the message (if any) associated with the given key.
+	** Messages are looked up in the following order:
 	** 
-	** The returned message is XML escaped and safe for embedding in HTML.
-	Str? msg(Str key) {
-		formBean._msg(key)?.toXml
+	**   - '<bean>.<field>.<key>'
+	**   - '<field>.<key>'
+	**   - '<key>'
+	Str? fieldMsg(Str key) {
+		formBean.fieldMsg(field, key)
 	}
 	
 	** Converts the given value to a string using the preferred 'ValueEncoder'.

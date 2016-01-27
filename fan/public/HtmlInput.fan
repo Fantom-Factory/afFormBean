@@ -10,6 +10,7 @@ facet class HtmlInput {
 	** The label to display next to the '<input>'.
 	**  
 	** If 'null' then the key 'field.${fieldName}.label' is used to look for a message. 
+	** If still not found then it defaults to a human readable version of the field name. 
 	const Str?	label
 
 	** The value to render as a 'placeholder' attribute on the '<input>'.

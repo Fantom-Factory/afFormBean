@@ -2,9 +2,11 @@ Versions
 ********
 v1.1.0
 ======
- - New: All attributes from '@HtmlInput' are available in 'FormField' and are pre-populated from message values.
- - Chg: Updated to work with [IoC v3.0]`pod:afIoc`.
+ - New: All attributes from '@HtmlInput' are pre-populated from message values and are available in 'FormField'.
+ - Chg: Rejigged all the message keys, see *Message Cheat Sheet* for details. (Breaking change.)
+ - Chg: Updated to work with [IoC v3.0]`pod:afIoc`. (Breaking change.)
  - Chg: 'HtmlInput.required' defaults to 'true' if the field is non-nullable.
+ - Chg: Messages files may also have a '.props' extension.
 
 v1.0.2
 ======
