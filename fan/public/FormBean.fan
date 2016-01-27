@@ -6,12 +6,10 @@ using web
 
 ** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
 class FormBean {	
-	@Config
-	@Inject private const	Int?			defaultMaxLength
-	@Inject private const	Scope			scope
-	@Inject private const	ObjCache		objCache
-	@Inject private const	InputSkins		inputSkins
-	@Inject private const	ValueEncoders 	valueEncoders
+	@Inject private const	Scope			_scope
+	@Inject private const	ValueEncoders 	_valueEncoders
+	@Inject private const	InputSkins		_inputSkins
+	@Inject private const	ObjCache		_objCache
 	@Inject private const	Messages		_messages
 	
 	** The bean type this 'FormBean' represents.
@@ -45,12 +43,50 @@ class FormBean {
 		
 		// create formfields with default values
 		beanType.fields.findAll { it.hasFacet(HtmlInput#) }.each |field| {
-			input := (HtmlInput) Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
-			&formFields[field] = FormField {
-				it.field	 		= field
-				it.valueEncoder		= objCache[input.valueEncoder]
-				it.inputSkin		= objCache[input.inputSkin]
-				it.optionsProvider	= objCache[input.optionsProvider]
+			input := (HtmlInput) field.facet(HtmlInput#)
+
+			// populate formField objects with any non-null values, minus any default values
+			// 'null' is a useful indicator of where a default will be applied, 
+			// meaning we can infer when to use semi-default values such as 'required' for non-nullable fields
+			&formFields[field] = ((FormField) _scope.build(FormField#, null, [
+				FormField#field	 	: field,
+				FormField#formBean	: this
+			])) {
+				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: _msg("field.${field.name}.type"))
+				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: _msg("field.${field.name}.inputSkin"))
+				it.optionsProvider	= fromObjCache(input.optionsProvider ?: _msg("field.${field.name}.optionsProvider"))
+				it.type				= input.type		?: _msg("field.${field.name}.type"		)
+				it.label			= input.label		?: _msg("field.${field.name}.label"		)
+				it.placeholder		= input.placeholder	?: _msg("field.${field.name}.placeholder")
+				it.hint				= input.hint		?: _msg("field.${field.name}.hint"		)
+				it.css				= input.css			?: _msg("field.${field.name}.css"		)
+				it.attributes		= input.attributes	?: _msg("field.${field.name}.attributes")
+				it.required			= input.required	?: _msg("field.${field.name}.required"	)?.toBool
+				it.minLength		= input.minLength	?: _msg("field.${field.name}.minLength"	)?.toInt
+				it.maxLength		= input.maxLength	?: _msg("field.${field.name}.maxLength"	)?.toInt
+				it.min				= input.min			?: _msg("field.${field.name}.min"		)?.toInt
+				it.max				= input.max			?: _msg("field.${field.name}.max"		)?.toInt
+				it.pattern			= input.pattern		?: _msg("field.${field.name}.pattern"	)?.toRegex
+				it.step				= input.step		?: _msg("field.${field.name}.step"		)?.toInt
+				it.showBlank		= input.showBlank	?: _msg("field.${field.name}.showBlank"	)?.toBool
+				it.blankLabel		= input.blankLabel	?: _msg("field.${field.name}.blankLabel")
+				
+				// apply semi-defaults
+				// TODO add contributions to do this in an inspection hook
+				
+				if (required == null && field.type.isNullable.not && field.type != Bool#)
+					required = true
+				
+				if (type == null && field.type == Bool#)
+					type = "checkbox"
+
+				// this was a nice idea, but HTML5 doesn't allow a maxlength on textareas, which would be the main protagonist.
+				// so it renders it all a bit pointless
+//				if (maxLength == null) {
+//					valueEncoderType := inputSkin?.typeof ?: _inputSkins.find(type ?: "text", false)?.typeof
+//					if (valueEncoderType != null && valueEncoderType.name.contains("Text"))
+//						maxLength = 512
+//				}
 			}
 		}
 	}
@@ -81,16 +117,7 @@ class FormBean {
 		inErr	:= hasErrors
 		html	:= Str.defVal
 		&formFields.each |formField, field| {
-			skinCtx := SkinCtx(defaultMaxLength) {
-				it.bean			= bean
-				it.field		= field
-				it.formBean		= this
-				it.formField	= formField
-				it.inErr		= inErr
-				it.valueEncoders= this.valueEncoders
-			}
-			
-			html += formField.inputSkin != null ? formField.inputSkin.render(skinCtx) : inputSkins.render(skinCtx)
+			html += formField.render(bean)
 		}
 		return html
 	}
@@ -121,46 +148,13 @@ class FormBean {
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
 	Bool validateForm(Str:Str form) {
+		addErrFunc := #_addErr.func.bind([this])
 		&formFields.each |formField, field| {
-			input 		:= formField.input
-			formValue 	:= (Str?) form[field.name]?.trim
-			hasValue	:= formValue != null && !formValue.isEmpty
-
 			// save the value in-case we have error and have to re-render
+			formValue := (Str?) form[field.name]?.trim
 			formField.formValue = formValue
-
-			if (input.required ?: (field.type == Bool# ? false : field.type.isNullable.not))
-				if (formValue == null || formValue.isEmpty)
-					return _addErr(formField, formValue, "required", Str.defVal)
-			
-			if (hasValue && input.minLength != null)
-				if (formValue.size < input.minLength)
-					return _addErr(formField, formValue, "minLength", input.minLength)
-
-			maxLength := input.maxLength ?: defaultMaxLength
-			if (hasValue && maxLength != null)
-				if (formValue.size > maxLength)
-					return _addErr(formField, formValue, "maxLength", maxLength)
-
-			if (hasValue && input.min != null) {
-				if (formValue.toInt(10, false) == null)
-					return _addErr(formField, formValue, "notNum", Str.defVal)
-				if (formValue.toInt < input.min)
-					return _addErr(formField, formValue, "min", input.min)
-			}
-
-			if (hasValue && input.max != null) {
-				if (formValue.toInt(10, false) == null)
-					return _addErr(formField, formValue, "notNum", Str.defVal)
-				if (formValue.toInt > input.max)
-					return _addErr(formField, formValue, "max", input.max)
-			}
-
-			if (hasValue && input.pattern != null)
-				if (!"^${input.pattern}\$".toRegex.matches(formValue))
-					return _addErr(formField, formValue, "pattern", input.pattern)			
+			formField.validate(addErrFunc)
 		}
-		
 		return !hasErrors
 	}
 
@@ -172,7 +166,7 @@ class FormBean {
 	** Any extra properties passed in will also be set.
 	Obj createBean([Str:Obj?]? extraProps := null) {
 		beanProps := _gatherBeanProperties(extraProps)
-		return BeanProperties.create(beanType, beanProps, null) { scope.build(IocBeanFactory#, [it]) }
+		return BeanProperties.create(beanType, beanProps, null) { _scope.build(IocBeanFactory#, [it]) }
 	}
 
 	** Updates the given bean instance with form field values.
@@ -188,7 +182,7 @@ class FormBean {
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		beanProps := _gatherBeanProperties(extraProps)
 
-		scope	:= scope
+		scope	:= _scope	// for the immutable func
 		factory := BeanPropertyFactory {
 			it.makeFunc	 = |Type type->Obj| { ((IocBeanFactory) scope.build(IocBeanFactory#, [type])).create }.toImmutable
 		}
@@ -208,15 +202,16 @@ class FormBean {
 		messages[key]
 	}
 
-	private Void _addErr(FormField formField, Str? value, Str type, Obj constraint) {
+	private Void _addErr(FormField formField, Str type, Obj? constraint := null) {
 		field	:= formField.field
-		input 	:= (HtmlInput) Slot#.method("facet").callOn(field, [HtmlInput#])	// Stoopid F4
+		value	:= formField.formValue
+		input 	:= (HtmlInput) field.facet(HtmlInput#)
 		label	:= input.label ?: (_msg("field.${field.name}.label") ?: field.name.toDisplayName)
 		errMsg 	:= _msg("field.${field.name}.${type}") ?: _msg("field.${type}")
 
 		errMsg = errMsg
 			.replace("\${label}", label)
-			.replace("\${constraint}", constraint.toStr)
+			.replace("\${constraint}", constraint?.toStr ?: "")
 			.replace("\${value}", value ?: Str.defVal)
 
 		formField.errMsg = errMsg
@@ -228,12 +223,12 @@ class FormBean {
 			value := null
 
 			// fugging checkboxes don't send unchecked data
-			if (formField.formValue == null && formField.input.type.equalsIgnoreCase("checkbox"))
+			if (formField.formValue == null && formField.type.equalsIgnoreCase("checkbox"))
 				beanProps[field.name] = false
 
 			// other fields that weren't submitted are also null
 			if (formField.formValue != null) {
-				value = (formField.valueEncoder != null) ? formField.valueEncoder.toValue(formField.formValue) : valueEncoders.toValue(field.type, formField.formValue)
+				value = (formField.valueEncoder != null) ? formField.valueEncoder.toValue(formField.formValue) : _valueEncoders.toValue(field.type, formField.formValue)
 				beanProps[field.name] = value
 			}
 		}
@@ -242,6 +237,14 @@ class FormBean {
 			beanProps.addAll(extraProps)
 		
 		return beanProps
+	}
+	
+	private Obj? fromObjCache(Obj? what) {
+		if (what is Str)
+			what = Type.find(what)
+		if (what is Type)
+			return _objCache[what]
+		return null
 	}
 }
 
