@@ -164,7 +164,13 @@ We call such objects *form beans*. The `FormBean` class then does the necessary 
   syntax: fantom
   formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#])
 
-Or, as in the quick start example, you can '@Inject' a 'FormBean' instance as a field using the 'type' facet attribute:
+You could also use the '@Autobuild' facet on a field:
+
+  syntax: fantom
+  @Autobuild { ctorArgs=[MyFormModel#] }
+  private FormBean formBean
+
+Or, as in the quick start example, you can even '@Inject' a 'FormBean' instance as a field using the 'type' facet attribute:
 
   syntax: fantom
   @Inject { type=MyFormModel# }

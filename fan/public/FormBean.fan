@@ -52,7 +52,7 @@ class FormBean {
 				FormField#field	 	: field,
 				FormField#formBean	: this
 			])) {
-				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(field, "type"))
+				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(field, "valueEncoder"))
 				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: fieldMsg(field, "inputSkin"))
 				it.optionsProvider	= fromObjCache(input.optionsProvider ?: fieldMsg(field, "optionsProvider"))
 				it.type				= input.type		?: fieldMsg(field, "type"		)
@@ -70,16 +70,22 @@ class FormBean {
 				it.step				= input.step		?: fieldMsg(field, "step"		)?.toInt
 				it.showBlank		= input.showBlank	?: fieldMsg(field, "showBlank"	)?.toBool
 				it.blankLabel		= input.blankLabel	?: fieldMsg(field, "blankLabel"	)
-				
+
 				// apply semi-defaults
-				// TODO add contributions to do this in an inspection hook
-				
+				// TODO add contributions to do this in an inspection hook - that way they can be easily disabled / turned off
+
 				// a 'required' checkbox means it *has* to be checked - usually not what we want by default
 				if (required == null && field.type.isNullable.not && field.type != Bool#)
 					required = true
-				
+
 				if (type == null && field.type == Bool#)
 					type = "checkbox"
+
+				if (type == null && field.name.lower.contains("email"))
+					type = "email"
+
+				if (type == null && (field.name == "url" || field.name == "uri" || field.name.endsWith("Url") || field.name.endsWith("Uri")))
+					type = "url"
 
 				// this was a nice idea, but HTML5 doesn't allow a maxlength on textareas, which would be the main protagonist.
 				// so it renders it all a bit pointless
