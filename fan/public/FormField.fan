@@ -204,6 +204,10 @@ class FormField {
 			if (formValue.size > maxLength)
 				return errMsg = msg("maxLength.msg", maxLength)
 
+		if (hasValue && type == "number")
+			if (formValue.toInt(10, false) == null)
+				return errMsg = msg("notNum.msg")
+	
 		if (hasValue && min != null) {
 			if (formValue.toInt(10, false) == null)
 				return errMsg = msg("notNum.msg")
