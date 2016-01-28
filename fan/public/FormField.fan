@@ -29,12 +29,14 @@ class FormField {
 	** If 'null' then a default 'InputSkin' is chosen based on the 'type' attribute. 
 	InputSkin?		inputSkin
 	
-	** Setting this to a non-null value also invalidates the form field. 
+	** Returns the error message associated with this field.
+	** 
+	** Setting this to a non-null value invalidate the form field. 
 	Str?			errMsg	{ set { if (it != null) invalid = true; &errMsg = it } }
 	
 	** Is this form field invalid?
 	** 
-	** Setting this to 'false' also clears any error message. 
+	** Setting this to 'false' also clears any 'errMsg'. 
 	Bool			invalid { set { if (it == false) errMsg = null; &invalid = it } }
 
 
@@ -130,12 +132,33 @@ class FormField {
 	OptionsProvider?	optionsProvider
 	
 
+	@Inject private const	|->Scope|		_scope
 	@Inject private const	InputSkins		_inputSkins
 	@Inject private const	ValueEncoders 	_valueEncoders
 	
 	@NoDoc // Boring!
 	new make(|This| in) { in(this) }
 	
+	
+	** Returns a message for the given field. Messages are looked up in the following order:
+	** 
+	**   - '<bean>.<field>.<key>'
+	**   - '<field>.<key>'
+	**   - '<key>'
+	** 
+	** And the following substitutions are made:
+	** 
+	**  - '${label} -> formField.label'
+	**  - '${value} -> formField.formValue'
+	**  - '${arg1}  -> arg1.toStr'
+	**  - '${arg2}  -> arg2.toStr'
+	**  - '${arg3}  -> arg3.toStr'
+	** 
+	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	Str? msg(Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
+		formBean.fieldMsg(this, key, arg1, arg2, arg3)
+	}
+
 	** Hook to render this field to HTML.
 	** By default this defers rendering to an 'InputSkin'.
 	** 
@@ -153,42 +176,50 @@ class FormField {
 		return inputSkin.render(skinCtx)		
 	}
 	
-	** Hook to validate form field.
-	** By default this performs the basic HTML5 validation.
+	** Validates this form field.
+	** Calls 'doHtmlValidation()' and then any static '@Validate' method that corresponds to this field. 
 	** 
-	** Override to perform custom field validation.
-	** Use the given 'addErr' func to report errors; note that 'constraint' is optional.   
-	virtual Void validate(|Str type, Obj? constraint| addErr) {
+	** '@Validate' methods may check 'invalid' and 'errMsg' to ascertain if any previous validation failed. 
+	virtual Void validate() {
+		doHtmlValidation
+		
+		field.parent.methods
+			.findAll { ((Validate?) it.facet(Validate#, false))?.field == field }
+			.each 	 { _scope().callMethod(it, null, [this]) }
+	}
+
+	** Performs basic HTML5 validation.
+	virtual Void doHtmlValidation() {
 		hasValue := formValue != null && !formValue.isEmpty
 
 		if (required ?: false)
 			if (formValue == null || formValue.isEmpty)
-				return addErr("required", Str.defVal)
+				return errMsg = msg("required.msg")
 		
 		if (hasValue && minLength != null)
 			if (formValue.size < minLength)
-				return addErr("minLength", minLength)
+				return errMsg = msg("minLength.msg", minLength)
 
 		if (hasValue && maxLength != null)
 			if (formValue.size > maxLength)
-				return addErr("maxLength", maxLength)
+				return errMsg = msg("maxLength.msg", maxLength)
 
 		if (hasValue && min != null) {
 			if (formValue.toInt(10, false) == null)
-				return addErr("notNum", Str.defVal)
+				return errMsg = msg("notNum.msg")
 			if (formValue.toInt < min)
-				return addErr("min", min)
+				return errMsg = msg("min.msg", min)
 		}
 
 		if (hasValue && max != null) {
 			if (formValue.toInt(10, false) == null)
-				return addErr("notNum", Str.defVal)
+				return errMsg = msg("notNum.msg")
 			if (formValue.toInt > max)
-				return addErr("max", max)
+				return errMsg = msg("max.msg", max)
 		}
 
 		if (hasValue && pattern != null)
 			if (!"^${pattern}\$".toRegex.matches(formValue))
-				return addErr("pattern", pattern)			
+				return errMsg = msg("pattern.msg", pattern)			
 	}
 }

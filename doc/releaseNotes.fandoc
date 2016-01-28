@@ -2,6 +2,7 @@ Versions
 ********
 v1.1.0
 ======
+ - New: '@Validate' methods for custom server side validation.
  - New: All attributes from '@HtmlInput' are pre-populated from message values and are available in 'FormField'.
  - Chg: Rejigged all the message keys, see *Message Cheat Sheet* for details. (Breaking change.)
  - Chg: Updated to work with [IoC v3.0]`pod:afIoc`. (Breaking change.)

@@ -4,9 +4,9 @@ using afBedSheet
 using afBeanUtils
 using web
 
-** Represents a Fantom object that can rendered as a HTML form, and reconstituted back to a Fantom object.  
+** Represents a Fantom type that can be rendered as a HTML form, and reconstituted back to a Fantom instance.  
 class FormBean {	
-	@Inject private const	Scope			_scope
+	@Inject private const	|->Scope|		_scope
 	@Inject private const	ValueEncoders 	_valueEncoders
 	@Inject private const	InputSkins		_inputSkins
 	@Inject private const	ObjCache		_objCache
@@ -48,28 +48,28 @@ class FormBean {
 			// populate formField objects with any non-null values, minus any default values
 			// 'null' is a useful indicator of where a default will be applied, 
 			// meaning we can infer when to use semi-default values such as 'required' for non-nullable fields
-			&formFields[field] = ((FormField) _scope.build(FormField#, null, [
+			&formFields[field] = ((FormField) _scope().build(FormField#, null, [
 				FormField#field	 	: field,
 				FormField#formBean	: this
 			])) {
-				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(field, "valueEncoder"))
-				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: fieldMsg(field, "inputSkin"))
-				it.optionsProvider	= fromObjCache(input.optionsProvider ?: fieldMsg(field, "optionsProvider"))
-				it.type				= input.type		?: fieldMsg(field, "type"		)
-				it.label			= input.label		?: fieldMsg(field, "label"		)
-				it.placeholder		= input.placeholder	?: fieldMsg(field, "placeholder")
-				it.hint				= input.hint		?: fieldMsg(field, "hint"		)
-				it.css				= input.css			?: fieldMsg(field, "css"		)
-				it.attributes		= input.attributes	?: fieldMsg(field, "attributes"	)
-				it.required			= input.required	?: fieldMsg(field, "required"	)?.toBool
-				it.minLength		= input.minLength	?: fieldMsg(field, "minLength"	)?.toInt
-				it.maxLength		= input.maxLength	?: fieldMsg(field, "maxLength"	)?.toInt
-				it.min				= input.min			?: fieldMsg(field, "min"		)?.toInt
-				it.max				= input.max			?: fieldMsg(field, "max"		)?.toInt
-				it.pattern			= input.pattern		?: fieldMsg(field, "pattern"	)?.toRegex
-				it.step				= input.step		?: fieldMsg(field, "step"		)?.toInt
-				it.showBlank		= input.showBlank	?: fieldMsg(field, "showBlank"	)?.toBool
-				it.blankLabel		= input.blankLabel	?: fieldMsg(field, "blankLabel"	)
+				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(it, "valueEncoder"))
+				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: fieldMsg(it, "inputSkin"))
+				it.optionsProvider	= fromObjCache(input.optionsProvider ?: fieldMsg(it, "optionsProvider"))
+				it.type				= input.type		?: fieldMsg(it, "type"			)
+				it.label			= input.label		?: fieldMsg(it, "label"			)
+				it.placeholder		= input.placeholder	?: fieldMsg(it, "placeholder"	)
+				it.hint				= input.hint		?: fieldMsg(it, "hint"			)
+				it.css				= input.css			?: fieldMsg(it, "css"			)
+				it.attributes		= input.attributes	?: fieldMsg(it, "attributes"	)
+				it.required			= input.required	?: fieldMsg(it, "required"		)?.toBool
+				it.minLength		= input.minLength	?: fieldMsg(it, "minLength"		)?.toInt
+				it.maxLength		= input.maxLength	?: fieldMsg(it, "maxLength"		)?.toInt
+				it.min				= input.min			?: fieldMsg(it, "min"			)?.toInt
+				it.max				= input.max			?: fieldMsg(it, "max"			)?.toInt
+				it.pattern			= input.pattern		?: fieldMsg(it, "pattern"		)?.toRegex
+				it.step				= input.step		?: fieldMsg(it, "step"			)?.toInt
+				it.showBlank		= input.showBlank	?: fieldMsg(it, "showBlank"		)?.toBool
+				it.blankLabel		= input.blankLabel	?: fieldMsg(it, "blankLabel"	)
 
 				applySemiDefaults(it)
 			}
@@ -78,7 +78,7 @@ class FormBean {
 	
 	@NoDoc	// virtual so people can overide and turn off this behaviour 
 	virtual Void applySemiDefaults(FormField formField) {
-	// TODO add contributions to do this in an inspection hook - that way they can be easily disabled / turned off
+		// TODO add contributions to do this in an inspection hook - that way they can be easily disabled / turned off
 		formField {
 			// a 'required' checkbox means it *has* to be checked - usually not what we want by default
 			if (required == null && field.type.isNullable.not && field.type != Bool#)
@@ -107,7 +107,7 @@ class FormBean {
 	**   </div>
 	** 
 	** To change the banner message, set a message with the key 'errors.banner'.
-	Str renderErrors() {
+	virtual Str renderErrors() {
 		((ErrorSkin) (errorSkin ?: DefaultErrorSkin())).render(this)
 	}
 
@@ -115,7 +115,7 @@ class FormBean {
 	** 
 	** If the given 'bean' is 'null' then values are taken from the form fields. 
 	** Do so if you're re-rendering a form with validation errors.
-	Str renderBean(Obj? bean) {
+	virtual Str renderBean(Obj? bean) {
 		if (bean != null && !bean.typeof.fits(beanType))
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		inErr	:= hasErrors
@@ -133,11 +133,11 @@ class FormBean {
 	**   </div>
 	** 
 	** The label is taken from the msg key 'submit.label' and defaults to 'Submit'.
-	Str renderSubmit() {
+	virtual Str renderSubmit() {
 		buf := StrBuf()
 		out := WebOutStream(buf.out)
 
-		label := messages["submit.label"] ?: "Submit"
+		label := messages["submit.label"] ?: ""
 		out.div("class='formBean-row submitRow'")
 		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label.toXml}\"")
 		out.divEnd
@@ -151,17 +151,19 @@ class FormBean {
 	** Returns 'true' if all the values are valid, 'false' if not.
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
-	Bool validateForm(Str:Str form) {
-		addErrFunc := #_addErr.func.bind([this])
+	virtual Bool validateForm(Str:Str form) {
 		&formFields.each |formField, field| {
-			
 			// save the value in-case we have error and have to re-render
 			formValue := (Str?) form[field.name]?.trim
 			formField.formValue = formValue
-			
-			fieldFunc := addErrFunc.bind([formField])
-			formField.validate(fieldFunc)
+
+			formField.validate
 		}
+		
+		beanType.methods
+			.findAll { it.hasFacet(Validate#) && ((Validate) it.facet(Validate#)).field == null }
+			.each 	 { _scope().callMethod(it, null, [this]) }
+		
 		return !hasErrors
 	}
 
@@ -171,9 +173,9 @@ class FormBean {
 	** This should only be called after 'validateForm()'.
 	** 
 	** Any extra properties passed in will also be set.
-	Obj createBean([Str:Obj?]? extraProps := null) {
+	virtual Obj createBean([Str:Obj?]? extraProps := null) {
 		beanProps := _gatherBeanProperties(extraProps)
-		return BeanProperties.create(beanType, beanProps, null) { _scope.build(IocBeanFactory#, [it]) }
+		return BeanProperties.create(beanType, beanProps, null) { _scope().build(IocBeanFactory#, [it]) }
 	}
 
 	** Updates the given bean instance with form field values.
@@ -184,12 +186,12 @@ class FormBean {
 	** The given extra properties will also be set on the bean.
 	** 
 	** Returns the given bean instance.
-	Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
+	virtual Obj updateBean(Obj bean, [Str:Obj?]? extraProps := null) {
 		if (!bean.typeof.fits(beanType))
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		beanProps := _gatherBeanProperties(extraProps)
 
-		scope	:= _scope	// for the immutable func
+		scope	:= _scope()	// for the immutable func
 		factory := BeanPropertyFactory {
 			it.makeFunc	 = |Type type->Obj| { ((IocBeanFactory) scope.build(IocBeanFactory#, [type])).create }.toImmutable
 		}
@@ -210,25 +212,29 @@ class FormBean {
 	**   - '<bean>.<field>.<key>'
 	**   - '<field>.<key>'
 	**   - '<key>'
-	Str? fieldMsg(Field field, Str key) {
+	** 
+	** And the following substitutions are made:
+	** 
+	**  - '${label} -> formField.label'
+	**  - '${value} -> formField.formValue'
+	**  - '${arg1}  -> arg1.toStr'
+	**  - '${arg2}  -> arg2.toStr'
+	**  - '${arg3}  -> arg3.toStr'
+	** 
+	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	Str? fieldMsg(FormField formField, Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
+
 		// bean messages have already been merged
-		messages["${field.name}.${key}"] ?: messages["${key}"]
-	}
+		msg		:= messages["${formField.field.name}.${key}"] ?: messages["${key}"]
+		label	:= formField.label ?: formField.field.name.toDisplayName
+		value	:= formField.formValue ?: ""
 
-	private Void _addErr(FormField formField, Str type, Obj? constraint := null) {
-		field	:= formField.field
-		value	:= formField.formValue
-		input 	:= (HtmlInput) field.facet(HtmlInput#)
-		
-		label	:= formField.label ?: field.name.toDisplayName
-		errMsg 	:= fieldMsg(field, "${type}.msg")
-
-		errMsg = errMsg
-			.replace("\${label}", 		label)
-			.replace("\${constraint}",	constraint?.toStr ?: "")
-			.replace("\${value}",		value ?: "")
-
-		formField.errMsg = errMsg
+		return msg
+			?.replace("\${label}", 	label)
+			?.replace("\${value}",	value)
+			?.replace("\${arg1}",	arg1?.toStr ?: "")
+			?.replace("\${arg2}",	arg2?.toStr ?: "")
+			?.replace("\${arg3}",	arg3?.toStr ?: "")
 	}
 	
 	private Str:Obj? _gatherBeanProperties([Str:Obj?]? extraProps) {

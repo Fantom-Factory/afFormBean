@@ -53,7 +53,7 @@ class ContactUsPage  {
 }
 
 class ContactDetails {
-    @HtmlInput { required=true; attributes="placeholder='Fred Bloggs'" }
+    @HtmlInput { required=true; placeholder="Fred Bloggs"; attributes="autofocus" }
     Str name
 
     @HtmlInput { type="email"; required=true; placeholder="fred.bloggs@example.com"; hint="Proper format 'name@something.com'" }
@@ -66,6 +66,12 @@ class ContactDetails {
     Str message
 
     new make(|This|in) { in(this) }
+	
+	@Validate { field=#name }
+	static Void validateName(FormField formField) {
+		if (formField.formValue == "Trisha")
+			formField.errMsg = "Ex-girlfriends not allowed!"
+	}
 }
 
 // @SubModule only needed because this example is run as a script

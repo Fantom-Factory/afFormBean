@@ -73,7 +73,7 @@ internal const class SelectSkin : DefaultInputSkin {
 		}
 		
 		optionsProvider.options(skinCtx.field).each |value, label| {
-			optLabel := skinCtx.fieldMsg("option.${label}.label") ?: label
+			optLabel := skinCtx.formField.msg("option.${label}.label") ?: label
 			optValue := skinCtx.toClient(value)
 			optSelec := (optValue.equalsIgnoreCase(skinCtx.value)) ? " selected" : Str.defVal
 			html += """<option value="${optValue}"${optSelec}>${optLabel}</option>"""

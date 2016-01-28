@@ -89,6 +89,12 @@ Quick Start
         Str message
 
         new make(|This|in) { in(this) }
+
+        @Validate { field=#name }
+        static Void validateName(FormField formField) {
+            if (formField.formValue == "Trisha")
+                formField.errMsg = "Ex-girlfriends not allowed!"
+        }
     }
 
     // @SubModule only needed because this example is run as a script
@@ -234,13 +240,11 @@ They're generally a pain to configure, awkward to tweak and don't go anywhere ne
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
-The '@HtmlInput' facet attributes 'required', 'minLength', 'maxLength', 'min', 'max', 'regex', and 'step' map directly HTML5 input attributes and are rendered as such.
-As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
+The '@HtmlInput' facet attributes 'required', 'minLength', 'maxLength', 'min', 'max', 'regex', and 'step' map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
 
 You can, of course, embed and utilise any javascript form validation framework you wish! Using FormBean does not preclude you from using other validation frameworks.
 
-Now, because hackers and testers alike constantly try to break your application, you can not assume that everyone is using a HTML5 enabled browser.
-That means any old junk may be submitted to the server and you have to guard against this.
+Now, because hackers and testers alike constantly try to break your application, you can not assume that everyone is using a HTML5 enabled browser. That means any old junk may be submitted to the server and you have to guard against this.
 
 Thankfully, FormBean performs some server side validation of its own. Calling 'FormBean.validateForm(...)' will perform the same basic HTML5 validation as the browser.
 Any error messages generated are saved directly on the 'FormField' instances.
@@ -267,6 +271,48 @@ Fortunately HTML5 gives us an easy way to do this, just add the 'novalidate' att
   <form action='/contact' method='POST' novalidate>
       ...
   </form>
+
+
+
+Custom Server-Side Validation
+=============================
+As well as the basic HTML5 validation, beans may also provide custom server-side validation. To use, annotate a bean method with '@Validate'. Validate methods should be static and take a single 'FormField' parameter.
+They should inspect the 'formField.value' and set an 'errMsg' if invalid.
+Example:
+
+pre>
+syntax: fantom
+
+class User {
+    Str? name
+
+    @Validate { field=#name }
+    static Void validateName(FormField formField) {
+        if (formField.value == "Trisha")
+            formField.errMsg = "Ex-girlfriends not allowed!"
+    }
+}
+<pre
+
+If '@Validate.field' is 'null' then the first parameter should be 'FormBean':
+
+pre>
+syntax: fantom
+
+@Validate
+static Void validateBean(FormBean formBean) { ... }
+<pre
+
+'FormBean' validation is performed *after* 'FormField' validation.
+
+Note that validation methods are called using IoC, so services may be passed in as extra parameters:
+
+pre>
+syntax: fantom
+
+@Validate
+static Void validateName(FormField formField, MyService service) { ... }
+<pre
 
 
 
