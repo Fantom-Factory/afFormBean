@@ -17,8 +17,8 @@ internal const class Messages {
 				// can only get single props, not the whole file, so add locale to getMessage
 				// or just look for more files using the same rules (better)
 				// pass in Locale locale := Locale.cur()
-				formBeanMsgs :=    beanType.pod.files.find { matches(it, "FormBean")		}?.readProps ?: [:]
-				beanTypeMsgs :=    beanType.pod.files.find { matches(it, "beanType.name")	}?.readProps ?: [:]
+				formBeanMsgs :=    beanType.pod.files.find { matches(it, "FormBean")	}?.readProps ?: [:]
+				beanTypeMsgs :=    beanType.pod.files.find { matches(it, beanType.name)	}?.readProps ?: [:]
 				tempMsgs	 := Str:Str[:] { caseInsensitive=true }.setAll(defaultMsgs).setAll(formBeanMsgs).setAll(beanTypeMsgs)
 				beanName 	 := beanType.name.lower + "."
 
