@@ -7,21 +7,21 @@ class SkinCtx {
 	internal	ValueEncoders	_valueEncoders
 
 	** The bean instance being rendered.
-				Obj?			bean
+				Obj?			bean { internal set }
 	
 	** The corresponding bean field.
 	const		Field			field
 	
 	
 	** The 'FormField' being rendered.
-				FormField		formField
+				FormField		formField { internal set }
 	
 	** The containing 'FormBean' instance.
-				FormBean		formBean
+				FormBean		formBean { internal set }
 	
 	internal new make(|This|in) { in(this)	}
 
-	** Returns the name of the field. Safe for use as a CSS class name.
+	** Returns the name of the field. Safe for use as an ID / CSS class name.
 	Str name() {
 		field.name
 	}
@@ -34,7 +34,8 @@ class SkinCtx {
 	** Returns the preferred string value to be rendered in the '<input>'. 
 	Str value() {
 		// if the bean has *any* errors, always render the formValues
-		return beanInvalid ? (formField.formValue ?: "") : toClient(fieldValue)
+		// bean errors indicate that the form has been validated and we are re-rendering the form with submitted values.
+		beanInvalid ? (formField.formValue ?: "") : toClient(fieldValue)
 	}
 	
 	** Returns the field value. 
@@ -58,16 +59,6 @@ class SkinCtx {
 		formField.errMsg
 	}
 	
-	** Returns the message (if any) associated with the given key.
-	** Messages are looked up in the following order:
-	** 
-	**   - '<bean>.<field>.<key>'
-	**   - '<field>.<key>'
-	**   - '<key>'
-	Str? fieldMsg(Str key) {
-		formBean.fieldMsg(field, key)
-	}
-	
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
 	Str toClient(Obj? value) {
 		strVal := (formField.valueEncoder != null) ? formField.valueEncoder.toClient(value) : _valueEncoders.toClient(field.type, value)
@@ -82,7 +73,7 @@ class SkinCtx {
 	** The given 'extraAttributes' are merged in, allowing you to pass in extra css styles:
 	** 
 	**   syntax: fantom
-	**   attrs := skinCtx.renderAttributes(["class" : "hot-pink"])
+	**   attrs := skinCtx.renderAttributes(["autocomplete" : "off"])
 	** 
 	** Note that empty string values are rendered as HTML5 empty attributes.
 	Str renderAttributes([Str:Str]? extraAttributes := null) {
