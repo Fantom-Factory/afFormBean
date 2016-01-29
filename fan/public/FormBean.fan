@@ -61,6 +61,7 @@ class FormBean {
 				it.hint				= input.hint		?: fieldMsg(it, "hint"			)
 				it.css				= input.css			?: fieldMsg(it, "css"			)
 				it.attributes		= input.attributes	?: fieldMsg(it, "attributes"	)
+				it.viewOnly			= input.viewOnly	?: fieldMsg(it, "viewOnly"		)?.toBool
 				it.required			= input.required	?: fieldMsg(it, "required"		)?.toBool
 				it.minLength		= input.minLength	?: fieldMsg(it, "minLength"		)?.toInt
 				it.maxLength		= input.maxLength	?: fieldMsg(it, "maxLength"		)?.toInt
@@ -153,6 +154,9 @@ class FormBean {
 	** It is safe to pass in 'HttpRequest.form()' directly.
 	virtual Bool validateForm(Str:Str form) {
 		&formFields.each |formField, field| {
+			if (formField.viewOnly ?: false)
+				return
+
 			// save the value in-case we have error and have to re-render
 			formValue := (Str?) form[field.name]?.trim
 			formField.formValue = formValue
@@ -241,6 +245,9 @@ class FormBean {
 		beanProps := Str:Obj?[:]
 		&formFields.each |formField, field| {
 			value := null
+			
+			if (formField.viewOnly ?: false)
+				return
 
 			// fugging checkboxes don't send unchecked data
 			if (formField.formValue == null && formField.type.equalsIgnoreCase("checkbox"))

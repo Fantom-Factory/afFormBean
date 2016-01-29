@@ -39,6 +39,12 @@ class FormField {
 	** Setting this to 'false' also clears any 'errMsg'. 
 	Bool			invalid { set { if (it == false) errMsg = null; &invalid = it } }
 
+	** If 'true' then the field is rendered into the HTML form as normal, but no attempt is made 
+	** to validate the form value or decode it back to a Fantom value. 
+	** 
+	** Useful for rendering static, read only, HTML associated with the field.
+	Bool? 			viewOnly
+	
 
 
 	// ---- Html Options ------------------------------------------------------------------------
