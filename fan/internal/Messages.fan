@@ -9,6 +9,7 @@ internal const class Messages {
 		defaultMsgs = this.typeof.pod.files.find { matches(it, "FormBean") } .readProps		
 	}
 	
+	@Operator
 	Str:Str getMessages(Type beanType) {
 		((Str:Str) messages.getOrAdd(beanType) |->Str:Str| {
 			msgs 		:= Str:Str[:] { caseInsensitive = true }

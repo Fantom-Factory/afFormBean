@@ -11,6 +11,7 @@ class FormBean {
 	@Inject private const	InputSkins		_inputSkins
 	@Inject private const	ObjCache		_objCache
 	@Inject private const	Messages		_messages
+	@Inject private const	FieldInspectors	_fieldInspectors
 	
 	** The bean type this 'FormBean' represents.
 					const	Type			beanType
@@ -41,59 +42,7 @@ class FormBean {
 		this.beanType = beanType
 		this.messages = _messages.getMessages(beanType)
 		
-		// create formfields with default values
-		beanType.fields.findAll { it.hasFacet(HtmlInput#) }.each |field| {
-			input := (HtmlInput) field.facet(HtmlInput#)
-
-			// populate formField objects with any non-null values, minus any default values
-			// 'null' is a useful indicator of where a default will be applied, 
-			// meaning we can infer when to use semi-default values such as 'required' for non-nullable fields
-			&formFields[field] = ((FormField) _scope().build(FormField#, null, [
-				FormField#field	 	: field,
-				FormField#formBean	: this
-			])) {
-				it.valueEncoder		= fromObjCache(input.valueEncoder	 ?: fieldMsg(it, "valueEncoder"))
-				it.inputSkin		= fromObjCache(input.inputSkin 		 ?: fieldMsg(it, "inputSkin"))
-				it.optionsProvider	= fromObjCache(input.optionsProvider ?: fieldMsg(it, "optionsProvider"))
-				it.type				= input.type		?: fieldMsg(it, "type"			)
-				it.label			= input.label		?: fieldMsg(it, "label"			)
-				it.placeholder		= input.placeholder	?: fieldMsg(it, "placeholder"	)
-				it.hint				= input.hint		?: fieldMsg(it, "hint"			)
-				it.css				= input.css			?: fieldMsg(it, "css"			)
-				it.attributes		= input.attributes	?: fieldMsg(it, "attributes"	)
-				it.viewOnly			= input.viewOnly	?: fieldMsg(it, "viewOnly"		)?.toBool
-				it.required			= input.required	?: fieldMsg(it, "required"		)?.toBool
-				it.minLength		= input.minLength	?: fieldMsg(it, "minLength"		)?.toInt
-				it.maxLength		= input.maxLength	?: fieldMsg(it, "maxLength"		)?.toInt
-				it.min				= input.min			?: fieldMsg(it, "min"			)?.toInt
-				it.max				= input.max			?: fieldMsg(it, "max"			)?.toInt
-				it.pattern			= input.pattern		?: fieldMsg(it, "pattern"		)?.toRegex
-				it.step				= input.step		?: fieldMsg(it, "step"			)?.toInt
-				it.showBlank		= input.showBlank	?: fieldMsg(it, "showBlank"		)?.toBool
-				it.blankLabel		= input.blankLabel	?: fieldMsg(it, "blankLabel"	)
-
-				applySemiDefaults(it)
-			}
-		}
-	}
-	
-	@NoDoc	// virtual so people can overide and turn off this behaviour 
-	virtual Void applySemiDefaults(FormField formField) {
-		// TODO add contributions to do this in an inspection hook - that way they can be easily disabled / turned off
-		formField {
-			// a 'required' checkbox means it *has* to be checked - usually not what we want by default
-			if (required == null && field.type.isNullable.not && field.type != Bool#)
-				required = true
-
-			if (type == null && field.type == Bool#)
-				type = "checkbox"
-
-			if (type == null && field.name.lower.contains("email"))
-				type = "email"
-
-			if (type == null && (field.name == "url" || field.name == "uri" || field.name.endsWith("Url") || field.name.endsWith("Uri")))
-				type = "url"
-		}
+		_fieldInspectors.inspect(this, &formFields)
 	}
 	
 	** Renders form field errors (if any) to an unordered list.

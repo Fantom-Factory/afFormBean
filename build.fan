@@ -36,7 +36,7 @@ class Build : BuildPod {
 //			"afSizzle     1.0.2  - 1.0"
 		]
 
-		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/public/`]
+		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/inspectors/`, `fan/public/`]
 		resDirs = [`doc/`, `res/`]
 	}
 	

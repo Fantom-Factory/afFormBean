@@ -9,6 +9,7 @@ const class FormBeanModule {
 		defs.addService(InputSkins#)
 		defs.addService(OptionsProviders#)
 		defs.addService(Messages#)
+		defs.addService(FieldInspectors#)
 	}
 	
 	@Contribute { serviceType=InputSkins# }
@@ -38,6 +39,12 @@ const class FormBeanModule {
 //		config["radio"]		= 
 //		config["reset"]		= 
 //		config["submit"]	= 
+	}
+	
+	@Contribute { serviceType=FieldInspectors# }
+	Void contributeFieldInspectors(Configuration config) {
+		config["afFormBean.htmlInput"] 		= config.build(HtmlInputInspector#)
+		config["afFormBean.semiDefaults"]	= config.build(SemiDefaultInspector#)
 	}
 	
 	@Contribute { serviceType=OptionsProviders# }
