@@ -1,16 +1,8 @@
 
-@NoDoc
-const class EnumOptionsProvider : OptionsProvider {
-	override const Bool showBlank
-	override const Str? blankLabel
+internal const class EnumOptionsProvider : OptionsProvider {
 
-	new make(Bool showBlank, Str? blankLabel) {
-		this.showBlank	= showBlank
-		this.blankLabel	= blankLabel
-	}
-	
-	override Str:Obj options(Field field) {
-		vals := (Enum[]) field.type.field("vals").get
+	override Str:Obj options(FormField formField) {
+		vals := (Enum[]) formField.field.type.field("vals").get
 		return Str:Obj[:] { ordered=true }.addList(vals) |Enum enm->Str| { enm.name.toDisplayName }
 	}
 }

@@ -24,7 +24,7 @@ class Build : BuildPod {
 
 			// ---- Core ------------------------
 			"afBeanUtils  1.0.6  - 1.0",
-			"afConcurrent 1.0.12 - 1.0",	// for CachingTypeLookup / OptionsProviders
+			"afConcurrent 1.0.12 - 1.0",	// for Messages.AtomicMap
 			"afIoc        3.0.0  - 3.0",
 			"afIocConfig  1.1.0  - 1.1",
 
