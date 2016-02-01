@@ -49,7 +49,7 @@ const class FormBeanModule {
 	
 	@Contribute { serviceType=OptionsProviders# }
 	Void contributeOptionsProviders(Configuration config) {
-		config[Enum#] = EnumOptionsProvider(true, "")
+		config[Enum#] = EnumOptionsProvider()
 	}
 
 	@Contribute { serviceType=ValueEncoders# }

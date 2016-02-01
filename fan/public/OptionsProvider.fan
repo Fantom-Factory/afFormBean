@@ -17,12 +17,18 @@
 const mixin OptionsProvider {
 	
 	** Return 'true' if the '<select>' should show a blank value at the start of the options list.
-	abstract Bool showBlank()
+	** 
+	** Default behaviour is to return '!formField.required'.
+	virtual Bool showBlank(FormField formField) {
+		(formField.required ?: false).not
+	}
 	
 	** The label to display in the blank option, should 'showBlank' return 'true'. 
-	abstract Str? blankLabel()
+	** 
+	** Default behaviour is to return an empty string.
+	virtual Str? blankLabel(FormField formField) { "" }
 	
 	** A map of option values to display, keyed on the display label. 
 	** The returned map should be ordered.
-	abstract Str:Obj options(Field field)
+	abstract Str:Obj options(FormField formField)
 }
