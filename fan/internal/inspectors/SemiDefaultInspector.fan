@@ -10,6 +10,9 @@ internal const class SemiDefaultInspector : FieldInspector {
 			if (type == null && field.type == Bool#)
 				type = "checkbox"
 
+			if (type == null && field.type.fits(Enum#))
+				type = "select"
+			
 			if (type == null && field.name.lower.contains("email"))
 				type = "email"
 
