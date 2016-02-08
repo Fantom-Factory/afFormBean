@@ -3,7 +3,7 @@ using afIoc
 
 internal class IocBeanFactory : BeanFactory {
 	
-	private |->Scope|	scope
+	@Inject	private |->Scope|	scope
 	
 	new make(Type type, |This|in) : super(type) { 
 		in(this)
