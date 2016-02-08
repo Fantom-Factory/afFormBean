@@ -160,7 +160,7 @@ class FormBean {
 		!errorMsgs.isEmpty || &formFields.vals.any { it.invalid }
 	}
 	
-	** Returns a message for the given field. Messages are looked up in the following order:
+	** Returns a message for the given field and key. Messages are looked up in the following order:
 	** 
 	**   - '<bean>.<field>.<key>'
 	**   - '<field>.<key>'
@@ -174,7 +174,9 @@ class FormBean {
 	**  - '${arg2}  -> arg2.toStr'
 	**  - '${arg3}  -> arg3.toStr'
 	** 
-	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	** The form value is substituted for '${value}' because it is intended for use by validation msgs.
+	** 
+	** Returns 'null' if a message could not be found. 
 	Str? fieldMsg(FormField formField, Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
 
 		// bean messages have already been merged
@@ -185,6 +187,29 @@ class FormBean {
 		return msg
 			?.replace("\${label}", 	label)
 			?.replace("\${value}",	value)
+			?.replace("\${arg1}",	arg1?.toStr ?: "")
+			?.replace("\${arg2}",	arg2?.toStr ?: "")
+			?.replace("\${arg3}",	arg3?.toStr ?: "")
+	}
+
+	** Returns a message for the given key. Messages are looked up in the following order:
+	** 
+	**   - '<bean>.<key>'
+	**   - '<key>'
+	** 
+	** And the following substitutions are made:
+	** 
+	**  - '${arg1}  -> arg1.toStr'
+	**  - '${arg2}  -> arg2.toStr'
+	**  - '${arg3}  -> arg3.toStr'
+	** 
+	** Returns 'null' if a message could not be found. 
+	Str? msg(Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
+
+		// bean messages have already been merged
+		msg		:= messages["${key}"]
+
+		return msg
 			?.replace("\${arg1}",	arg1?.toStr ?: "")
 			?.replace("\${arg2}",	arg2?.toStr ?: "")
 			?.replace("\${arg3}",	arg3?.toStr ?: "")
