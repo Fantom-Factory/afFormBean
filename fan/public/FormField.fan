@@ -161,6 +161,8 @@ class FormField {
 	**  - '${arg3}  -> arg3.toStr'
 	** 
 	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	** 
+	** Returns 'null' if a msg could not be found.
 	Str? msg(Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
 		formBean.fieldMsg(this, key, arg1, arg2, arg3)
 	}
