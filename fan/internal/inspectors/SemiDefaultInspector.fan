@@ -16,6 +16,9 @@ internal const class SemiDefaultInspector : FieldInspector {
 			if (type == null && field.name.lower.contains("email"))
 				type = "email"
 
+			if (type == null && field.name.lower.contains("password"))
+				type = "password"
+
 			if (type == null && (field.name == "url" || field.name == "uri" || field.name.endsWith("Url") || field.name.endsWith("Uri")))
 				type = "url"
 		}		
