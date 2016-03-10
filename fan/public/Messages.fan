@@ -1,6 +1,23 @@
 using afConcurrent
 
-internal const class Messages {
+** (Service) - 
+** Creates a map of messages by merging together property files. 
+** Property files are looked for in the following locations:
+** 
+**  - 'FormBean.props' in pod 'afFormBean'
+**  - 'FormBean.props' in pod '<pod>'
+**  - '<bean>.props' in pod '<pod>'
+** 
+** Messages override those defined previously.
+const mixin Messages {
+
+	** Returns messages for the given bean.
+	@Operator
+	abstract Str:Str getMessages(Type beanType)
+	
+}
+
+internal const class MessagesImpl : Messages {
 	private const AtomicMap messages	:= AtomicMap { keyType=Type#; valType=[Str:Str]# }
 	private const Str:Str 	defaultMsgs
 	
@@ -10,7 +27,7 @@ internal const class Messages {
 	}
 	
 	@Operator
-	Str:Str getMessages(Type beanType) {
+	override Str:Str getMessages(Type beanType) {
 		((Str:Str) messages.getOrAdd(beanType) |->Str:Str| {
 			msgs 		:= Str:Str[:] { caseInsensitive = true }
 			try {
