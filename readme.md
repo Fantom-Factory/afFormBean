@@ -1,7 +1,7 @@
-#Form Bean v1.0.2
+#Form Bean v1.1.0
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.0.2](http://img.shields.io/badge/pod-v1.0.2-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![pod: v1.1.0](http://img.shields.io/badge/pod-v1.1.0-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -26,11 +26,11 @@ Current limitations:
 
 Install `Form Bean` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
-    C:\> fanr install -r http://repo.status302.com/fanr/ afFormBean
+    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afFormBean
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afFormBean 1.0"]
+    depends = ["sys 1.0", ..., "afFormBean 1.1"]
 
 ## Documentation
 
@@ -77,7 +77,7 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
             Text onContact() {
                 // perform server side validation
                 // if invalid, re-render the page and show the errors
-                if (!formBean.validateForm(httpRequest.form))
+                if (!formBean.validateForm(httpRequest.body.form))
                     return render
         
                 // create an instance of our form object
@@ -108,13 +108,19 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
             Str message
         
             new make(|This|in) { in(this) }
+        
+            @Validate { field=#name }
+            static Void validateName(FormField formField) {
+                if (formField.formValue == "Trisha")
+                    formField.errMsg = "Ex-girlfriends not allowed!"
+            }
         }
         
         // @SubModule only needed because this example is run as a script
         @SubModule { modules=[FormBeanModule#] }
-        class AppModule {
+        const class AppModule {
             @Contribute { serviceType=Routes# }
-            static Void contributeRoutes(Configuration conf) {
+            Void contributeRoutes(Configuration conf) {
                 conf.add(Route(`/`, ContactUsPage#render))
                 conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
         
@@ -126,7 +132,7 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
         
         class Main {
             Int main() {
-                afBedSheet::Main().main([AppModule#.qname, "8069"])
+                BedSheetBuilder("Example_0").startWisp(8069)
             }
         }
 
@@ -135,24 +141,25 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
 
         C:\> fan Example.fan
         
-        [info] [afBedSheet] Starting Bed App 'Example_0::AppModule' on port 8069
-        [info] [web] WispService started on port 8069
+        [info] [afBedSheet] Found pod 'Example_0'
         [info] [afBedSheet] Found mod 'Example_0::AppModule'
+        [info] [afBedSheet] Starting Bed App 'Example_0' on port 8069
         [info] [afIoc] Adding module definitions from pod 'Example_0'
-        [info] [afIoc] Adding module definition for Example_0::AppModule
-        [info] [afIoc] Adding module definition for afBedSheet::BedSheetModule
-        [info] [afIoc] Adding module definition for afIocConfig::ConfigModule
-        [info] [afIoc] Adding module definition for afIocEnv::IocEnvModule
-        [info] [afIoc]
+        [info] [afIoc] Adding module Example_0::AppModule
+        [info] [afIoc] Adding module afBedSheet::BedSheetModule
+        [info] [afIoc] Adding module afFormBean::FormBeanModule
+        [info] [afIoc] Adding module afIocConfig::IocConfigModule
+        [info] [afIoc] Adding module afBedSheet::BedSheetEnvModule
+        [info] [afIoc] Adding module afConcurrent::ConcurrentModule
            ___    __                 _____        _
           / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
          / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
         /_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
                        How do I set a laser pointer to stun? /___/
         
-        IoC Registry built in 323ms and started up in 39ms
+        IoC Registry built in 142ms and started up in 139ms
         
-        Bed App 'Unknown' listening on http://localhost:8069/
+        Bed App 'Example_0' listening on http://localhost:8069/
 
 
 3. Point your web browser to `http://localhost:8069/` and you'll see a basic HTML contact form:
@@ -181,7 +188,12 @@ HTML forms are the backbone of data entry in any web application. It is common p
 
     formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#])
 
-Or, as in the quick start example, you can `@Inject` a `FormBean` instance as a field using the `type` facet attribute:
+You could also use the `@Autobuild` facet on a field:
+
+    @Autobuild { ctorArgs=[MyFormModel#] }
+    private FormBean formBean
+
+Or, as in the quick start example, you can even `@Inject` a `FormBean` instance as a field using the `type` facet attribute:
 
     @Inject { type=MyFormModel# }
     FormBean formBean
@@ -253,53 +265,98 @@ When rendering a form bean, any fields in error will have the `error` class set 
 
 While listing the errors together in one place may seem old skool (as oppose to displaying the error with the field in question) it does help with gaining a AAA accessibility rating.
 
-To view the server side error messages (for styling) you may wish to switch off client side validation. Fortunately HTML5 gives us an easy way to do this, just add the `novalidate` attribute to the form:
+To view the server side error messages (for styling) you may wish to switch off client side validation. Fortunately HTML5 gives us an easy way to do this, just add the `novalidate` attribute to the form, and submit it as usual.
 
     <form action='/contact' method='POST' novalidate>
         ...
     </form>
 
+### Custom Server-Side Validation
+
+As well as the basic HTML5 validation, beans may also provide custom server-side validation. To use, annotate a bean method with `@Validate`. Validate methods should be static and take a single `FormField` parameter. They should inspect the `formField.value` and set an `errMsg` if invalid. Example:
+
+```
+class User {
+    Str? name
+
+    @Validate { field=#name }
+    static Void validateName(FormField formField) {
+        if (formField.value == "Trisha")
+            formField.errMsg = "Ex-girlfriends not allowed!"
+    }
+}
+```
+
+If `@Validate.field` is `null` then the first parameter should be `FormBean`:
+
+```
+@Validate
+static Void validateBean(FormBean formBean) { ... }
+```
+
+`FormBean` validation is performed *after* `FormField` validation.
+
+Note that validation methods are called using IoC, so services may be passed in as extra parameters:
+
+```
+@Validate
+static Void validateName(FormField formField, MyService service) { ... }
+```
+
 ## Messages
+
+Most FormBean configuration may also be done though messages. These are basic key / value pairs that are assmebled on a per bean basis. The mechanism is extremely versatile.
 
 ### Message Locations
 
 Labels, placeholders, hints and validation messages are all customisable through messages. Messages boil down to a simple key / value map of strings on `FormBean`.
 
-Each `FormBean` instance creates its own map of messages by merging together property files. If your form bean is of type `acme::MyFormModel` then the following files are looked up:
+Each `FormBean` instance creates its own map of messages by merging together property files. These files are looked for in the following locations:
 
-- `FormBean.properties` in pod `afFormBean`
-- `FormBean.properties` in pod `acme`
-- `MyFormModel.properties` in pod `acme`
+- `FormBean.props` in pod `afFormBean`
+- `FormBean.props` in pod `<pod>`
+- `<bean>.props` in pod `<pod>`
 
-With messages in each file overriding the messages defined previously.
+With messages in each file overriding those defined previously.
+
+For example, if your form bean is of type `acme::UserBean` then the following files are looked up:
+
+- `FormBean.props` in pod `afFormBean`
+- `FormBean.props` in pod `acme`
+- `UserBean.props` in pod `acme`
 
 Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the `build.fan`. This ensures they are included in the pod file. Example:
 
-    resDirs = [`fan/entities/MyFormModel.properies`]
+    resDirs = [`fan/entities/UserBean.properties`]
 
 or
 
     resDirs = [`fan/entities/`]
 
-There are generally 2 strategies for handling bean messages; per bean or per pod, or you could mix the two!
+Note that file names are case-insensitive and have the extension `.props` or `.properties`.
+
+There are generally 2 strategies for handling bean messages; per bean or per app. (Or you could mix the two!)
 
 #### Messages per Bean
 
 Because FormBean looks for a property file named after the form bean, you can collect all the properties for the bean there. This is a good strategy if you only have a few beans but with lots of properties.
 
-Example, if your form bean is called `MyFormModel` then you would create a pod file called `MyFormModel.properies`. In there, you list all the messages specific to that bean.
+Example, if your form bean is called `LoginDetails` then you would create a pod file called `LoginDetails.props`. In there, you list all the messages specific to that bean. `LoginDetails.props` may look like:
 
-#### Messages per Pod
+    username.label  = Username:
+    password.label  = Password:
 
-Messages may optionally be prefixed with the bean name. This lets you group all your messages for all your beans in the one property file - `FormBean.properties`.
+#### Messages per App
 
-Example, if you had form beans called `LoginDetails` and `SignupDetails` your `FormBean.properties` may look like:
+Messages may optionally be prefixed with the bean name. This lets you group all your messages for all your beans in the one property file - `FormBean.props`.
 
-    loginDetails.field.username.label  = Username:
-    loginDetails.field.password.label  = Password:
+Example, if you had a form bean `LoginDetails` and another `SignupDetails` your `FormBean.props` may look like:
+
+    loginDetails.username.label  = Username:
+    loginDetails.password.label  = Password:
     
-    signupDetails.field.username.label  = Username:
-    signupDetails.field.password.label  = Password:
+    signupDetails.username.label  = Username:
+    signupDetails.password.label  = Password:
 
 The advantage of this strategy is that it succinctly groups all the messages for all your beans together in the one place; handy if you have lots of beans with only a few messages each.
 
@@ -307,7 +364,7 @@ The advantage of this strategy is that it succinctly groups all the messages for
 
 You may also manually set messages on a `FormBean` instance:
 
-    formBean.messages["field.firstName.label"] = "Christian Name:"
+    formBean.messages["username.label"] = "Username:"
 
 In all, FormBean Messages are very versatile.
 
@@ -315,45 +372,59 @@ In all, FormBean Messages are very versatile.
 
 #### Field Messages
 
-Labels, placeholders and hints all have dedicated attributes on the `@HtmlInput` facet. If these are `null` then the messages map is consulted with the keys:
+All the attributes on the `@HtmlInput` facet may also be defined by messages. They take the form
 
-    field.#NAME.label
-    field.#NAME.placeholder
-    field.#NAME.hint
+    <bean>.<field>.<attribute>
 
-where `#NAME` is the name of the field. If label value can not be found then it defaults to `field.name.toDisplayName()`.
+where `<bean>` is the (optional) name of the bean class, `<field>` is the field name, and `<attribute>` is the name of the `@HtmlInput` attribute.
+
+    userBean.username.label       = Username:
+    userBean.username.placeholder = Enter username here
+    userBean.username.hint        = Must be at least 5 characters
+
+Note that any values on the `@HtmlInput` facet override those defined in messages.
 
 #### Validation Messages
 
 Validation messages are looked up with the key:
 
-    field.#NAME.#VALIDATION
+    <bean>.<field>.<validation>.msg
 
-where `#NAME` is the name of the field and `#VALIDATION` is the validation type / attribute name. Example:
+where `<validation>` is the validation type / attribute name. Example:
 
-    field.age.min = "Sorry, but you're not old enough for this ride!"
+    userBean.age.min     = 7
+    userBean.age.min.msg = Sorry, but you're not old enough for this ride!
 
-All occurrences of the strings `${label}`, `${constraint}`, and `${value}` are replaced with appropriate values.
+All occurrences of the literal strings `${label}`, `${constraint}`, and `${value}` are replaced with appropriate values.
 
-    field.age.min = "Sorry kid, you need to be at least ${constraint} for this ride!"
+    userBean.age.min     = 7
+    userBean.age.min.msg = Sorry kid, you need to be at least ${constraint} for this ride!
 
-If a field specific message is not found then the key `field.#VALIDATION` is looked up.
+Both `<bean>` and `<field>` may be ommitted to provide a default value for all validation messages of that type:
+
+    min.msg = ${constraint} is too small
+
+> **TIP:** This can be used to set a default max length for all text boxes:
+
+    maxLength = 512
 
 #### Defaults
 
-The default FormBean messages are:
+The default messages supplied by FormBean are:
 
-    errors.banner       = There were problems with the form data:
-    
-    field.required      = ${label} is required
-    field.minLength     = ${label} should be at least ${constraint} characters
-    field.maxLength     = ${label} should be at most ${constraint} characters
-    field.notNum        = ${label} should be a whole number
-    field.min           = ${label} should be at least ${constraint}
-    field.max           = ${label} should be at most ${constraint}
-    field.regex         = ${label} does not match the pattern ${constraint}
-    
-    field.submit.label  = Submit
+```
+errors.msg    = There were problems with the form data:
+
+required.msg  = ${label} is required
+minLength.msg = ${label} should be at least ${constraint} characters
+maxLength.msg = ${label} should be at most ${constraint} characters
+notNum.msg    = ${label} should be a whole number
+min.msg       = ${label} should be at least ${constraint}
+max.msg       = ${label} should be at most ${constraint}
+regex.msg     = ${label} does not match the pattern ${constraint}
+
+submit.label  = Submit
+```
 
 ## Skins
 
@@ -365,10 +436,10 @@ Skins may be set on the `FormField` directly for a specific field:
 
     formBean.formFields[MyFormModel#field1].inputSkin = MySkin()
 
-Or they may be contributed to the `InputSkins` service where they are used by default for that specific type:
+Or they may be contributed to the `InputSkins` service where they are used by default for that specific `@HtmlInput.type`:
 
     @Contribute { serviceType=InputSkins# }
-    static Void contributeInputSkins(Configuration config) {
+    Void contributeInputSkins(Configuration config) {
         config["custom"] = MySkin()
     }
     
@@ -386,8 +457,8 @@ For dates, I personally like to use [Bootstrap Datepicker](http://bootstrap-date
 
 Implement [ErrorSkin](http://pods.fantomfactory.org/pods/afFormBean/api/ErrorSkin) to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your `ErrorSkin` as an IoC service:
 
-    static Void defineServices(ServiceDefinitions defs) {
-        defs.add(ErrorSkin#, MyErrorSkin#)
+    Void defineServices(RegistryBuilder bob) {
+        bob.add(ErrorSkin#, MyErrorSkin#)
     }
 
 Or you can set it directly on the `FormBean` instance:
@@ -405,7 +476,7 @@ FormBean's default skin for `select` uses [OptionsProviders](http://pods.fantomf
 Or they may be contributed to the `OptionsProviders` service where they are used by default for that specific field type:
 
     @Contribute { serviceType=OptionsProviders# }
-    static Void contributeOptionsProviders(Configuration config) {
+    Void contributeOptionsProviders(Configuration config) {
         config[MyValue#] = MyOptions()
     }
     
@@ -413,9 +484,11 @@ Or they may be contributed to the `OptionsProviders` service where they are used
     @HtmlInput
     MyValue myValue
 
-The method `OptionsProvider.options()` returns a map of option values. The values are converted to strings via the usual `ValueEncoder` service in the same way as the select value. The keys of the map are used as message keys in the format:
+The method `OptionsProvider.options()` returns a map of option values. The values are converted to strings via the usual `ValueEncoder` service in the same way as the select value.
 
-    option.#KEY.label
+The keys of the map are used as message keys in the format:
+
+    option.<key>.label
 
 If not found then the key itself is used as the option label.
 
@@ -432,4 +505,77 @@ Note that a default `OptionsProvider` is already given for `Enums`. So to render
     // then in your bean.properties:
     option.red.label  = Roses are red
     option.blue.label = Violets are blue
+
+## Messages Cheat Sheet
+
+```
+# Message Properties Cheat Sheet
+# ******************************
+#
+# Place global properties in 'FormBean.props'.
+# Place bean specific properties in '#BEAN.props', e.g. 'UserBean.props'
+# Ensure all property files are bundled in your pod via 'resDirs' in 'build.fan'
+
+
+
+# Field Attributes
+# ================
+
+# specific to the field 'UserBean#creditCard'
+userBean.creditCard.label              = Credit Card Type
+userBean.creditCard.minLength          = 16
+userBean.creditCard.maxLength          = 16
+
+# used for any field named creditCard
+creditCard.label                       = Credit Card Type
+creditCard.minLength                   = 16
+creditCard.maxLength                   = 16
+
+
+
+# Validation Messages
+# ===================
+
+# specific to the field 'UserBean#creditCard'
+userBean.creditCard.minLength.msg      = Too few numbers!
+
+# used for any field named 'creditCard'
+creditCard.minLength.msg               = Too few numbers!
+
+# used for *all* 'minLength' validation messages
+minLength.msg                          = Too few numbers!
+
+# also...
+# used for all fields in 'UserBean'
+userBean.minLength.msg                 = Too few numbers!
+
+
+
+# Errors Message
+# ==============
+
+# specific to the 'UserBean' class
+userBean.errors.msg                    = Please fix the errors
+
+# used in all error banners
+errors.msg                             = Please fix the errors
+
+
+
+# Select Option Messages
+# ======================
+
+# specific to the field 'UserBean#creditCard'
+userBean.creditCard.option.visa.label  = Visa
+
+# used for any field named 'creditCard'
+creditCard.option.visa.label           = Visa
+
+# used for any option with the key 'visa'
+option.visa.label                      = Visa
+
+# also...
+# used for all options in 'UserBean'
+userBean.option.visa.label             = Visa
+```
 

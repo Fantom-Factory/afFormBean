@@ -1,4 +1,5 @@
 using build
+using afBuild
 
 class Build : BuildPod {
 
@@ -40,11 +41,14 @@ class Build : BuildPod {
 		resDirs = [`doc/`, `res/`]
 	}
 	
-//	override Void compile() {
-//		// remove test pods from final build
-//		testPods := "afBounce afSizzle".split
-//		depends = depends.exclude { testPods.contains(it.split.first) }
-//		super.compile
-//	}
+	@Target { help = "Compile to pod file and associated natives" }
+	override Void compile() {
+		BuildTask(this).run
+	}
+
+	@Target { help = "Builds, publishes, and Hg tags a new pod release" }
+	Void release() {
+		ReleaseTask(this).run
+	}
 }
 
