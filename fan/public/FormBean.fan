@@ -45,6 +45,13 @@ class FormBean {
 		_fieldInspectors.inspect(this, &formFields)
 	}
 	
+	** Re-generates the 'formFields' map. 
+	** Useful if you've set new message properties and want them to be picked up.  
+	Void reinspectBean() {
+		&formFields.clear
+		_fieldInspectors.inspect(this, &formFields)
+	}
+	
 	** Renders form field errors (if any) to an unordered list.
 	** Delegates to a default instance of 'ErrorSkin' which renders the following HTML:
 	** 
