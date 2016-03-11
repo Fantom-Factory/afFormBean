@@ -1,0 +1,34 @@
+Versions
+********
+v1.1.0
+======
+ - New: '@Validate' methods for custom server side validation.
+ - New: All attributes from '@HtmlInput' are pre-populated from message values and are available in 'FormField'.
+ - New: '@HtmlInput.viewOnly' attribute.
+ - New: 'FormFields' are created via 'FieldInspectors'.
+ - New: 'OptionsProvider' methods now take 'FormField' for contextual customisation. (Breaking change.)
+ - New: 'FormBean.reinspectBean()' method.
+ - Chg: Rejigged all the message keys, see *Message Cheat Sheet* for details. (Breaking change.)
+ - Chg: Updated to work with [IoC v3.0]`pod:afIoc`. (Breaking change.)
+ - Chg: 'HtmlInput.required' defaults to 'true' if the field is non-nullable.
+ - Chg: Messages files may also have a '.props' extension.
+
+v1.0.2
+======
+ - Chg: Exposed 'SkinCtx.formField' as the current field being rendered.
+ - Bug: Could not render validation messages when run from a script.
+
+v1.0.0
+======
+ - New: Messages are a lot more customisable.
+ - New: Customisable 'ErrorSkin' for form errors.
+ - New: Added 'SkinCtx.renderAttributes()'
+
+v0.0.4
+======
+ - Chg: Removed dependency on efanXtra.
+
+v0.0.2
+======
+ - New: Preview release.
+
