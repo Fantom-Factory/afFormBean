@@ -11,11 +11,7 @@ class Build : BuildPod {
 			"proj.name"		: "Form Bean",	
 			"afIoc.module"	: "afFormBean::FormBeanModule",
 			"repo.tags"		: "web",
-			"repo.public"	: "false"
-		]
-
-		index	= [	
-			"afIoc.module"	: "afFormBean::FormBeanModule",
+			"repo.public"	: "true"
 		]
 
 		depends = [
@@ -23,7 +19,7 @@ class Build : BuildPod {
 			"web 1.0.68 - 1.0",
 
 			// ---- Core ------------------------
-			"afBeanUtils  1.0.6  - 1.0",
+			"afBeanUtils  1.0.8  - 1.0",
 			"afConcurrent 1.0.12 - 1.0",	// for Messages.AtomicMap
 			"afIoc        3.0.0  - 3.0",
 			"afIocConfig  1.1.0  - 1.1",
