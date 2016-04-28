@@ -108,6 +108,8 @@ class FormBean {
 	** Returns 'true' if all the values are valid, 'false' if not.
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
+	** 
+	** Note that all form values are trimmed before being stowed and validated.
 	virtual Bool validateForm(Str:Str form) {
 		&formFields.each |formField, field| {
 			if (formField.viewOnly ?: false)
