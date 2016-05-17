@@ -493,7 +493,7 @@ Skins make it easy to render custom markup for date pickers.
 
 > **TIP:** Use [Duvet]`pod:afDuvet` in your skins to inject field specific javascript.
 
-For dates, I personally like to use [Bootstrap Datepicker]`http://bootstrap-datepicker.readthedocs.org/en/release/index.html` - see the [DatePicker for FormBean]`http://www.fantomfactory.org/articles/datepicker-for-formbean` article for details.
+For dates, I personally like to use [Bootstrap Datepicker]`https://bootstrap-datepicker.readthedocs.io/en/latest/` - see the [DatePicker for FormBean]`http://www.fantomfactory.org/articles/datepicker-for-formbean` article for details.
 
 
 
