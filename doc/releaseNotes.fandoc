@@ -1,5 +1,9 @@
 Versions
 ********
+v1.1.2
+======
+ - New: FormBean now handles File uploads!
+
 v1.1.0
 ======
  - New: '@Validate' methods for custom server side validation.

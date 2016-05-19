@@ -137,6 +137,9 @@ class FormField {
 	** If 'null' then a default 'OptionsProvider' is chosen based on the field type. 
 	OptionsProvider?	optionsProvider
 	
+	** Used as temporary store when uploading binary data, such as 'Bufs' and 'Files'. 
+	** Contains the value that the form field will be set to.
+	Obj? formData
 
 	@Inject private const	|->Scope|		_scope
 	@Inject private const	InputSkins		_inputSkins

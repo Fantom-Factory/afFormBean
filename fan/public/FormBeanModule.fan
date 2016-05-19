@@ -19,6 +19,7 @@ const class FormBeanModule {
 		config["date"] 		= textInputSkin
 		config["datetime"]	= textInputSkin
 		config["email"]		= textInputSkin
+		config["file"]		= textInputSkin
 		config["hidden"] 	= textInputSkin
 		config["month"]		= textInputSkin
 		config["number"] 	= textInputSkin
@@ -34,7 +35,6 @@ const class FormBeanModule {
 		config["select"]	= config.build(SelectSkin#)
 //		config["button"]	= 
 //		config["color"]		= 
-//		config["file"]		= 
 //		config["image"]		= 
 //		config["radio"]		= 
 //		config["reset"]		= 
