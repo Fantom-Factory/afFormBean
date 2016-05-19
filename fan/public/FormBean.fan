@@ -129,6 +129,72 @@ class FormBean {
 		return !hasErrors
 	}
 
+	** Populates the form fields with values from the HTTP Request and performs server side validation.
+	** Error messages are saved to the form fields.
+	** 
+	** This method also handles File uploads and sets any 'Buf' and 'File' fields to an appropriate 
+	** value. Forms with file uploads *must* set 'enctype="multipart/form-data"'
+	** 
+	** If the form content type is *not* 'multipart/form-data' then processing is delegated to 
+	** 'validateForm()'. That makes this method safe to use in all situations.
+	** 
+	** Each form submission creates a new temporary directory for the uploaded files (not 'Bufs'). 
+	** Therefore it is up the caller to delete all files **and their parent directory** after use. 
+	** 
+	** Returns 'true' if all the values are valid, 'false' if not.
+	virtual Bool validateRequest(HttpRequest httpReq) {
+		if (httpReq.headers.contentType.noParams != MimeType("multipart/form-data"))
+			return validateForm(httpReq.body.form)
+
+		form	:= Str:Str[:]
+		tempDir	:= null as File
+		httpReq.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
+			formField := &formFields.find { it.field.name == inputName }
+
+			switch (formField?.field?.type?.toNonNullable) {
+				case InStream#:
+					formField.formData = in
+
+				case Buf#:
+					formField.formData = in.readAllBuf
+
+				case File#:
+					quoted   := headers["Content-Disposition"]?.split(';')?.find { it.startsWith("filename") }?.split('=')?.getSafe(1)
+					filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
+					if (tempDir == null)
+						tempDir = createTempDir("afFormBean-uploads-")
+					file	:= tempDir + filename.toUri
+					out		:= file.out
+					try		in.pipe(out)
+					finally	out.close
+					formField.formData  = file
+					form[inputName]		= filename	// set the formValue to the filename so it can be 'required' validated
+			
+				default:
+					form[inputName] = in.readAllStr
+			}
+		}
+
+		return validateForm(form)
+	}
+	
+	
+	** Based on Guava's createTempDir() method, see `http://stackoverflow.com/a/8998916/1532548`.
+	private static File createTempDir(Str prefix := "fan-", Str suffix := "", File? dir := null) {
+		baseDir  := dir ?: Env.cur.tempDir
+		baseName := Duration.now.toMillis.toHex
+		maxTries := 0x8FF	// that's plenty!
+
+		for (i := 0; i < maxTries; ++i) {
+			tempDir := baseDir + (prefix + baseName + i.toHex(3) + suffix + "/").toUri
+			if (!tempDir.exists)
+				// note the race condition here between .exists() and .create()
+				return tempDir.create
+		}
+		
+		throw IOErr("Could not create a temp directory")
+	}
+	
 	** Creates an instance of 'beanType' with all the field values set to the form field values.
 	** Uses 'afBeanUtils::BeanProperties.create()'.
 	** 
@@ -231,6 +297,12 @@ class FormBean {
 			
 			if (formField.viewOnly ?: false)
 				return
+
+			// set binary upload data 
+			if (formField.formData != null) {
+				beanProps[field.name] = formField.formData
+				return
+			}
 
 			// fugging checkboxes don't send unchecked data
 			if (formField.formValue == null && formField.type.equalsIgnoreCase("checkbox"))

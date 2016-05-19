@@ -5,8 +5,9 @@ FormBean is a means to render Fantom objects as HTML forms, validate submitted v
 Features:
  - Renders Fantom objects as HTML forms.
  - HTML5 client and server side validation
- - Uses BedSheet 'ValueEncoders' for string conversion
  - Customise HTML generation with skins
+ - Handles File uploads
+ - Uses BedSheet 'ValueEncoders' for string conversion
  - Versatile means of generating select options
  - Customised (error) messages
 
@@ -168,7 +169,7 @@ We call such objects *form beans*. The `FormBean` class then does the necessary 
 'FormBeans' should be autobuilt by IoC, passing in the type of object it should model.
 
   syntax: fantom
-  formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#])
+  formBean := (FormBean) scope.build(FormBean#, [MyFormModel#])
 
 You could also use the '@Autobuild' facet on a field:
 
@@ -176,7 +177,7 @@ You could also use the '@Autobuild' facet on a field:
   @Autobuild { ctorArgs=[MyFormModel#] }
   private FormBean formBean
 
-Or, as in the quick start example, you can even '@Inject' a 'FormBean' instance as a field using the 'type' facet attribute:
+Or the best way, as in the quick start example, '@Inject' a 'FormBean' instance as a field using the 'type' facet attribute:
 
   syntax: fantom
   @Inject { type=MyFormModel# }
@@ -560,10 +561,64 @@ Note that a default 'OptionsProvider' is already given for 'Enums'. So to render
 
 
 
-Messages Cheat Sheet
-********************
+File Uploads
+************
+FormBean can also handle File uploads!
+
+To use, set your form field type to either a 'Buf' or a 'File':
+
 pre>
 syntax: fantom
+
+class FormDetails {
+    @HtmlInput Buf  uploadedBuf
+    @HtmlInput File uploadedFile
+
+    new make(|This|f) { f(this) }
+}
+<pre
+
+Render your HTML as normal, just make sure the form element has the correct 'enctype' (MUST be 'multipart/form-data') and 'method' attributes (MUST be 'POST'):
+
+pre>
+syntax: fantom
+html := "<form action='...' enctype='multipart/form-data' method='POST'>"
+html += formBean.renderErrors()
+html += formBean.renderBean(null)
+html += formBean.renderSubmit()
+html += "<form>"
+<pre
+
+When the form is submitted, use 'FormBean.validateRequest()' and create your form object as normal:
+
+pre>
+syntax: fantom
+valid := formBean.validateRequest(httpRequest)
+if (!valid)
+    return render
+
+details := (FormDetails) formBean.createBean
+<pre
+
+'Bufs' and 'Files' should now be populated on your form. Easy!
+
+pre>
+syntax: fantom
+echo(details.uploadedFile)	// --> /tmp/afFormBean-uploads-xxxxxx/myFile.tmp
+<pre
+
+Each form submission creates a new temporary directory for uploaded files (not 'Bufs').
+Therefore it is up the **you**, the caller, to delete all files **and their parent directory** after use.
+A separate directory is created for each form submission so files may retain the same names they were uploaded with.
+
+
+
+Messages Cheat Sheet
+********************
+Example messages, explaining where they would be used.
+
+pre>
+syntax: fandoc
 
 # Message Properties Cheat Sheet
 # ******************************
