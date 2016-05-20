@@ -22,7 +22,7 @@ internal const class SemiDefaultInspector : FieldInspector {
 			if (type == null && (field.name == "url" || field.name == "uri" || field.name.endsWith("Url") || field.name.endsWith("Uri")))
 				type = "url"
 
-			if (type == null && field.type.fits(File#))
+			if (type == null && (field.type.fits(File#) || field.type.fits(Buf#) || field.type.fits(InStream#)))
 				type = "file"
 		}		
 	}
