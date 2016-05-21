@@ -6,14 +6,13 @@ Features:
  - Renders Fantom objects as HTML forms.
  - HTML5 client and server side validation
  - Customise HTML generation with skins
- - Handles File uploads
+ - Supports multipart forms / file uploads
  - Uses BedSheet 'ValueEncoders' for string conversion
  - Versatile means of generating select options
  - Customised (error) messages
 
 Current limitations:
  - Maps, Lists and nested objects are not supported.
- - Radioboxes are not natively supported.
 
 
 
@@ -558,6 +557,13 @@ Note that a default 'OptionsProvider' is already given for 'Enums'. So to render
   // then in your bean.properties:
   option.red.label  = Roses are red
   option.blue.label = Violets are blue
+
+
+Radio Buttons
+*************
+Radio buttons re-use the [OptionsProvider]`OptionsProvider` mechanism from Select Boxes to render individual values and lables. See the above section for more details.
+
+To render a form value as a set of radio buttons, set the form field type to 'radio'.
 
 
 

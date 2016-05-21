@@ -33,10 +33,10 @@ const class FormBeanModule {
 		config["checkbox"]	= CheckboxSkin()
 		config["textarea"]	= TextAreaSkin()
 		config["select"]	= config.build(SelectSkin#)
+		config["radio"]		= config.build(RadioSkin#)
 //		config["button"]	= 
 //		config["color"]		= 
 //		config["image"]		= 
-//		config["radio"]		= 
 //		config["reset"]		= 
 //		config["submit"]	= 
 	}
