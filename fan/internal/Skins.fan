@@ -89,6 +89,56 @@ internal const class SelectSkin : DefaultInputSkin {
 	}
 }
 
+internal const class RadioSkin : InputSkin {
+	@Inject private const	ValueEncoders		valueEncoders
+	@Inject private const	OptionsProviders	optionsProviders
+
+	new make(|This| in) { in(this) }
+	
+	override Str render(SkinCtx skinCtx) {
+		html	:= Str.defVal
+		errCss	:= skinCtx.fieldInvalid ? " error" : Str.defVal
+		hint	:= skinCtx.formField.hint
+		html	+= """<div class="formBean-row inputRow ${skinCtx.name}${errCss}">"""
+		
+		html	+= """<label>${skinCtx.label}</label>"""
+		html	+= renderElement(skinCtx)
+
+		if (hint != null)
+			html += """<div class="formBean-hint">${hint}</div>"""				
+		html	+= """</div>\n"""
+		return html
+	}
+	
+	Str renderElement(SkinCtx skinCtx) {
+		formField	:= skinCtx.formField
+
+		// null out attributes we don't want rendered
+		formField.minLength	= null
+		formField.maxLength	= null
+		formField.min		= null
+		formField.max		= null
+		formField.step		= null
+		formField.pattern	= null
+
+		html	:= """<span class="radio">"""
+		idx		:= 1
+		optionsProvider := formField.optionsProvider ?: optionsProviders.find(skinCtx.field.type)
+		optionsProvider.options(formField).each |value, label| {
+			optLabel := formField.msg("option.${label}.label") ?: label
+			optValue := skinCtx.toClient(value)
+			optCheck := (optValue.equalsIgnoreCase(skinCtx.value)) ? " checked" : ""
+			optReq	 := formField.required ? " required" : ""
+			html	 += """<input type="radio" id="${skinCtx.name}${idx}" name="${skinCtx.name}" value="${optValue}"${optCheck}${optReq}>"""
+			html	 += """<label for="${skinCtx.name}${idx}">${optLabel}</label>"""
+			idx++
+		}
+
+		html	+= "</span>"
+		return html
+	}
+}
+
 internal const class DefaultErrorSkin : ErrorSkin {
 	
 	override Str render(FormBean formBean) {
