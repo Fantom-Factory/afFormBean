@@ -35,6 +35,10 @@ class FormBean {
 	@Inject { optional = true}
 							ErrorSkin?		errorSkin
 	
+	** The base directory to use for uploaded files. 
+	** Defaults to 'Env.cur.tempDir'.
+							File			tempDir		:= Env.cur.tempDir
+	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
 		in(this)	// IoC Injection
@@ -43,6 +47,15 @@ class FormBean {
 		this.messages = _messages.getMessages(beanType)
 		
 		_fieldInspectors.inspect(this, &formFields)
+	}
+	
+	** Returns the form field that corresponds to the given field name.
+	** 
+	**   syntax:fantom
+	**   formField := formBean["name"]
+	@Operator
+	FormField getByName(Str name) {
+		&formFields.find { it.field.name.equalsIgnoreCase(name) }
 	}
 	
 	** Re-generates the 'formFields' map. 
@@ -162,7 +175,7 @@ class FormBean {
 					quoted   := headers["Content-Disposition"]?.split(';')?.find { it.startsWith("filename") }?.split('=')?.getSafe(1)
 					filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
 					if (tempDir == null)
-						tempDir = createTempDir("afFormBean-uploads-")
+						tempDir = createTempDir("afFormBean-uploads-", "", tempDir)
 					file	:= tempDir + filename.toUri
 					out		:= file.out
 					try		in.pipe(out)
