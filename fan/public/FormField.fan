@@ -29,7 +29,7 @@ class FormField {
 	** If 'null' then a default 'InputSkin' is chosen based on the 'type' attribute. 
 	InputSkin?		inputSkin
 	
-	** Returns the error message associated with this field.
+	** The error message associated with this field.
 	** 
 	** Setting this to a non-null value invalidate the form field. 
 	Str?			errMsg	{ set { if (it != null) invalid = true; &errMsg = it } }
