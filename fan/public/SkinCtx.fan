@@ -12,16 +12,36 @@ class SkinCtx {
 	** The corresponding bean field.
 	const		Field			field
 	
-	
 	** The 'FormField' being rendered.
 				FormField		formField { internal set }
 	
 	** The containing 'FormBean' instance.
 				FormBean		formBean { internal set }
 	
+	** Convenience for `formField.errMsg`.
+	** 
+	** The error message associated with this field.
+	** 
+	** Setting this to a non-null value invalidate the form field. 
+				Str?			errMsg	{
+					get { formField.errMsg }
+					set { formField.errMsg = it }
+				}
+
+	** Convenience for `formField.invalid`.
+	** 
+	** Returns 'true' if the form field is invalid. Note that just because the field is invalid, 
+	** it does not mean it has an error message. 
+	** 
+	** Setting this to 'false' also clears any 'errMsg'. 
+				Bool			fieldInvalid {
+					get { formField.invalid }
+					set { formField.invalid = it }
+				}
+	
 	internal new make(|This|in) { in(this)	}
 
-	** Returns the name of the field. Safe for use as an ID / CSS class name.
+	** Convenience for `field.name`. Safe for use as an ID / CSS class name.
 	Str name() {
 		field.name
 	}
@@ -44,19 +64,9 @@ class SkinCtx {
 		bean == null ? formField.formValue : field.get(bean)
 	}
 	
-	** Returns 'true' if the field is invalid. Note that if invalid, the field may not have an error msg.
-	Bool fieldInvalid() {
-		formField.invalid
-	}
-
 	** Returns 'true' if the *bean* is invalid; that is, if *any* field is in error.
 	Bool beanInvalid() {
 		formBean.hasErrors
-	}
-
-	** Returns the error message associated with this field.
-	Str? errMsg() {
-		formField.errMsg
 	}
 	
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
@@ -65,17 +75,42 @@ class SkinCtx {
 		return strVal.toXml
 	}
 	
+	** Convenience for `formField.msg`.
+	** 
+	** Returns a message for the given field. Messages are looked up in the following order:
+	** 
+	**   - '<bean>.<field>.<key>'
+	**   - '<field>.<key>'
+	**   - '<key>'
+	** 
+	** And the following substitutions are made:
+	** 
+	**  - '${label} -> formField.label'
+	**  - '${value} -> formField.formValue'
+	**  - '${arg1}  -> arg1.toStr'
+	**  - '${arg2}  -> arg2.toStr'
+	**  - '${arg3}  -> arg3.toStr'
+	** 
+	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	** 
+	** Returns 'null' if a msg could not be found.
+	Str? msg(Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
+		formField.msg(key, arg1, arg2, arg3)
+	}
+	
 	** Returns a rendered string of common attributes to be placed in the '<input>' HTML tag.
 	** This includes 'id', 'name' and any validation attributes defined on the 'HtmlInput' facet.
 	** 
 	** Note the string does *not* contain the 'type' or 'value' attributes as these are dependent on the input type.
 	** 
-	** The given 'extraAttributes' are merged in, allowing you to pass in extra css styles:
+	** The given 'extraAttributes' are merged in, with any values of the same name being separated with a space.
+	** This allows you to pass in extra css class names.
 	** 
 	**   syntax: fantom
-	**   attrs := skinCtx.renderAttributes(["autocomplete" : "off"])
+	**   attrs := skinCtx.renderAttributes(["autocomplete" : "off", "css" : "funkStyle"])
 	** 
 	** Note that empty string values are rendered as HTML5 empty attributes.
+	** e.g. '["disabled":""]' would be rendered as just 'disabled'.
 	Str renderAttributes([Str:Str]? extraAttributes := null) {
 		attrs := Str:Str?[:] { it.ordered = true }
 		attrs["id"]				= name
