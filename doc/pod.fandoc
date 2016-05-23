@@ -617,6 +617,15 @@ Each form submission creates a new temporary directory for uploaded files (not '
 Therefore it is up the **you**, the caller, to delete all files **and their parent directory** after use.
 A separate directory is created for each form submission so files may retain the same names they were uploaded with.
 
+If you wish to save an uploaded file to a particular location on the file system, then either use [File.copyTo()]`sys::File.copyTo` or change the 'File' field to a 'Buf'. The buf may then be saved like this:
+
+pre>
+syntax: fantom
+
+details := (FormDetails) formBean.createBean
+`myFile.tmp`.toFile.out.writBuf(details.buf).close
+<pre
+
 
 
 Messages Cheat Sheet
