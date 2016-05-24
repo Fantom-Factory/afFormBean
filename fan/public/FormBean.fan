@@ -164,16 +164,20 @@ class FormBean {
 		httpReq.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
 			formField := &formFields.find { it.field.name == inputName }
 
+			// in case of a binary upload, we set the formValue to the filename so it can be 'required' validated
+			quoted   := headers["Content-Disposition"]?.split(';')?.find { it.startsWith("filename") }?.split('=')?.getSafe(1)
+			filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
+
 			switch (formField?.field?.type?.toNonNullable) {
 				case InStream#:
-					formField.formData = in
+					formField.formData	= in
+					form[inputName]		= filename
 
 				case Buf#:
-					formField.formData = in.readAllBuf
+					formField.formData	= in.readAllBuf
+					form[inputName]		= filename
 
 				case File#:
-					quoted   := headers["Content-Disposition"]?.split(';')?.find { it.startsWith("filename") }?.split('=')?.getSafe(1)
-					filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
 					if (tempDir == null)
 						tempDir = createTempDir("afFormBean-uploads-", "", tempDir)
 					file	:= tempDir + filename.toUri
@@ -181,7 +185,7 @@ class FormBean {
 					try		in.pipe(out)
 					finally	out.close
 					formField.formData  = file
-					form[inputName]		= filename	// set the formValue to the filename so it can be 'required' validated
+					form[inputName]		= filename
 			
 				default:
 					form[inputName] = in.readAllStr
