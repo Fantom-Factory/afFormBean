@@ -30,5 +30,7 @@ const mixin OptionsProvider {
 	
 	** A map of option values to display, keyed on the display label. 
 	** The returned map should be ordered.
-	abstract Str:Obj options(FormField formField)
+	** 
+	** 'bean' is the bean instance being rendered.
+	abstract Str:Obj options(FormField formField, Obj bean)
 }
