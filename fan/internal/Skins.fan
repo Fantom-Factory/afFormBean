@@ -77,7 +77,7 @@ internal const class SelectSkin : DefaultInputSkin {
 			html += """<option value="">${blankLabel?.toXml}</option>"""
 		}
 		
-		optionsProvider.options(formField).each |value, label| {
+		optionsProvider.options(formField, skinCtx.bean).each |value, label| {
 			optLabel := formField.msg("option.${label}.label") ?: label
 			optValue := skinCtx.toClient(value)
 			optSelec := (optValue.equalsIgnoreCase(skinCtx.value)) ? " selected" : Str.defVal
@@ -124,7 +124,7 @@ internal const class RadioSkin : InputSkin {
 		html	:= """<span class="radio">"""
 		idx		:= 1
 		optionsProvider := formField.optionsProvider ?: optionsProviders.find(skinCtx.field.type)
-		optionsProvider.options(formField).each |value, label| {
+		optionsProvider.options(formField, skinCtx.bean).each |value, label| {
 			optLabel := formField.msg("option.${label}.label") ?: label
 			optValue := skinCtx.toClient(value)
 			optCheck := (optValue.equalsIgnoreCase(skinCtx.value)) ? " checked" : ""

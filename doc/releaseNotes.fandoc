@@ -4,6 +4,7 @@ v1.1.2
 ======
  - New: FormBean now handles File uploads!
  - New: Added a simple Radio button skin.
+ - Chg: 'OptionsProvider.options()' now takes a bean instance.
 
 v1.1.0
 ======
