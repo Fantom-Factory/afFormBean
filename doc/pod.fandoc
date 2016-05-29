@@ -288,13 +288,13 @@ class User {
 
     @Validate { field=#name }
     static Void validateName(FormField formField) {
-        if (formField.value == "Trisha")
+        if (formField.formValue == "Trisha")
             formField.errMsg = "Ex-girlfriends not allowed!"
     }
 }
 <pre
 
-If '@Validate.field' is 'null' then the first parameter should be 'FormBean':
+If '@Validate.field' is 'null' then the first parameter should be 'FormBean'. This allows you to perform bean wide validation.
 
 pre>
 syntax: fantom
@@ -303,7 +303,7 @@ syntax: fantom
 static Void validateBean(FormBean formBean) { ... }
 <pre
 
-'FormBean' validation is performed *after* 'FormField' validation.
+'FormBean' validation is performed *after* all and any 'FormField' validation.
 
 Note that validation methods are called using IoC, so services may be passed in as extra parameters:
 
