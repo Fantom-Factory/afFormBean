@@ -32,5 +32,5 @@ const mixin OptionsProvider {
 	** The returned map should be ordered.
 	** 
 	** 'bean' is the bean instance being rendered.
-	abstract Str:Obj options(FormField formField, Obj bean)
+	abstract Str:Obj options(FormField formField, Obj? bean)
 }
