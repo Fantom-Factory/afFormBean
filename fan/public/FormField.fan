@@ -94,8 +94,6 @@ class FormField {
 	
 	** HTML5 validation attribute.
 	** Sets the maximum length (inclusive) a string should be.
-	** 
-	** If 'null' then (for text types) it defaults to the config value `FormBeanConfigIds.defaultMaxLength`. 
 	Int?	maxLength
 
 	** HTML5 validation attribute.
