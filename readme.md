@@ -1,7 +1,7 @@
-#Form Bean v1.1.0
+#Form Bean v1.1.2
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.1.0](http://img.shields.io/badge/pod-v1.1.0-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![pod: v1.1.2](http://img.shields.io/badge/pod-v1.1.2-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -12,15 +12,15 @@ Features:
 
 - Renders Fantom objects as HTML forms.
 - HTML5 client and server side validation
-- Uses BedSheet `ValueEncoders` for string conversion
 - Customise HTML generation with skins
+- Supports multipart forms / file uploads
+- Uses BedSheet `ValueEncoders` for string conversion
 - Versatile means of generating select options
 - Customised (error) messages
 
 Current limitations:
 
 - Maps, Lists and nested objects are not supported.
-- Radioboxes are not natively supported.
 
 ## Install
 
@@ -186,14 +186,14 @@ HTML forms are the backbone of data entry in any web application. It is common p
 
 `FormBeans` should be autobuilt by IoC, passing in the type of object it should model.
 
-    formBean := (FormBean) registry.autobuild(FormBean#, [MyFormModel#])
+    formBean := (FormBean) scope.build(FormBean#, [MyFormModel#])
 
 You could also use the `@Autobuild` facet on a field:
 
     @Autobuild { ctorArgs=[MyFormModel#] }
     private FormBean formBean
 
-Or, as in the quick start example, you can even `@Inject` a `FormBean` instance as a field using the `type` facet attribute:
+Or the best way, as in the quick start example, `@Inject` a `FormBean` instance as a field using the `type` facet attribute:
 
     @Inject { type=MyFormModel# }
     FormBean formBean
@@ -281,20 +281,20 @@ class User {
 
     @Validate { field=#name }
     static Void validateName(FormField formField) {
-        if (formField.value == "Trisha")
+        if (formField.formValue == "Trisha")
             formField.errMsg = "Ex-girlfriends not allowed!"
     }
 }
 ```
 
-If `@Validate.field` is `null` then the first parameter should be `FormBean`:
+If `@Validate.field` is `null` then the first parameter should be `FormBean`. This allows you to perform bean wide validation.
 
 ```
 @Validate
 static Void validateBean(FormBean formBean) { ... }
 ```
 
-`FormBean` validation is performed *after* `FormField` validation.
+`FormBean` validation is performed *after* all and any `FormField` validation.
 
 Note that validation methods are called using IoC, so services may be passed in as extra parameters:
 
@@ -451,7 +451,7 @@ Skins make it easy to render custom markup for date pickers.
 
 > **TIP:** Use [Duvet](http://pods.fantomfactory.org/pods/afDuvet) in your skins to inject field specific javascript.
 
-For dates, I personally like to use [Bootstrap Datepicker](http://bootstrap-datepicker.readthedocs.org/en/release/index.html) - see the [DatePicker for FormBean](http://www.fantomfactory.org/articles/datepicker-for-formbean) article for details.
+For dates, I personally like to use [Bootstrap Datepicker](https://bootstrap-datepicker.readthedocs.io/en/latest/) - see the [DatePicker for FormBean](http://www.fantomfactory.org/articles/datepicker-for-formbean) article for details.
 
 ### Error Skins
 
@@ -506,7 +506,65 @@ Note that a default `OptionsProvider` is already given for `Enums`. So to render
     option.red.label  = Roses are red
     option.blue.label = Violets are blue
 
+## Radio Buttons
+
+Radio buttons re-use the [OptionsProvider](http://pods.fantomfactory.org/pods/afFormBean/api/OptionsProvider) mechanism from Select Boxes to render individual values and lables. See the above section for more details.
+
+To render a form value as a set of radio buttons, set the form field type to `radio`.
+
+## File Uploads
+
+FormBean can also handle File uploads!
+
+To use, set your form field type to either a `Buf` or a `File`:
+
+```
+class FormDetails {
+    @HtmlInput Buf  uploadedBuf
+    @HtmlInput File uploadedFile
+
+    new make(|This|f) { f(this) }
+}
+```
+
+Render your HTML as normal, just make sure the form element has the correct `enctype` (MUST be `multipart/form-data`) and `method` attributes (MUST be `POST`):
+
+```
+html := "<form action='...' enctype='multipart/form-data' method='POST'>"
+html += formBean.renderErrors()
+html += formBean.renderBean(null)
+html += formBean.renderSubmit()
+html += "<form>"
+```
+
+When the form is submitted, use `FormBean.validateRequest()` and create your form object as normal:
+
+```
+valid := formBean.validateRequest(httpRequest)
+if (!valid)
+    return render
+
+details := (FormDetails) formBean.createBean
+```
+
+`Bufs` and `Files` should now be populated on your form. Easy!
+
+```
+echo(details.uploadedFile)	// --> /tmp/afFormBean-uploads-xxxxxx/myFile.tmp
+```
+
+Each form submission creates a new temporary directory for uploaded files (not `Bufs`). Therefore it is up the **you**, the caller, to delete all files **and their parent directory** after use. A separate directory is created for each form submission so files may retain the same names they were uploaded with.
+
+If you wish to save an uploaded file to a particular location on the file system, then either use [File.copyTo()](http://fantom.org/doc/sys/File.html#copyTo) or change the `File` field to a `Buf`. The buf may then be saved like this:
+
+```
+details := (FormDetails) formBean.createBean
+`myFile.tmp`.toFile.out.writBuf(details.buf).close
+```
+
 ## Messages Cheat Sheet
+
+Example messages, explaining where they would be used.
 
 ```
 # Message Properties Cheat Sheet
