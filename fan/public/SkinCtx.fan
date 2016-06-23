@@ -18,7 +18,7 @@ class SkinCtx {
 	** The containing 'FormBean' instance.
 				FormBean		formBean { internal set }
 	
-	** Convenience for `formField.errMsg`.
+	** Convenience for `FormField.errMsg`.
 	** 
 	** The error message associated with this field.
 	** 
@@ -28,7 +28,7 @@ class SkinCtx {
 					set { formField.errMsg = it }
 				}
 
-	** Convenience for `formField.invalid`.
+	** Convenience for `FormField.invalid`.
 	** 
 	** Returns 'true' if the form field is invalid. Note that just because the field is invalid, 
 	** it does not mean it has an error message. 
@@ -41,7 +41,7 @@ class SkinCtx {
 	
 	internal new make(|This|in) { in(this)	}
 
-	** Convenience for `field.name`. Safe for use as an ID / CSS class name.
+	** Convenience for 'field.name'. Safe for use as an ID / CSS class name.
 	Str name() {
 		field.name
 	}
@@ -75,7 +75,7 @@ class SkinCtx {
 		return strVal.toXml
 	}
 	
-	** Convenience for `formField.msg`.
+	** Convenience for `FormField.msg`.
 	** 
 	** Returns a message for the given field. Messages are looked up in the following order:
 	** 
