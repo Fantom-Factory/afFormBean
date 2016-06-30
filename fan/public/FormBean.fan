@@ -165,7 +165,7 @@ class FormBean {
 			formField := &formFields.find { it.field.name == inputName }
 
 			// in case of a binary upload, we set the formValue to the filename so it can be 'required' validated
-			quoted   := headers["Content-Disposition"]?.split(';')?.find { it.startsWith("filename") }?.split('=')?.getSafe(1)
+			quoted   := headers["Content-Disposition"]?.split(';')?.find { it.lower.startsWith("filename") }?.split('=')?.getSafe(1)
 			filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
 
 			switch (formField?.field?.type?.toNonNullable) {
