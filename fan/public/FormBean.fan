@@ -146,13 +146,13 @@ class FormBean {
 	** Error messages are saved to the form fields.
 	** 
 	** This method also handles File uploads and sets any 'Buf' and 'File' fields to an appropriate 
-	** value. Forms with file uploads *must* set 'enctype="multipart/form-data"'
+	** value. HTML Forms with file uploads *must* have set the attribute '<form enctype="multipart/form-data" ... >'
 	** 
 	** If the form content type is *not* 'multipart/form-data' then processing is delegated to 
 	** 'validateForm()'. That makes this method safe to use in all situations.
 	** 
-	** Each form submission creates a new temporary directory for the uploaded files (not 'Bufs'). 
-	** Therefore it is up the caller to delete all files **and their parent directory** after use. 
+	** Because [File.deleteOnExit()]`https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/` 
+	** it is up the caller to delete all uploaded files after use. 
 	** 
 	** Returns 'true' if all the values are valid, 'false' if not.
 	virtual Bool validateRequest(HttpRequest httpReq) {
@@ -160,7 +160,6 @@ class FormBean {
 			return validateForm(httpReq.body.form)
 
 		form	:= Str:Str[:]
-		tempDir	:= null as File
 		httpReq.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
 			formField := &formFields.find { it.field.name == inputName }
 
@@ -178,9 +177,8 @@ class FormBean {
 					form[inputName]		= filename
 
 				case File#:
-					if (tempDir == null)
-						tempDir = createTempDir("afFormBean-uploads-", "", tempDir)
-					file	:= tempDir + filename.toUri
+					tmpFile	:= File(filename.toUri)
+					file	:= File.createTemp(tmpFile.basename + ".", "." + (tmpFile.ext ?: ""), tempDir)
 					out		:= file.out
 					try		in.pipe(out)
 					finally	out.close
@@ -193,23 +191,6 @@ class FormBean {
 		}
 
 		return validateForm(form)
-	}
-	
-	
-	** Based on Guava's createTempDir() method, see `http://stackoverflow.com/a/8998916/1532548`.
-	private static File createTempDir(Str prefix := "fan-", Str suffix := "", File? dir := null) {
-		baseDir  := dir ?: Env.cur.tempDir
-		baseName := Duration.now.toMillis.toHex
-		maxTries := 0x8FF	// that's plenty!
-
-		for (i := 0; i < maxTries; ++i) {
-			tempDir := baseDir + (prefix + baseName + i.toHex(3) + suffix + "/").toUri
-			if (!tempDir.exists)
-				// note the race condition here between .exists() and .create()
-				return tempDir.create
-		}
-		
-		throw IOErr("Could not create a temp directory")
 	}
 	
 	** Creates an instance of 'beanType' with all the field values set to the form field values.
