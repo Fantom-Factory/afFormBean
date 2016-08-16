@@ -1,7 +1,7 @@
-#Form Bean v1.1.2
+#Form Bean v1.1.4
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.1.2](http://img.shields.io/badge/pod-v1.1.2-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![pod: v1.1.4](http://img.shields.io/badge/pod-v1.1.4-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -550,10 +550,10 @@ details := (FormDetails) formBean.createBean
 `Bufs` and `Files` should now be populated on your form. Easy!
 
 ```
-echo(details.uploadedFile)	// --> /tmp/afFormBean-uploads-xxxxxx/myFile.tmp
+echo(details.uploadedFile)	// --> /tmp/myFile.xxxxxx.tmp
 ```
 
-Each form submission creates a new temporary directory for uploaded files (not `Bufs`). Therefore it is up the **you**, the caller, to delete all files **and their parent directory** after use. A separate directory is created for each form submission so files may retain the same names they were uploaded with.
+Because [File.deleteOnExit()](https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/) it is up **you**, the caller, to delete all uploaded files after use. `Bufs` and `InStreams` are kept in memory.
 
 If you wish to save an uploaded file to a particular location on the file system, then either use [File.copyTo()](http://fantom.org/doc/sys/File.html#copyTo) or change the `File` field to a `Buf`. The buf may then be saved like this:
 
