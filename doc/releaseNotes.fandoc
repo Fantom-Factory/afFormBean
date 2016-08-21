@@ -4,6 +4,7 @@ v1.1.4
 ======
  - Chg: File uploads are no longer placed in a unique directory - it felt weird and wrong asking people to delete a directory!
  - ** ((( DANGER! ))) ** - if upgrading from v1.1.2, DO NOT DELETE the parent directory of file uploads!
+ - Bug: 'minlength' input attribute was incorrectly rendered as 'minLength' - should have been all lowercase.
 
 v1.1.2
 ======

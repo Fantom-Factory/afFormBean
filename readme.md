@@ -327,7 +327,7 @@ For example, if your form bean is of type `acme::UserBean` then the following fi
 
 Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the `build.fan`. This ensures they are included in the pod file. Example:
 
-    resDirs = [`fan/entities/UserBean.properties`]
+    resDirs = [`fan/entities/UserBean.props`]
 
 or
 
@@ -502,7 +502,7 @@ Note that a default `OptionsProvider` is already given for `Enums`. So to render
     @HtmlInput { type="select" }
     Colours colour
     
-    // then in your bean.properties:
+    // then in your bean.props:
     option.red.label  = Roses are red
     option.blue.label = Violets are blue
 
