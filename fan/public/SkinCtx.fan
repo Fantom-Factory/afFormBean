@@ -117,7 +117,7 @@ class SkinCtx {
 		attrs["class"]			= formField.css
 		attrs["name"]			= name
 		attrs["placeholder"]	= formField.placeholder
-		attrs["minLength"]		= formField.minLength?.toStr
+		attrs["minlength"]		= formField.minLength?.toStr
 		attrs["maxlength"]		= formField.maxLength?.toStr
 		attrs["min"]			= formField.min?.toStr
 		attrs["max"]			= formField.max?.toStr
