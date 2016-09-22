@@ -177,6 +177,7 @@ class FormBean {
 					form[inputName]		= filename
 
 				case File#:
+					tempDir.create	// java.io.UnixFileSystem.createFileExclusively() throws java.io.IOException: No such file or directory
 					tmpFile	:= File(filename.toUri)
 					file	:= File.createTemp(tmpFile.basename + ".", "." + (tmpFile.ext ?: ""), tempDir)
 					out		:= file.out
@@ -308,7 +309,9 @@ class FormBean {
 
 			// other fields that weren't submitted are also null
 			if (formField.formValue != null) {
-				value = (formField.valueEncoder != null) ? formField.valueEncoder.toValue(formField.formValue) : _valueEncoders.toValue(field.type, formField.formValue)
+				value = (formField.valueEncoder != null)
+					? formField.valueEncoder.toValue(formField.formValue)
+					: _valueEncoders.toValue(field.type, formField.formValue)
 				beanProps[field.name] = value
 			}
 		}

@@ -1,5 +1,9 @@
 Versions
 ********
+v1.1.6
+======
+ - Chg: When uploading files, the 'tempDir' is created if it doesn't exists. This prevents 'IOErrs' on nix systems.
+
 v1.1.4
 ======
  - Chg: File uploads are no longer placed in a unique directory - it felt weird and wrong asking people to delete a directory!
