@@ -24,8 +24,7 @@ class FormBean {
 							Str:Str 		messages	:= Str:Str[:] { caseInsensitive=true }
 	
 	** The form fields that make up this form bean.
-	** The returned map is read only, but the 'FormFields' themselves may still be manipulated.
-							Field:FormField	formFields	:= Field:FormField[:] { ordered=true } { get { &formFields.ro } private set }
+							Field:FormField	formFields	:= Field:FormField[:] { ordered=true } { private set }
 	
 	** You may set any extra (cross field validation) error messages here. 
 	** They will be rendered along with the form field error messages.
