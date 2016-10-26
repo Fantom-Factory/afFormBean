@@ -1,7 +1,7 @@
-#Form Bean v1.1.4
+#Form Bean v1.1.6
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.1.4](http://img.shields.io/badge/pod-v1.1.4-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![pod: v1.1.6](http://img.shields.io/badge/pod-v1.1.6-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -550,17 +550,14 @@ details := (FormDetails) formBean.createBean
 `Bufs` and `Files` should now be populated on your form. Easy!
 
 ```
-echo(details.uploadedFile)	// --> /tmp/myFile.xxxxxx.tmp
+echo(details.uploadedFile) // --> myFile.tmp
 ```
 
-Because [File.deleteOnExit()](https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/) it is up **you**, the caller, to delete all uploaded files after use. `Bufs` and `InStreams` are kept in memory.
+By default, FormBean creates in-memory files for uploaded files. This negates the need to use `File.deleteOnExit()` [(which is evil)](https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/) and in general, negates all need to delete temp files after use.
 
-If you wish to save an uploaded file to a particular location on the file system, then either use [File.copyTo()](http://fantom.org/doc/sys/File.html#copyTo) or change the `File` field to a `Buf`. The buf may then be saved like this:
+To save an uploaded file to a particular file system location, then simply use [File.copyTo()](http://fantom.org/doc/sys/File.html#copyTo).
 
-```
-details := (FormDetails) formBean.createBean
-`myFile.tmp`.toFile.out.writBuf(details.buf).close
-```
+If validation is required, like enforcing a max file size before it is loaded into memory, then you may provide your own `FormBean.fileUploadHook`.
 
 ## Messages Cheat Sheet
 
