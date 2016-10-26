@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "Renders Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("1.1.7")
+		version = Version("1.1.6")
 
 		meta = [
 			"pod.displayName"	: "Form Bean",	
@@ -15,8 +15,8 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys 1.0.68 - 1.0",
-			"web 1.0.68 - 1.0",
+			"sys 1.0.69 - 1.0",	// 1.0.69 because we make use of in-memory Files
+			"web 1.0.69 - 1.0",
 
 			// ---- Core ------------------------
 			"afBeanUtils  1.0.8  - 1.0",
