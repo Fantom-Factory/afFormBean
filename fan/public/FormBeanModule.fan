@@ -1,5 +1,4 @@
 using afIoc
-using afIocConfig
 using afBedSheet
 
 @NoDoc

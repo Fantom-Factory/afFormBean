@@ -1,5 +1,4 @@
 using afIoc
-using afIocConfig
 using afBedSheet
 
 ** Passed to 'InputSkins' to provide all the information they need to render a form field.

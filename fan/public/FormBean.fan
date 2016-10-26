@@ -1,5 +1,4 @@
 using afIoc
-using afIocConfig::Config
 using afBedSheet
 using afBeanUtils
 using web

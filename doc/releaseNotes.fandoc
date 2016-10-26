@@ -4,6 +4,7 @@ v1.1.6
 ======
  - Chg: File uploads now return in-memory files. Use 'FormBean.fileUploadHook' to change this behaviour.
  - Chg: 'FormBean.formFields' is no longer read only.
+ - Chg: Removed direct dependency on IoC Config.
 
 v1.1.4
 ======
