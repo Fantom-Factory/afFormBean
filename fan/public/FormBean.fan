@@ -33,10 +33,10 @@ class FormBean {
 	** The 'ErrorSkin' used to render error messages.
 	@Inject { optional = true}
 							ErrorSkin?		errorSkin
-	
-	** The base directory to use for uploaded files. 
-	** Defaults to 'Env.cur.tempDir'.
-							File			tempDir		:= Env.cur.tempDir
+
+	** Hook for handling file uploads. By default, an in-memory file is returned.
+	** In memory files do not require deleting.
+	|Str fileName, InStream in -> File|?	fileUploadHook
 	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	new make(Type beanType, |This| in) {
@@ -117,6 +117,8 @@ class FormBean {
 	** Populates the form fields with values from the given 'form' map and performs server side validation.
 	** Error messages are saved to the form fields.
 	** 
+	** This method does not handle file uploads - use 'validateRequest()' instead.
+	** 
 	** Returns 'true' if all the values are valid, 'false' if not.
 	**  
 	** It is safe to pass in 'HttpRequest.form()' directly.
@@ -150,8 +152,7 @@ class FormBean {
 	** If the form content type is *not* 'multipart/form-data' then processing is delegated to 
 	** 'validateForm()'. That makes this method safe to use in all situations.
 	** 
-	** Because [File.deleteOnExit()]`https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/` 
-	** it is up the caller to delete all uploaded files after use. 
+	** In memory file are returned for file uploads, so the caller does not need to concern themselves with deleting them.
 	** 
 	** Returns 'true' if all the values are valid, 'false' if not.
 	virtual Bool validateRequest(HttpRequest httpReq) {
@@ -168,25 +169,19 @@ class FormBean {
 
 			switch (formField?.field?.type?.toNonNullable) {
 				case InStream#:
-					formField.formData	= in
 					form[inputName]		= filename
+					formField.formData	= in
 
 				case Buf#:
-					formField.formData	= in.readAllBuf
 					form[inputName]		= filename
+					formField.formData	= in.readAllBuf
 
 				case File#:
-					tempDir.create	// java.io.UnixFileSystem.createFileExclusively() throws java.io.IOException: No such file or directory
-					tmpFile	:= File(filename.toUri)
-					file	:= File.createTemp(tmpFile.basename + ".", "." + (tmpFile.ext ?: ""), tempDir)
-					out		:= file.out
-					try		in.pipe(out)
-					finally	out.close
-					formField.formData  = file
 					form[inputName]		= filename
+					formField.formData	= fileUploadHook?.call(filename, in) ?: in.readAllBuf.toFile(filename.toUri)
 			
 				default:
-					form[inputName] = in.readAllStr
+					form[inputName]		= in.readAllStr
 			}
 		}
 
