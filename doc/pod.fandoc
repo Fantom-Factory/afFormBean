@@ -610,19 +610,14 @@ details := (FormDetails) formBean.createBean
 
 pre>
 syntax: fantom
-echo(details.uploadedFile)	// --> /tmp/myFile.xxxxxx.tmp
+echo(details.uploadedFile) // --> myFile.tmp
 <pre
 
-Because [File.deleteOnExit()]`https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/` it is up **you**, the caller, to delete all uploaded files after use. 'Bufs' and 'InStreams' are kept in memory.
+By default, FormBean creates in-memory files for uploaded files. This negates the need to use 'File.deleteOnExit()' [(which is evil)]`https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/` and in general, negates all need to delete temp files after use.
 
-If you wish to save an uploaded file to a particular location on the file system, then either use [File.copyTo()]`sys::File.copyTo` or change the 'File' field to a 'Buf'. The buf may then be saved like this:
+To save an uploaded file to a particular file system location, then simply use [File.copyTo()]`sys::File.copyTo`.
 
-pre>
-syntax: fantom
-
-details := (FormDetails) formBean.createBean
-`myFile.tmp`.toFile.out.writBuf(details.buf).close
-<pre
+If validation is required, like enforcing a max file size before it is loaded into memory, then you may provide your own 'FormBean.fileUploadHook'.
 
 
 

@@ -2,8 +2,8 @@ Versions
 ********
 v1.1.6
 ======
+ - Chg: File uploads now return in-memory files. Use 'FormBean.fileUploadHook' to change this behaviour.
  - Chg: 'FormBean.formFields' is no longer read only.
- - Chg: When uploading files, the 'tempDir' is created if it doesn't exists. This prevents 'IOErrs' on nix systems.
 
 v1.1.4
 ======
