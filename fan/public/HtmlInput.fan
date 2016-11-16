@@ -26,6 +26,10 @@ facet class HtmlInput {
 	const Str?	hint
 	
 	** The value to render as a CSS 'class' attribute on the '<input>'. 
+	** May contain multiple space-separated values.
+	** Example:
+	** 
+	**   bean.field.css = big green
 	** 
 	** If 'null' then the msg key '<bean>.<field>.css' is used to look for a value. 
 	const Str?	css
@@ -33,22 +37,42 @@ facet class HtmlInput {
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	** Example:
 	** 
-	**   attributes = "autocomplete='off'"
+	**   syntax: fantom
+	**   @HtmlInput { attributes = "autocomplete='off'" }
 	** 
 	** If 'null' then the msg key '<bean>.<field>.attributes' is used to look for a value. 
+	** Example:
+	** 
+	**   bean.field.attributes = autocomplete='off'
 	const Str?	attributes
 	
 	** The 'ValueEncoder' (type) used to convert the field value to and from a 'Str'.
 	** 'ValueEncoders' are autobuilt and cached by IoC.
+	** Example:
+	** 
+	**   syntax: fantom
+	**   @HtmlInput { valueEncoder = acme::MyValueEncoder# }
 	** 
 	** If 'null' then the msg key '<bean>.<field>.valueEncoder' is used to look for a value. 
+	** Example:
+	** 
+	**   bean.field.valueEncoder = acme::MyValueEncoder
+	** 
 	** Defaults to using BedSheet's 'ValueEncoders' service if not found. 
 	const Type?	valueEncoder
 	
 	** The 'InputSkin' (type) used to render the field to HTML.
 	** 'InputSkins' are autobuilt and cached by IoC.
+	** Example:
+	** 
+	**   syntax: fantom
+	**   @HtmlInput { inputSkin = acme::MySkin# }
 	**  
 	** If 'null' then the msg key '<bean>.<field>.inputSkin' is used to look for a value. 
+	** Example:
+	** 
+	**   bean.field.inputSkin = acme::MySkin
+	** 
 	** Defaults a lookup using '@HtmlInput.type' if not found. 	
 	const Type?	inputSkin
 
@@ -124,8 +148,15 @@ facet class HtmlInput {
 	** Used by the '<select>' renderer. 
 	** The 'OptionsProvider' to use to provide, um, options!
 	** 'OptionsProvider' instances are autobuilt and cached by IoC.
+	** Example:
+	** 
+	**   syntax: fantom
+	**   @HtmlInput { optionsProvider = acme::MyOptionsProvider# }
 	** 
 	** If 'null' then the msg key '<bean>.<field>.optionsProvider' is used to look for a value. 
+	** Example:
+	** 
+	**   bean.field.optionsProvider = acme::MyOptionsProvider
 	** 
 	** leave as null to use a default.
 	const Type?	optionsProvider
