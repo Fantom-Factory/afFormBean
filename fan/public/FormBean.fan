@@ -155,8 +155,8 @@ class FormBean {
 	** 
 	** Returns 'true' if all the values are valid, 'false' if not.
 	virtual Bool validateRequest(HttpRequest httpReq) {
-		if (httpReq.headers.contentType.noParams != MimeType("multipart/form-data"))
-			return validateForm(httpReq.body.form)
+		if (httpReq.headers.contentType?.noParams != MimeType("multipart/form-data"))
+			return validateForm(httpReq.body.form ?: Str:Str[:])
 
 		form	:= Str:Str[:]
 		httpReq.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
