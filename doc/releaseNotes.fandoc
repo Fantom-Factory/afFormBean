@@ -1,5 +1,9 @@
 Versions
 ********
+v1.1.8
+======
+ - Bug: Fixed NPE in 'FormBean.validateRequest()' when request had no 'Content-Type' HTTP header.
+
 v1.1.6
 ======
  - Chg: File uploads now return in-memory files. Use 'FormBean.fileUploadHook' to change this behaviour.
