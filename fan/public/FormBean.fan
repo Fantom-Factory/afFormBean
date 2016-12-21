@@ -3,7 +3,9 @@ using afBedSheet
 using afBeanUtils
 using web
 
-** Represents a Fantom type that can be rendered as a HTML form, and reconstituted back to a Fantom instance.  
+** Represents a Fantom type that can be rendered as a HTML form, and reconstituted back to a Fantom instance.
+**   
+** FormBean instances should be created by [IoC]`pod:afIoc`.
 class FormBean {	
 	@Inject private const	|->Scope|		_scope
 	@Inject private const	ValueEncoders 	_valueEncoders
@@ -38,6 +40,18 @@ class FormBean {
 	|Str fileName, InStream in -> File|?	fileUploadHook
 	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
+	** 
+	** FormBean instances should be created by [IoC]`pod:afIoc`. Either create manually:
+	** 
+	**   syntax: fantom
+	**   formBean := (FormBean) scope.build(FormBean#, [MyFormModel#])
+	** 
+	** or inject a field:
+	** 
+	**   syntax: fantom
+	**   @Inject { type=MyFormModel# }
+	**   FormBean formBean
+	** 
 	new make(Type beanType, |This| in) {
 		in(this)	// IoC Injection
 
