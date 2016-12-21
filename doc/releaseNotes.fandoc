@@ -3,6 +3,8 @@ Versions
 v1.1.8
 ======
  - New: 'FormBean.validateField()' to validate individual fields.
+ - New: 'FormField.populate()' allows form fields be individually populated from '@HtmlInput' facets and messages.
+ - Chg: Changed the 'FormField' ctor. (Potential breaking change.)
  - Bug: Fixed NPE in 'FormBean.validateRequest()' when request had no 'Content-Type' HTTP header.
 
 v1.1.6

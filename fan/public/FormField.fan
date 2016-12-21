@@ -1,6 +1,7 @@
 using afIoc
 using afBedSheet::ValueEncoder
 using afBedSheet::ValueEncoders
+using afBedSheet::ObjCache
 
 ** Holds all the meta data required to convert a field on a Fantom object to HTML and back again.
 class FormField {
@@ -142,10 +143,54 @@ class FormField {
 	@Inject private const	|->Scope|		_scope
 	@Inject private const	InputSkins		_inputSkins
 	@Inject private const	ValueEncoders 	_valueEncoders
+	@Inject private const	ObjCache 		_objCache
+
+	** Create 'FormField' instances via IoC:
+	** 
+	**   syntax: fantom
+	**   formField := scope.build(FormField#, [field, formBean])
+	** 
+	new make(Field field, FormBean formBean, |This| in) {
+		this.field		= field
+		this.formBean	= formBean
+		in(this)
+	}
 	
-	@NoDoc // Boring!
-	new make(|This| in) { in(this) }
+	** Populates this 'FormField' instance with values from the '@HtmlInput' facet (if any) and 
+	** message values.
+	This populate() {
+		input := (HtmlInput?) field.facet(HtmlInput#, false)
+		
+		valueEncoder	= _fromObjCache(input?.valueEncoder		?: msg("valueEncoder"))
+		inputSkin		= _fromObjCache(input?.inputSkin 		?: msg("inputSkin"))
+		optionsProvider	= _fromObjCache(input?.optionsProvider	?: msg("optionsProvider"))
+		type			= input?.type			?: msg("type"		)
+		label			= input?.label			?: msg("label"		)
+		placeholder		= input?.placeholder	?: msg("placeholder")
+		hint			= input?.hint			?: msg("hint"		)
+		css				= input?.css			?: msg("css"		)
+		attributes		= input?.attributes		?: msg("attributes"	)
+		viewOnly		= input?.viewOnly		?: msg("viewOnly"	)?.toBool
+		required		= input?.required		?: msg("required"	)?.toBool
+		minLength		= input?.minLength		?: msg("minLength"	)?.toInt
+		maxLength		= input?.maxLength		?: msg("maxLength"	)?.toInt
+		min				= input?.min			?: msg("min"		)?.toInt
+		max				= input?.max			?: msg("max"		)?.toInt
+		pattern			= input?.pattern		?: msg("pattern"	)?.toRegex
+		step			= input?.step			?: msg("step"		)?.toInt
+		showBlank		= input?.showBlank		?: msg("showBlank"	)?.toBool
+		blankLabel		= input?.blankLabel		?: msg("blankLabel"	)
+		
+		return this
+	}
 	
+	private Obj? _fromObjCache(Obj? what) {
+		if (what is Str)
+			what = Type.find(what)
+		if (what is Type)
+			return _objCache[what]
+		return null
+	}
 	
 	** Returns a message for the given field. Messages are looked up in the following order:
 	** 
