@@ -282,4 +282,13 @@ class FormField {
 			if (!"^${pattern}\$".toRegex.matches(formValue))
 				return errMsg = msg("pattern.msg", pattern)			
 	}
+	
+	@NoDoc
+	override Int hash()				{ field.hash }
+	
+	@NoDoc
+	override Bool equals(Obj? that)	{ (that as FormField)?.field == field }
+
+	@NoDoc
+	override Str toStr()			{ "${field} - ${formValue}" }
 }
