@@ -278,7 +278,7 @@ class FormBean {
 	Str? fieldMsg(FormField formField, Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
 
 		// bean messages have already been merged
-		msg		:= messages["${formField.field.name}.${key}"] ?: messages["${key}"]
+		msg		:= messages["${formField.field.name}.${key}"] ?: messages[key]
 		label	:= formField.label ?: formField.field.name.toDisplayName
 		value	:= formField.formValue ?: ""
 
@@ -352,6 +352,11 @@ class FormBean {
 		if (what is Type)
 			return _objCache[what]
 		return null
+	}
+	
+	@NoDoc
+	override Str toStr() {
+		beanType.toStr
 	}
 }
 

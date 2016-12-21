@@ -4,6 +4,7 @@ v1.1.8
 ======
  - New: 'FormBean.validateField()' to validate individual fields.
  - New: 'FormField.populate()' allows form fields be individually populated from '@HtmlInput' facets and messages.
+ - New: Added 'hash()', 'equals()', & 'toStr()' to 'FormField'.
  - Chg: Changed the 'FormField' ctor. (Potential breaking change.)
  - Bug: Fixed NPE in 'FormBean.validateRequest()' when request had no 'Content-Type' HTTP header.
  - Bug: Potential for 'Messages' to throw an NPE if a pod contained resource files with no extension.
