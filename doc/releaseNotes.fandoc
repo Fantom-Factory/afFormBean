@@ -6,6 +6,7 @@ v1.1.8
  - New: 'FormField.populate()' allows form fields be individually populated from '@HtmlInput' facets and messages.
  - Chg: Changed the 'FormField' ctor. (Potential breaking change.)
  - Bug: Fixed NPE in 'FormBean.validateRequest()' when request had no 'Content-Type' HTTP header.
+ - Bug: There was no default message for 'pattern'.
 
 v1.1.6
 ======
