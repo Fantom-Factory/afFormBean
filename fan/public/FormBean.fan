@@ -139,20 +139,18 @@ class FormBean {
 	** Note that all form values are trimmed before being stowed and validated.
 	virtual Bool validateForm(Str:Str form) {
 		&formFields.each |formField, field| {
-			if (formField.viewOnly ?: false)
+			if (formField.viewOnly == true)
 				return
 
-			// save the value in-case we have error and have to re-render
 			formValue := (Str?) form[field.name]?.trim
 			formField.formValue = formValue
-
 			formField.validate
 		}
-		
+
 		beanType.methods
 			.findAll { it.hasFacet(Validate#) && ((Validate) it.facet(Validate#)).field == null }
 			.each 	 { _scope().callMethod(it, null, [this]) }
-		
+
 		return !hasErrors
 	}
 
@@ -199,6 +197,25 @@ class FormBean {
 		}
 
 		return validateForm(form)
+	}
+	
+	** Convenience method to validate a single form field with a given value.
+	**
+	** Note that validation is skipped for 'viewOnly' fields and that given 'formValues' are *not* trimmed.
+	** 
+	** Returns any associated 'formField.errMsg'.
+	** 
+	** See [FormField.validate()]`FormField#validate`. 
+	virtual Str? validate(Field field, Str? formValue) {
+		formField := formFields[field]
+		
+		if (formField.viewOnly == true)
+			return null
+
+		formField.formValue = formValue
+		formField.validate
+		
+		return formField.errMsg
 	}
 	
 	** Creates an instance of 'beanType' with all the field values set to the form field values.

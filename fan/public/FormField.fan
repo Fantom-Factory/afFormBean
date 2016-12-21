@@ -188,10 +188,12 @@ class FormField {
 	** Validates this form field.
 	** Calls 'doHtmlValidation()' and then any static '@Validate' method that corresponds to this field. 
 	** 
-	** '@Validate' methods may check 'invalid' and 'errMsg' to ascertain if any previous validation failed. 
+	** '@Validate' methods may check 'invalid' and 'errMsg' to ascertain if any previous validation failed.
+	** 
+	** After validation check the value of the 'invalid' and 'errMsg' fields. 
 	virtual Void validate() {
 		doHtmlValidation
-		
+
 		field.parent.methods
 			.findAll { ((Validate?) it.facet(Validate#, false))?.field == field }
 			.each 	 { _scope().callMethod(it, null, [this]) }
