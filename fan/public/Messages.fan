@@ -62,6 +62,6 @@ internal const class MessagesImpl : Messages {
 	}
 	
 	private Bool matches(File file, Str baseName) {
-		file.basename.equalsIgnoreCase(baseName) && (file.ext.equalsIgnoreCase("props") || file.ext.equalsIgnoreCase("properties"))
+		file.basename.equalsIgnoreCase(baseName) && file.ext != null && (file.ext.equalsIgnoreCase("props") || file.ext.equalsIgnoreCase("properties"))
 	}
 }
