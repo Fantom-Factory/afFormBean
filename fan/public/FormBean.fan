@@ -206,7 +206,7 @@ class FormBean {
 	** Returns any associated 'formField.errMsg'.
 	** 
 	** See [FormField.validate()]`FormField.validate`. 
-	virtual Str? validate(Field field, Str? formValue) {
+	virtual Str? validateField(Field field, Str? formValue) {
 		formField := formFields.getOrThrow(field)
 		
 		if (formField.viewOnly == true)
