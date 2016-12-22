@@ -1,12 +1,12 @@
-#Form Bean v1.1.6
+#Form Bean v1.1.8
 ---
-[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.1.6](http://img.shields.io/badge/pod-v1.1.6-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
+[![pod: v1.1.8](http://img.shields.io/badge/pod-v1.1.8-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
 
-FormBean is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects. Built on top of [IoC](http://pods.fantomfactory.org/pods/afIoc) and [BedSheet](http://pods.fantomfactory.org/pods/afBedSheet) FormBean allows you to customise every aspect of your HTML form generation.
+FormBean is a means to render Fantom objects as HTML forms, validate submitted values, and reconstitute them back into Fantom objects. Built on top of [IoC](http://eggbox.fantomfactory.org/pods/afIoc) and [BedSheet](http://eggbox.fantomfactory.org/pods/afBedSheet) FormBean allows you to customise every aspect of your HTML form generation.
 
 Features:
 
@@ -24,17 +24,21 @@ Current limitations:
 
 ## Install
 
-Install `Form Bean` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
+Install `Form Bean` with the Fantom Pod Manager ( [FPM](http://eggbox.fantomfactory.org/pods/afFpm) ):
 
-    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afFormBean
+    C:\> fpm install afFormBean
 
-To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
+Or install `Form Bean` with [fanr](http://fantom.org/doc/docFanr/Tool.html#install):
+
+    C:\> fanr install -r http://eggbox.fantomfactory.org/fanr/ afFormBean
+
+To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
 
     depends = ["sys 1.0", ..., "afFormBean 1.1"]
 
 ## Documentation
 
-Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fantomfactory.org/pods/afFormBean/).
+Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afFormBean/) - the Fantom Pod Repository.
 
 ## Quick Start
 
@@ -164,7 +168,7 @@ Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fant
 
 3. Point your web browser to `http://localhost:8069/` and you'll see a basic HTML contact form:
 
-  ![Screenshot of the afFormBean Quick Start example](http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.png)
+  ![Screenshot of the afFormBean Quick Start example](http://eggbox.fantomfactory.org/pods/afFormBean/doc/quickStart.png)
 
 
 
@@ -182,7 +186,7 @@ Contact made!
 
 ## To and From HTML Forms
 
-HTML forms are the backbone of data entry in any web application. It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form. We call such objects *form beans*. The [FormBean](http://pods.fantomfactory.org/pods/afFormBean/api/FormBean) class then does the necessary hard work of converting form beans to HTML and back again.
+HTML forms are the backbone of data entry in any web application. It is common practice to model client side HTML forms as objects on the server, with fields on the object representing inputs on the form. We call such objects *form beans*. The [FormBean](http://eggbox.fantomfactory.org/pods/afFormBean/api/FormBean) class then does the necessary hard work of converting form beans to HTML and back again.
 
 `FormBeans` should be autobuilt by IoC, passing in the type of object it should model.
 
@@ -198,7 +202,7 @@ Or the best way, as in the quick start example, `@Inject` a `FormBean` instance 
     @Inject { type=MyFormModel# }
     FormBean formBean
 
-When created, a `FormBean` inspects the given type looking for fields annotated with [@HtmlInput](http://pods.fantomfactory.org/pods/afFormBean/api/HtmlInput). For each field found it creates a [FormField](http://pods.fantomfactory.org/pods/afFormBean/api/FormField) instance. `FormFields` hold all the information required to render the field as HTML, and convert it back again.
+When created, a `FormBean` inspects the given type looking for fields annotated with [@HtmlInput](http://eggbox.fantomfactory.org/pods/afFormBean/api/HtmlInput). For each field found it creates a [FormField](http://eggbox.fantomfactory.org/pods/afFormBean/api/FormField) instance. `FormFields` hold all the information required to render the field as HTML, and convert it back again.
 
 To render the HTML form, just call `FormBean.renderBean(...)`. To pre-populate the HTML form with existing data, pass in a form bean instance and its field values will be rendered as the HTML `<input>` values.
 
@@ -430,7 +434,7 @@ submit.label  = Submit
 
 ### Input Skins
 
-Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement [InputSkin](http://pods.fantomfactory.org/pods/afFormBean/api/InputSkin).
+Because the default HTML template is not suitable for every purpose, you can substitute your own skins for rendering HTML. Just implement [InputSkin](http://eggbox.fantomfactory.org/pods/afFormBean/api/InputSkin).
 
 Skins may be set on the `FormField` directly for a specific field:
 
@@ -449,13 +453,13 @@ Or they may be contributed to the `InputSkins` service where they are used by de
 
 Skins make it easy to render custom markup for date pickers.
 
-> **TIP:** Use [Duvet](http://pods.fantomfactory.org/pods/afDuvet) in your skins to inject field specific javascript.
+> **TIP:** Use [Duvet](http://eggbox.fantomfactory.org/pods/afDuvet) in your skins to inject field specific javascript.
 
 For dates, I personally like to use [Bootstrap Datepicker](https://bootstrap-datepicker.readthedocs.io/en/latest/) - see the [DatePicker for FormBean](http://www.fantomfactory.org/articles/datepicker-for-formbean) article for details.
 
 ### Error Skins
 
-Implement [ErrorSkin](http://pods.fantomfactory.org/pods/afFormBean/api/ErrorSkin) to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your `ErrorSkin` as an IoC service:
+Implement [ErrorSkin](http://eggbox.fantomfactory.org/pods/afFormBean/api/ErrorSkin) to define how error messages are displayed. It lists the errors messages displayed at the top of the form. Because you'll want most form beans in an app to look the same, you can add your `ErrorSkin` as an IoC service:
 
     Void defineServices(RegistryBuilder bob) {
         bob.add(ErrorSkin#, MyErrorSkin#)
@@ -469,7 +473,7 @@ Or you can set it directly on the `FormBean` instance:
 
 HTML `<select>` elements are notoriously difficult to render. Not only do you have the hassle of rendering and value encoding the field itself, but you have to do it all over again for all the `<option>` tags too! And these options aren't just hardcoded, they're often user specific and / or returned from a database query.
 
-FormBean's default skin for `select` uses [OptionsProviders](http://pods.fantomfactory.org/pods/afFormBean/api/OptionsProvider) to provide the options to be rendered. Like `InputSkins` an `OptionsProvider` may be set on the `FormField` directly for a specific field:
+FormBean's default skin for `select` uses [OptionsProviders](http://eggbox.fantomfactory.org/pods/afFormBean/api/OptionsProvider) to provide the options to be rendered. Like `InputSkins` an `OptionsProvider` may be set on the `FormField` directly for a specific field:
 
     formBean.formFields[MyFormModel#field1].optionsProvider = MyOptions()
 
@@ -508,7 +512,7 @@ Note that a default `OptionsProvider` is already given for `Enums`. So to render
 
 ## Radio Buttons
 
-Radio buttons re-use the [OptionsProvider](http://pods.fantomfactory.org/pods/afFormBean/api/OptionsProvider) mechanism from Select Boxes to render individual values and lables. See the above section for more details.
+Radio buttons re-use the [OptionsProvider](http://eggbox.fantomfactory.org/pods/afFormBean/api/OptionsProvider) mechanism from Select Boxes to render individual values and lables. See the above section for more details.
 
 To render a form value as a set of radio buttons, set the form field type to `radio`.
 
