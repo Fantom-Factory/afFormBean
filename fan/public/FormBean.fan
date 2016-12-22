@@ -205,9 +205,9 @@ class FormBean {
 	** 
 	** Returns any associated 'formField.errMsg'.
 	** 
-	** See [FormField.validate()]`FormField#validate`. 
+	** See [FormField.validate()]`FormField.validate`. 
 	virtual Str? validate(Field field, Str? formValue) {
-		formField := formFields[field]
+		formField := formFields.getOrThrow(field)
 		
 		if (formField.viewOnly == true)
 			return null
@@ -344,14 +344,6 @@ class FormBean {
 			beanProps.addAll(extraProps)
 		
 		return beanProps
-	}
-	
-	private Obj? fromObjCache(Obj? what) {
-		if (what is Str)
-			what = Type.find(what)
-		if (what is Type)
-			return _objCache[what]
-		return null
 	}
 	
 	@NoDoc
