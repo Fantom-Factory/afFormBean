@@ -9,12 +9,17 @@ using afConcurrent
 **  - '<bean>.props' in pod '<pod>'
 ** 
 ** Messages override those defined previously.
+** 
+** Note that message maps are cached on the given bean type, so hit of collating '.props' files is 
+** only taken once per bean type. 
 const mixin Messages {
 
 	** Returns messages for the given bean.
 	@Operator
 	abstract Str:Str getMessages(Type beanType)
 	
+	** Clears the message cache.
+	abstract Void clear()
 }
 
 internal const class MessagesImpl : Messages {
@@ -35,8 +40,8 @@ internal const class MessagesImpl : Messages {
 				// can only get single props, not the whole file, so add locale to getMessage
 				// or just look for more files using the same rules (better)
 				// pass in Locale locale := Locale.cur()
-				formBeanMsgs :=    beanType.pod.files.find { matches(it, "FormBean")	}?.readProps ?: [:]
-				beanTypeMsgs :=    beanType.pod.files.find { matches(it, beanType.name)	}?.readProps ?: [:]
+				formBeanMsgs := beanType.pod.files.find { matches(it, "FormBean")	}?.readProps ?: [:]
+				beanTypeMsgs := beanType.pod.files.find { matches(it, beanType.name)}?.readProps ?: [:]
 				tempMsgs	 := Str:Str[:] { caseInsensitive=true }.setAll(defaultMsgs).setAll(formBeanMsgs).setAll(beanTypeMsgs)
 				beanName 	 := beanType.name.lower + "."
 
@@ -59,6 +64,10 @@ internal const class MessagesImpl : Messages {
 				throw err
 			}
 		}).rw
+	}
+	
+	override Void clear() {
+		messages.clear
 	}
 	
 	private Bool matches(File file, Str baseName) {

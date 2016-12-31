@@ -1,5 +1,9 @@
 Versions
 ********
+v1.1.10
+=======
+ - New: 'Messages.clear()' to clear the messages cache.
+
 v1.1.8
 ======
  - New: 'FormBean.validateField()' to validate individual fields.
