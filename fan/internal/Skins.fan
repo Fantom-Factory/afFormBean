@@ -23,7 +23,7 @@ abstract const class DefaultInputSkin : InputSkin {
 
 internal const class TextInputSkin : DefaultInputSkin {
 	override Str renderElement(SkinCtx skinCtx) {
-		"""<input type="${skinCtx.formField.type}" ${skinCtx.renderAttributes} value="${skinCtx.value}">"""
+		"<input type=\"" + (skinCtx.formField.type ?: "text") + "\" ${skinCtx.renderAttributes} value=\"${skinCtx.value}\">"
 	}	
 }
 
