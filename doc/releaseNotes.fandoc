@@ -2,8 +2,9 @@ Versions
 ********
 v1.1.10
 =======
+ - New: Added 'FormBean.getByField()' as convenience 'formBean.formFields.get(field)'.
  - New: 'Messages.clear()' to clear the messages cache.
- - Bug: 'null' field input types were rendered as 'type="null"' instead of 'type="text"'
+ - Bug: 'null' field input types were rendered as 'type="null"' instead of 'type="text"'.
 
 v1.1.8
 ======
