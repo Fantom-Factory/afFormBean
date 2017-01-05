@@ -61,13 +61,26 @@ class FormBean {
 		_fieldInspectors.inspect(this, &formFields)
 	}
 	
-	** Returns the form field that corresponds to the given field name.
+	** Returns the form field that corresponds to the given simple field name.
 	** 
 	**   syntax:fantom
 	**   formField := formBean["name"]
 	@Operator
 	FormField getByName(Str name) {
 		&formFields.find { it.field.name.equalsIgnoreCase(name) }
+			?: throw ArgNotFoundErr("Could not find FormField for field: ${name}", &formFields.keys.map { it.qname })
+	}
+
+	** Returns the form field that corresponds to the given field.
+	** 
+	**   syntax:fantom
+	**   formField := formBean[MyFormDetails#name]
+	** 
+	** Convenience for 'formBean.formFields.get(field)'.
+	@Operator
+	FormField getByField(Field field) {
+		&formFields[field]
+			?: throw ArgNotFoundErr("Could not find FormField for field: ${field.qname}", &formFields.keys.map { it.qname })
 	}
 	
 	** Re-generates the 'formFields' map. 
