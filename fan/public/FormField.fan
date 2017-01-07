@@ -20,6 +20,10 @@ class FormField {
 	** This 'formValue' is also set during form validation so any user entered values are re-rendered should the form be re-displayed.   
 	Str?			formValue
 
+	** Used as temporary store when uploading binary data, such as 'Bufs' and 'Files'. 
+	** Contains the value that the form field will be set to.
+	Obj?			formData
+	
 	** The 'ValueEncoder' used to convert the field value to and from a 'Str'.
 	** 
 	** If 'null' then a default 'ValueEncoder' based on the field type is chosen from BedSheet's 'ValueEncoders' service. 
@@ -46,7 +50,10 @@ class FormField {
 	** Useful for rendering static, read only, HTML associated with the field.
 	Bool? 			viewOnly
 	
+	** A general stash, handy for passing data to static validate methods. 
+	[Str:Obj?]?		stash
 
+	
 
 	// ---- Html Options ------------------------------------------------------------------------
 	
@@ -136,10 +143,6 @@ class FormField {
 	** If 'null' then a default 'OptionsProvider' is chosen based on the field type. 
 	OptionsProvider?	optionsProvider
 	
-	** Used as temporary store when uploading binary data, such as 'Bufs' and 'Files'. 
-	** Contains the value that the form field will be set to.
-	Obj? formData
-
 	@Inject private const	|->Scope|		_scope
 	@Inject private const	InputSkins		_inputSkins
 	@Inject private const	ValueEncoders 	_valueEncoders

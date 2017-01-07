@@ -1,8 +1,10 @@
 Versions
 ********
+
 v1.1.10
 =======
- - New: Added 'FormBean.getByField()' as convenience 'formBean.formFields.get(field)'.
+ - New: Added 'FormBean.getByField()' as convenience for 'formBean.formFields.get(field)'.
+ - New: Added 'FormField.stash', handy for passing data to static validate methods.
  - New: 'Messages.clear()' to clear the messages cache.
  - Bug: 'null' field input types were rendered as 'type="null"' instead of 'type="text"'.
 
