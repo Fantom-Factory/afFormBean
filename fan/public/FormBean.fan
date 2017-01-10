@@ -1,7 +1,13 @@
-using afIoc
-using afBedSheet
-using afBeanUtils
-using web
+using afIoc::Inject
+using afIoc::Scope
+using afBedSheet::HttpRequest
+using afBedSheet::ObjCache
+using afBedSheet::ValueEncoders
+using afBeanUtils::ArgNotFoundErr
+using afBeanUtils::BeanPropertyFactory
+using afBeanUtils::BeanProperties
+using web::WebOutStream
+using web::WebUtil
 
 ** Represents a Fantom type that can be rendered as a HTML form, and reconstituted back to a Fantom instance.
 **   
@@ -35,6 +41,34 @@ class FormBean {
 	@Inject { optional = true}
 							ErrorSkin?		errorSkin
 
+	** If 'true' then 'FormFields' are rendered with a unique random prefix. 
+	** Use when rendering the same form multiple times on the same page to avoid conflicting HTML IDs.
+	** 
+	** When set to 'true' a string is automatically assigned to `uniqueIdSuffix`. 
+	** Auto generated suffixes look like '-xFFFFFFFF'.
+	** 
+	** Defaults to 'false'.
+							Bool			renderUniqueIds {
+								set {
+									&uniqueIdSuffix  = it ? "-x" + Int.random.and(0xFFFFFFFF).toHex(8).upper : null
+									&renderUniqueIds = it
+								}
+							}
+
+	** The unique suffix used for 'FormField' IDs.
+	** Use when rendering the same form multiple times on the same page to avoid conflicting HTML IDs.
+	** 
+	** This field is set automatically when `renderUniqueIds` is set to 'true'. 
+	** Manually setting this field will automatically set 'renderUniqueIds'; to 'false' if 'null' or 'true' otherwise.
+	** 
+	** Default to 'null'.
+							Str?			uniqueIdSuffix {
+								set {
+									&renderUniqueIds = (it?.trimToNull != null)
+									&uniqueIdSuffix  = it
+								}
+							}
+	
 	** Hook for handling file uploads. By default, an in-memory file is returned.
 	** In memory files do not require deleting.
 	|Str fileName, InStream in -> File|?	fileUploadHook
