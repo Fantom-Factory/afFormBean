@@ -40,7 +40,13 @@ class SkinCtx {
 	
 	internal new make(|This|in) { in(this)	}
 
-	** Convenience for 'field.name'. Safe for use as an ID / CSS class name.
+	
+	** Convenience for 'field.name' plus any unique ID suffix defined by the 'FormBean'.
+	Str id() {
+		field.name + (formBean.uniqueIdSuffix ?: "")
+	}
+	
+	** Convenience for 'field.name' and used as the form name. Also safe for use as a CSS class name.
 	Str name() {
 		field.name
 	}
@@ -112,7 +118,7 @@ class SkinCtx {
 	** e.g. '["disabled":""]' would be rendered as just 'disabled'.
 	Str renderAttributes([Str:Str]? extraAttributes := null) {
 		attrs := Str:Str?[:] { it.ordered = true }
-		attrs["id"]				= name
+		attrs["id"]				= id
 		attrs["class"]			= formField.css
 		attrs["name"]			= name
 		attrs["placeholder"]	= formField.placeholder

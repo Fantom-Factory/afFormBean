@@ -12,7 +12,7 @@
 ** 
 **     @Validate { field=#name }
 **     static Void validateName(FormField formField) {
-**         if (formField.value == "Trisha")
+**         if (formField.formValue == "Trisha")
 **             formField.errMsg = "Ex-girlfriends not allowed!"
 **     }
 ** }
@@ -29,7 +29,7 @@
 ** 
 ** 'FormBean' validation is performed *after* 'FormField' validation.
 ** 
-** Note that validation methods are called using IoC, so services may be passed in as extra parameters:
+** Note that validation methods are called using IoC, so services may be passed in as extra method parameters:
 **  
 ** pre>
 ** syntax: fantom

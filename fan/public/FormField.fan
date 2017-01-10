@@ -249,6 +249,7 @@ class FormField {
 
 	** Performs basic HTML5 validation.
 	virtual Void doHtmlValidation() {
+		// formValue should already be trimmed
 		hasValue := formValue != null && !formValue.isEmpty
 
 		if (required ?: false)
