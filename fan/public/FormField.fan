@@ -53,7 +53,10 @@ class FormField {
 	** A general stash, handy for passing data to static validate methods. 
 	[Str:Obj?]?		stash
 
-	
+	** A static method that performs extra server side validation. 
+	Method? validationMethod
+
+
 
 	// ---- Html Options ------------------------------------------------------------------------
 	
@@ -87,8 +90,8 @@ class FormField {
 	**   attributes = "autocomplete='off'"
 	Str?	attributes
 	
-	
-	
+
+
 	// ---- Validation Options ------------------------------------------------------------------------
 	
 	** HTML5 validation attribute.
@@ -183,6 +186,7 @@ class FormField {
 		step			= input?.step			?: msg("step"		)?.toInt
 		showBlank		= input?.showBlank		?: msg("showBlank"	)?.toBool
 		blankLabel		= input?.blankLabel		?: msg("blankLabel"	)
+		validationMethod= input?.validationMethod ?: Method.findMethod(msg("validationMethod") ?: "<pod>::<type>.<slot>", false)
 		
 		return this
 	}
@@ -242,6 +246,10 @@ class FormField {
 	virtual Void validate() {
 		doHtmlValidation
 
+		if (validationMethod != null)
+			_scope().callMethod(validationMethod, null, [this])
+
+		// should it be validationMethod AND / OR @Validate methods?
 		field.parent.methods
 			.findAll { ((Validate?) it.facet(Validate#, false))?.field == field }
 			.each 	 { _scope().callMethod(it, null, [this]) }

@@ -84,6 +84,25 @@ facet class HtmlInput {
 	** If 'null' then the msg key '<bean>.<field>.viewOnly' is used to look for a value. 
 	const Bool? viewOnly
 
+	** A static method that performs extra server side validation. 
+	** 
+	** If 'null' then the msg key '<bean>.<field>.validationMethod' is used to look for the qname. 
+	** Example:
+	** 
+	**   bean.field.validationMethod = acme::Bean.validateName
+	** 
+	** Note The bean type is also searched for static methods annotated with '@Validate', for example:
+	** 
+	** pre>
+	** syntax: fantom
+	** @Validate { field=#name }
+	** static Void validateName(FormField formField) {
+	**     if (formField.formValue == "Trisha")
+	**         formField.errMsg = "Ex-girlfriends not allowed!"
+	** } 
+	** <pre
+	const Method? validationMethod
+
 
 
 	// ---- HTML5 Validation Options --------------------------------------------------------------
