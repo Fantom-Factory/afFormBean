@@ -4,6 +4,7 @@ Versions
 v1.1.10
 =======
  - New: 'FormBean.renderUniqueIds' allows the same form to be rendered multiple times on the same page.
+ - New: 'HtmlInput.validationMethod' and 'FormField.validationMethod' provide an alternative means to specifying '@Validate' methods.
  - New: Added 'FormBean.getByField()' as convenience for 'formBean.formFields.get(field)'.
  - New: Added 'FormField.stash', handy for passing data to static validate methods.
  - New: 'Messages.clear()' to clear the messages cache.
