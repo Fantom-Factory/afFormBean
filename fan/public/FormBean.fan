@@ -27,7 +27,10 @@ class FormBean {
 	** Messages are read from (and overridden by) the following pod resource files: 
 	**  - '<beanType.name>.properties' 
 	**  - 'FormBean.properties'
+	** 
 	** Note that property files must be in the same pod as the defining bean. 
+	** 
+	** If you set a complete new map, then you probably want to call 'reinspectBean()' to re-initialise the formfields.
 							Str:Str 		messages	:= Str:Str[:] { caseInsensitive=true }
 	
 	** The form fields that make up this form bean.

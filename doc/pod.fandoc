@@ -240,7 +240,7 @@ They're generally a pain to configure, awkward to tweak and don't go anywhere ne
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
-The '@HtmlInput' facet attributes 'required', 'minLength', 'maxLength', 'min', 'max', 'regex', and 'step' map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
+The '@HtmlInput' facet attributes 'required', 'minLength', 'maxLength', 'min', 'max', 'pattern', and 'step' map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
 
 You can, of course, embed and utilise any javascript form validation framework you wish! Using FormBean does not preclude you from using other validation frameworks.
 
@@ -310,7 +310,7 @@ Note that validation methods are called using IoC, so services may be passed in 
 pre>
 syntax: fantom
 
-@Validate
+@Validate { field=#name }
 static Void validateName(FormField formField, MyService service) { ... }
 <pre
 
@@ -460,7 +460,7 @@ maxLength.msg = ${label} should be at most ${constraint} characters
 notNum.msg    = ${label} should be a whole number
 min.msg       = ${label} should be at least ${constraint}
 max.msg       = ${label} should be at most ${constraint}
-regex.msg     = ${label} does not match the pattern ${constraint}
+pattern.msg   = ${label} does not match the pattern ${constraint}
 
 submit.label  = Submit
 <pre
