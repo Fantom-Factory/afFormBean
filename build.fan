@@ -9,7 +9,6 @@ class Build : BuildPod {
 
 		meta = [
 			"pod.dis"			: "Form Bean",	
-			"pod.displayName"	: "Form Bean",	
 			"afIoc.module"		: "afFormBean::FormBeanModule",
 			"repo.tags"			: "web",
 			"repo.public"		: "true"
@@ -25,7 +24,9 @@ class Build : BuildPod {
 			"afIoc        3.0.0  - 3.0",
 
 			// ---- Web -------------------------
-//			"afBedSheet   1.5.0  - 1.5"
+			// removed the hard dependency on BedSheet so FormBean may be used to validate Domain objects
+			// we pretty much only needed the ValueEncoders service anyway!
+//			"afBedSheet   1.5.8  - 1.5"
 		]
 
 		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/inspectors/`, `fan/public/`]
