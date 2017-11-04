@@ -1,8 +1,9 @@
-#Form Bean v1.1.8
+#Form Bean v1.2.0
 ---
+
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.1.8](http://img.shields.io/badge/pod-v1.1.8-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
-![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
+[![pod: v1.2.0](http://img.shields.io/badge/pod-v1.2.0-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
+![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)
 
 ## Overview
 
@@ -34,7 +35,7 @@ Or install `Form Bean` with [fanr](http://fantom.org/doc/docFanr/Tool.html#insta
 
 To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afFormBean 1.1"]
+    depends = ["sys 1.0", ..., "afFormBean 1.2"]
 
 ## Documentation
 
@@ -247,7 +248,7 @@ Yes, there are hundreds of javascript form validation frameworks out there, but 
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
-The `@HtmlInput` facet attributes `required`, `minLength`, `maxLength`, `min`, `max`, `regex`, and `step` map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
+The `@HtmlInput` facet attributes `required`, `minLength`, `maxLength`, `min`, `max`, `pattern`, and `step` map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
 
 You can, of course, embed and utilise any javascript form validation framework you wish! Using FormBean does not preclude you from using other validation frameworks.
 
@@ -303,7 +304,7 @@ static Void validateBean(FormBean formBean) { ... }
 Note that validation methods are called using IoC, so services may be passed in as extra parameters:
 
 ```
-@Validate
+@Validate { field=#name }
 static Void validateName(FormField formField, MyService service) { ... }
 ```
 
@@ -425,7 +426,7 @@ maxLength.msg = ${label} should be at most ${constraint} characters
 notNum.msg    = ${label} should be a whole number
 min.msg       = ${label} should be at least ${constraint}
 max.msg       = ${label} should be at most ${constraint}
-regex.msg     = ${label} does not match the pattern ${constraint}
+pattern.msg   = ${label} does not match the pattern ${constraint}
 
 submit.label  = Submit
 ```
@@ -541,10 +542,10 @@ html += formBean.renderSubmit()
 html += "<form>"
 ```
 
-When the form is submitted, use `FormBean.validateRequest()` and create your form object as normal:
+When the form is submitted, use `FormBean.validateHttpRequest()` and create your form object as normal:
 
 ```
-valid := formBean.validateRequest(httpRequest)
+valid := formBean.validateHttpRequest()
 if (!valid)
     return render
 

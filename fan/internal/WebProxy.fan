@@ -1,10 +1,6 @@
 using afIoc::Inject
 using afIoc::Scope
 using concurrent::AtomicRef
-//using afBedSheet::HttpRequest
-//using afBedSheet::ObjCache
-//using afBedSheet::ValueEncoder
-//using afBedSheet::ValueEncoders
 
 internal const class WebProxy {
 	
@@ -15,40 +11,27 @@ internal const class WebProxy {
 	new make(|This| f) { f(this) }
 
 	MimeType? reqContentType() {
-		httpRequest := httpRequest
-		headers		:= httpRequest.typeof.method("headers").callOn(httpRequest, null)
-		contentType	:= headers.typeof.method("contentType").callOn(headers, null)
-		return contentType
+		httpRequest->headers->contentType
 	}
 	
 	[Str:Str]? reqForm() {
-		httpRequest := httpRequest
-		body		:= httpRequest.typeof.method("body").callOn(httpRequest, null)
-		form		:= body		  .typeof.method("form").callOn(body, null)
-		return form
+		httpRequest->body->form
 	}
 	
 	Void parseMultiPartForm(|Str partName, InStream in, Str:Str headers| callback) {
-		httpRequest := httpRequest
-		httpRequest.typeof.method("parseMultiPartForm").callOn(httpRequest, [callback])
+		httpRequest->parseMultiPartForm(callback)
 	}
 	
 	Obj? toValue(Type valType, Str clientValue) {
-		valueEncoders	:= valueEncoders
-		toValue			:= valueEncoders.typeof.method("toValue").callOn(valueEncoders, [valType, clientValue])
-		return toValue
+		valueEncoders->toValue(valType, clientValue)
 	}
 	
 	Str toClient(Type valType, Obj? value) {
-		valueEncoders	:= valueEncoders
-		toClient		:= valueEncoders.typeof.method("toClient").callOn(valueEncoders, [valType, value])
-		return toClient
+		valueEncoders->toClient(valType, value)
 	}
 	
 	Obj? getObj(Type? type) {
-		objCache	:= objCache
-		get			:= objCache.typeof.method("get").callOn(valueEncoders, [type])
-		return get
+		objCache->get(type)
 	}
 	
 	** Decode a HTTP quoted string according to RFC 2616 Section 2.2.
