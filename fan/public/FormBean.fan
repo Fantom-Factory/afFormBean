@@ -1,28 +1,23 @@
 using afIoc::Inject
 using afIoc::Scope
-using afBedSheet::HttpRequest
-using afBedSheet::ObjCache
-using afBedSheet::ValueEncoders
 using afBeanUtils::ArgNotFoundErr
 using afBeanUtils::BeanPropertyFactory
 using afBeanUtils::BeanProperties
-using web::WebOutStream
-using web::WebUtil
+
 
 ** Represents a Fantom type that can be rendered as a HTML form, and reconstituted back to a Fantom instance.
 **   
 ** FormBean instances should be created by [IoC]`pod:afIoc`.
 class FormBean {	
 	@Inject private const	|->Scope|		_scope
-	@Inject private const	ValueEncoders 	_valueEncoders
+	@Inject private const	WebProxy		_webProxy
 	@Inject private const	InputSkins		_inputSkins
-	@Inject private const	ObjCache		_objCache
 	@Inject private const	Messages		_messages
 	@Inject private const	FieldInspectors	_fieldInspectors
 	
 	** The bean type this 'FormBean' represents.
 					const	Type			beanType
-	
+
 	** The message map used to find strings for labels, placeholders, hints, and validation errors.  
 	** Messages are read from (and overridden by) the following pod resource files: 
 	**  - '<beanType.name>.properties' 
@@ -167,12 +162,11 @@ class FormBean {
 	** The label is taken from the msg key 'submit.label' and defaults to 'Submit'.
 	virtual Str renderSubmit() {
 		buf := StrBuf()
-		out := WebOutStream(buf.out)
 
 		label := messages["submit.label"] ?: ""
-		out.div("class='formBean-row submitRow'")
-		out.submit("name=\"formBeanSubmit\" class=\"submit\" value=\"${label.toXml}\"")
-		out.divEnd
+		buf.add("<div class='formBean-row submitRow'>")
+		buf.add("<input type='submit' name=\"formBeanSubmit\" class=\"submit\" value=\"${label.toXml}\"/>")
+		buf.add("</div>")
 
 		return buf.toStr
 	}
@@ -216,17 +210,17 @@ class FormBean {
 	** In memory file are returned for file uploads, so the caller does not need to concern themselves with deleting them.
 	** 
 	** Returns 'true' if all the values are valid, 'false' if not.
-	virtual Bool validateRequest(HttpRequest httpReq) {
-		if (httpReq.headers.contentType?.noParams != MimeType("multipart/form-data"))
-			return validateForm(httpReq.body.form ?: Str:Str[:])
+	virtual Bool validateHttpRequest() {
+		if (_webProxy.reqContentType?.noParams != MimeType("multipart/form-data"))
+			return validateForm(_webProxy.reqForm ?: Str:Str[:])
 
 		form	:= Str:Str[:]
-		httpReq.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
+		_webProxy.parseMultiPartForm |Str inputName, InStream in, Str:Str headers| {
 			formField := &formFields.find { it.field.name == inputName }
 
 			// in case of a binary upload, we set the formValue to the filename so it can be 'required' validated
 			quoted   := headers["Content-Disposition"]?.split(';')?.find { it.lower.startsWith("filename") }?.split('=')?.getSafe(1)
-			filename := quoted != null ? WebUtil.fromQuotedStr(quoted) : "${inputName}.tmp"
+			filename := quoted != null ? _webProxy.fromQuotedStr(quoted) : "${inputName}.tmp"
 
 			switch (formField?.field?.type?.toNonNullable) {
 				case InStream#:
@@ -384,8 +378,8 @@ class FormBean {
 			// other fields that weren't submitted are also null
 			if (formField.formValue != null) {
 				value = (formField.valueEncoder != null)
-					? formField.valueEncoder.toValue(formField.formValue)
-					: _valueEncoders.toValue(field.type, formField.formValue)
+					? formField.valueEncoder->toValue(formField.formValue)
+					: _webProxy.toValue(field.type, formField.formValue)
 				beanProps[field.name] = value
 			}
 		}
@@ -401,4 +395,3 @@ class FormBean {
 		beanType.toStr
 	}
 }
-

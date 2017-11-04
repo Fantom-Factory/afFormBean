@@ -1,6 +1,11 @@
 Versions
 ********
 
+v1.2.0
+======
+ - Chg: Removed hard dependency on BedSheet so domain objects may more easilty use / integrate with FormBean validation. The limited BedSheet integration is instead resolved at runtime. Requires BedSheet v1.5.8.
+ - Chg: Renamed 'FormBean.validateRequest()' to 'validateHttpRequest()' and dropped the 'HttpRequest' parameter.
+
 v1.1.10
 =======
  - New: 'FormBean.renderUniqueIds' allows the same form to be rendered multiple times on the same page.
