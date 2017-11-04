@@ -595,11 +595,11 @@ html += formBean.renderSubmit()
 html += "<form>"
 <pre
 
-When the form is submitted, use 'FormBean.validateRequest()' and create your form object as normal:
+When the form is submitted, use 'FormBean.validateHttpRequest()' and create your form object as normal:
 
 pre>
 syntax: fantom
-valid := formBean.validateRequest(httpRequest)
+valid := formBean.validateHttpRequest()
 if (!valid)
     return render
 

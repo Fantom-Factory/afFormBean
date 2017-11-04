@@ -1,5 +1,4 @@
 using afIoc
-using afBedSheet
 
 @NoDoc
 const class FormBeanModule {
@@ -9,6 +8,7 @@ const class FormBeanModule {
 		defs.addService(OptionsProviders#)
 		defs.addService(Messages#)
 		defs.addService(FieldInspectors#)
+		defs.addService(WebProxy#)
 	}
 	
 	@Contribute { serviceType=InputSkins# }
@@ -49,11 +49,6 @@ const class FormBeanModule {
 	@Contribute { serviceType=OptionsProviders# }
 	Void contributeOptionsProviders(Configuration config) {
 		config[Enum#] = EnumOptionsProvider()
-	}
-
-	@Contribute { serviceType=ValueEncoders# }
-	Void contributeValueEncoders(Configuration config) {
-		config[Bool#] = BoolEncoder()
 	}
 
 	@Contribute { serviceType=DependencyProviders# }

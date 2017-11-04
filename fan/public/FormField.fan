@@ -1,16 +1,13 @@
 using afIoc
-using afBedSheet::ValueEncoder
-using afBedSheet::ValueEncoders
-using afBedSheet::ObjCache
 
 ** Holds all the meta data required to convert a field on a Fantom object to HTML and back again.
 class FormField {
 	
 	** A link back to the owning 'FormBean' instance.
-	FormBean		formBean
+	FormBean	formBean
 	
 	** The Fantom field this 'FormField' represents.
-	Field			field
+	Field		field
 
 	** The 'Str' value that will be rendered in the HTML form. 
 	** You may set this value before the form is rendered to set a default value.
@@ -18,43 +15,43 @@ class FormField {
 	** If the 'formValue' is 'null' then the field value is used instead and converted by 'valueEncoder'.
 	** 
 	** This 'formValue' is also set during form validation so any user entered values are re-rendered should the form be re-displayed.   
-	Str?			formValue
+	Str?		formValue
 
 	** Used as temporary store when uploading binary data, such as 'Bufs' and 'Files'. 
 	** Contains the value that the form field will be set to.
-	Obj?			formData
+	Obj?		formData
 	
-	** The 'ValueEncoder' used to convert the field value to and from a 'Str'.
+	** The 'afBedSheet::ValueEncoder' used to convert the field value to and from a 'Str'.
 	** 
 	** If 'null' then a default 'ValueEncoder' based on the field type is chosen from BedSheet's 'ValueEncoders' service. 
-	ValueEncoder?	valueEncoder
+	Obj?		valueEncoder
 	
 	** The 'InputSkin' used to render the field to HTML.
 	**  
 	** If 'null' then a default 'InputSkin' is chosen based on the 'type' attribute. 
-	InputSkin?		inputSkin
+	InputSkin?	inputSkin
 	
 	** The error message associated with this field.
 	** 
 	** Setting this to a non-null value invalidate the form field. 
-	Str?			errMsg	{ set { if (it != null) invalid = true; &errMsg = it } }
+	Str?		errMsg	{ set { if (it != null) invalid = true; &errMsg = it } }
 	
 	** Is this form field invalid?
 	** 
 	** Setting this to 'false' also clears any 'errMsg'. 
-	Bool			invalid { set { if (it == false) errMsg = null; &invalid = it } }
+	Bool		invalid { set { if (it == false) errMsg = null; &invalid = it } }
 
 	** If 'true' then the field is rendered into the HTML form as normal, but no attempt is made 
 	** to validate the form value or decode it back to a Fantom value. 
 	** 
 	** Useful for rendering static, read only, HTML associated with the field.
-	Bool? 			viewOnly
+	Bool? 		viewOnly
 	
 	** A general stash, handy for passing data to static validate methods. 
-	[Str:Obj?]?		stash
+	[Str:Obj?]?	stash
 
 	** A static method that performs extra server side validation. 
-	Method? validationMethod
+	Method?		validationMethod
 
 
 
@@ -146,10 +143,9 @@ class FormField {
 	** If 'null' then a default 'OptionsProvider' is chosen based on the field type. 
 	OptionsProvider?	optionsProvider
 	
-	@Inject private const	|->Scope|		_scope
-	@Inject private const	InputSkins		_inputSkins
-	@Inject private const	ValueEncoders 	_valueEncoders
-	@Inject private const	ObjCache 		_objCache
+	@Inject private const	|->Scope|	_scope
+	@Inject private const	InputSkins	_inputSkins
+	@Inject private const	WebProxy	_webProxy
 
 	** Create 'FormField' instances via IoC:
 	** 
@@ -195,7 +191,7 @@ class FormField {
 		if (what is Str)
 			what = Type.find(what)
 		if (what is Type)
-			return _objCache[what]
+			return _webProxy.getObj(what)
 		return null
 	}
 	
@@ -226,11 +222,11 @@ class FormField {
 	** Override to perform custom field rendering.
 	virtual Str render(Obj? bean) {
 		skinCtx := SkinCtx() {
-			it.bean				= bean
-			it.field			= this.field
-			it.formBean			= this.formBean
-			it.formField		= this
-			it._valueEncoders	= this._valueEncoders
+			it.bean			= bean
+			it.field		= this.field
+			it.formBean		= this.formBean
+			it.formField	= this
+			it._webProxy	= this._webProxy
 		}
 		
 		inputSkin := inputSkin ?: _inputSkins.find(type ?: "text")

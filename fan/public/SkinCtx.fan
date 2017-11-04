@@ -1,9 +1,7 @@
-using afIoc
-using afBedSheet
 
 ** Passed to 'InputSkins' to provide all the information they need to render a form field.
 class SkinCtx {
-	internal	ValueEncoders	_valueEncoders
+	internal	WebProxy		_webProxy
 
 	** The bean instance being rendered.
 				Obj?			bean { internal set }
@@ -76,7 +74,7 @@ class SkinCtx {
 	
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
 	Str toClient(Obj? value) {
-		strVal := (formField.valueEncoder != null) ? formField.valueEncoder.toClient(value) : _valueEncoders.toClient(field.type, value)
+		strVal := (Str) ((formField.valueEncoder != null) ? formField.valueEncoder->toClient(value) : _webProxy.toClient(field.type, value))
 		return strVal.toXml
 	}
 	
