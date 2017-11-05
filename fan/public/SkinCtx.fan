@@ -1,7 +1,6 @@
 
 ** Passed to 'InputSkins' to provide all the information they need to render a form field.
 class SkinCtx {
-	internal	WebProxy		_webProxy
 
 	** The bean instance being rendered.
 				Obj?			bean { internal set }
@@ -68,14 +67,17 @@ class SkinCtx {
 	}
 	
 	** Returns 'true' if the *bean* is invalid; that is, if *any* field is in error.
+	** 
+	** Convenience for `formBean.hasErrors()`.
 	Bool beanInvalid() {
 		formBean.hasErrors
 	}
 	
+	** Convenience for `FormField.toClient()`.
+	** 
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
 	Str toClient(Obj? value) {
-		strVal := (Str) ((formField.valueEncoder != null) ? formField.valueEncoder->toClient(value) : _webProxy.toClient(field.type, value))
-		return strVal.toXml
+		formField.toClient(value)
 	}
 	
 	** Convenience for `FormField.msg`.
