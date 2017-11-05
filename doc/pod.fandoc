@@ -227,7 +227,7 @@ Or you can set an instance directly on the 'FormField' itself.
   syntax: fantom
   formBean.formFields[MyFormModel#field1].valueEncoder = MyValueEncoder()
 
-Note, FormBean provides a 'ValueEncoder' for 'Bool' to get around HTML's dodgy 'on' / not submitted syntax.
+Note, BedSheet provides a 'ValueEncoder' for 'Bool' to get around HTML's dodgy 'on' / not submitted syntax.
 
 
 
@@ -697,3 +697,16 @@ option.visa.label                      = Visa
 # used for all options in 'UserBean'
 userBean.option.visa.label             = Visa
 <pre
+
+
+
+Wot No BedSheet!?
+*****************
+The original version of FormBean was designed to work with [BedSheet]`pod:afBedSheet`; but since v1.2.0, FormBean has no hard dependencies on 'BedSheet' or 'web'! It turns out, that aside from some 'ValueEncoder' string conversions, FormBean doesn't actually do much web stuff - it just renders a bit of HTML and checks form values!
+
+If used in a BedSheet application then FormBean will automatically make use of BedSheet's 'ValueEncoders' service. Note that 'FormBean.validateHttpRequest()' will only work during a BedSheet HTTP request, or a 'web' HTTP request.
+
+This means that FormBean may be used by non-web classes libraries; such as domain models wanting to utilise validation methods.
+
+Note that due to the special 'BoolEncoder' required for Checkbox submissions, FormBean should only be used with BedSheet v1.5.8 or later.
+

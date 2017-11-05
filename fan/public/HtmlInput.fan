@@ -58,6 +58,9 @@ facet class HtmlInput {
 	** 
 	**   bean.field.valueEncoder = acme::MyValueEncoder
 	** 
+	** Ideally, the class should extend BedSheet's ValueEncoder mixin, but any class that responds
+	** to the same 'toValue()' and 'toClient()' methods will work.
+	** 
 	** Defaults to using BedSheet's 'ValueEncoders' service if not found. 
 	const Type?	valueEncoder
 	

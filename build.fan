@@ -29,7 +29,7 @@ class Build : BuildPod {
 //			"afBedSheet   1.5.8  - 1.5"
 		]
 
-		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/inspectors/`, `fan/public/`]
+		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/bedsheet/`, `fan/internal/inspectors/`, `fan/public/`]
 		resDirs = [`doc/`, `res/`]
 	}
 }
