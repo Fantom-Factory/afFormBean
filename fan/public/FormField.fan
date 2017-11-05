@@ -226,11 +226,16 @@ class FormField {
 			it.field		= this.field
 			it.formBean		= this.formBean
 			it.formField	= this
-			it._webProxy	= this._webProxy
 		}
 		
 		inputSkin := inputSkin ?: _inputSkins.find(type ?: "text")
 		return inputSkin.render(skinCtx)		
+	}
+	
+	** Converts the given value to a string using the preferred 'ValueEncoder'.
+	Str toClient(Obj? value) {
+		strVal := (Str) ((valueEncoder != null) ? valueEncoder->toClient(value) : _webProxy.toClient(field.type, value))
+		return strVal.toXml
 	}
 	
 	** Validates this form field.
