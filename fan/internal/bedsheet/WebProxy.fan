@@ -47,14 +47,14 @@ internal const class WebProxy {
 	** Only called during create / update Bean
 	Obj? toValue(Type valType, Str clientValue) {
 		if (valueEncoders != null)
-			valueEncoders->toValue(valType, clientValue)
+			return valueEncoders->toValue(valType, clientValue)
 		return typeCoercer.coerce(clientValue, valType)
 	}
 	
 	** Only called from SkinCtx.toClient() / rendering form beans
 	Str toClient(Type valType, Obj? value) {
 		if (valueEncoders != null)
-			valueEncoders->toClient(valType, value)
+			return valueEncoders->toClient(valType, value)
 		// don't bother with a TypeCoercer, just toStr it.
 		return value?.toStr ?: Str.defVal
 	}
