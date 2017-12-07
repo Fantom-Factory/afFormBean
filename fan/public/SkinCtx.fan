@@ -68,12 +68,12 @@ class SkinCtx {
 	
 	** Returns 'true' if the *bean* is invalid; that is, if *any* field is in error.
 	** 
-	** Convenience for `formBean.hasErrors()`.
+	** Convenience for [formBean.hasErrors()]`FormBean.hasErrors`.
 	Bool beanInvalid() {
 		formBean.hasErrors
 	}
 	
-	** Convenience for `FormField.toClient()`.
+	** Convenience for [formField.toClient()]`FormField.toClient`.
 	** 
 	** Converts the given value to a string using the preferred 'ValueEncoder'.
 	Str toClient(Obj? value) {
