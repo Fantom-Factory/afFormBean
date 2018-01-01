@@ -22,7 +22,7 @@ internal const class WebProxy {
 		httpReq := httpReq
 		if (httpReq != null)
 			return httpReq->headers->contentType
-		contType := webReq->headers->get("Content-Type")
+		contType := webReq(true)->headers->get("Content-Type")
 		return contType == null ? null : MimeType(contType)
 	}
 	
@@ -31,7 +31,7 @@ internal const class WebProxy {
 		httpReq := httpReq
 		if (httpReq != null)
 			return httpReq->body->form
-		return webReq->form
+		return webReq(true)->form
 	}
 	
 	** Only called from FormBean.validateHttpRequest()
@@ -41,7 +41,7 @@ internal const class WebProxy {
 			httpReq->parseMultiPartForm(callback)
 			return
 		}
-		webReq->parseMultiPartForm(callback)
+		webReq(true)->parseMultiPartForm(callback)
 	}
 	
 	** Only called during create / update Bean
@@ -75,14 +75,23 @@ internal const class WebProxy {
 		return s[1..-2].replace("\\\"", "\"")
 	}
 
+	Str? csrfToken() {
+		webReq := webReq(false)
+		if (webReq == null)
+			return null
+		return webReq->stash->get("afSleepSafe.csrfToken")?->toStr
+	}
+
 	private Obj? httpReq() {
 		// no need to cache this - FormBeans are typically created per HttpRequest, and this method called once per HttpRequest!
 		// active scope to get the current request scope
 		scope.registry.activeScope.serviceById("afBedSheet::HttpRequest", false)
 	}
 	
-	private Obj webReq() {
-		try return Actor.locals["web.req"]
-		catch (NullErr e) throw Err("No web request active in thread")
+	private Obj? webReq(Bool checked) {
+		webReq := Actor.locals["web.req"]
+		if (checked && webReq == null)
+			throw Err("No web request active in thread")
+		return webReq
 	}
 }
