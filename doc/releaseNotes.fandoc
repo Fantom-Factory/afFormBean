@@ -1,8 +1,20 @@
+v1.2
+****
+
+v1.2.2
+======
+ - New: [SleepSafe]`pod:afSleepSafe` integration! Forms automatically render hidden inputs with CSRF tokens.
+
 v1.2.0
 ======
  - New: Removed hard dependency on BedSheet so domain objects may more easilty use / integrate with FormBean validation. The limited BedSheet integration is instead resolved at runtime. Requires BedSheet v1.5.8.
  - New: Added 'FormField.toClient()'
  - Chg: Renamed 'FormBean.validateRequest()' to 'validateHttpRequest()' and dropped the 'HttpRequest' parameter.
+
+
+
+v1.0
+****
 
 v1.1.10
 =======
@@ -65,6 +77,11 @@ v1.0.0
  - New: Messages are a lot more customisable.
  - New: Customisable 'ErrorSkin' for form errors.
  - New: Added 'SkinCtx.renderAttributes()'
+
+
+
+v0.0
+****
 
 v0.0.4
 ======
