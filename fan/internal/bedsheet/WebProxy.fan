@@ -79,7 +79,8 @@ internal const class WebProxy {
 		webReq := webReq(false)
 		if (webReq == null)
 			return null
-		return webReq->stash->get("afSleepSafe.csrfToken")?->toStr
+		// csrfTokenFn should cache the token for us
+		return webReq->stash->get("afSleepSafe.csrfTokenFn")?->call?->toStr
 	}
 
 	private Obj? httpReq() {
