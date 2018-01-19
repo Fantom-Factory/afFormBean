@@ -75,7 +75,13 @@ internal const class WebProxy {
 		return s[1..-2].replace("\\\"", "\"")
 	}
 
-	Str? csrfToken() {
+	Str? csrfTokenName() {
+		// we don't want a dependency on IocConfig just for this
+		configSrc := scope.serviceById("afIocConfig::ConfigSource", false)
+		return configSrc?->get("afSleepSafe.csrfTokenName", Str#, false)
+	}
+
+	Str? csrfTokenValue() {
 		webReq := webReq(false)
 		if (webReq == null)
 			return null
