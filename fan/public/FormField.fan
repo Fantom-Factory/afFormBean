@@ -81,6 +81,10 @@ class FormField {
 	Str?	css
 	
 	** HTML attribute. 
+	** If true then a disabled attribute is rendered on the '<input>'. 
+	Bool	disabled
+
+	** HTML attribute. 
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	** Example:
 	** 
@@ -171,6 +175,7 @@ class FormField {
 		placeholder		= input?.placeholder	?: msg("placeholder")
 		hint			= input?.hint			?: msg("hint"		)
 		css				= input?.css			?: msg("css"		)
+		disabled		= (input?.disabled		?: msg("disabled"	)?.toBool) ?: false
 		attributes		= input?.attributes		?: msg("attributes"	)
 		viewOnly		= input?.viewOnly		?: msg("viewOnly"	)?.toBool
 		required		= input?.required		?: msg("required"	)?.toBool
