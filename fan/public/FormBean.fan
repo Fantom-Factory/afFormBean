@@ -71,9 +71,9 @@ class FormBean {
 	** In memory files do not require deleting.
 	|Str fileName, InStream in -> File|?	fileUploadHook
 	
-	** If 'true' and if [SleepSafe]`pod:afSleepSafe` has defined a CSRF token, then it is rendered as a hidden 'input' 
+	** If 'true' (default) and if [SleepSafe]`pod:afSleepSafe` has defined a CSRF token, then it is rendered as a hidden 'input' 
 	** when the form is rendered. 
-							Bool			renderCsrfToken
+							Bool			renderCsrfToken	:= true
 	
 	** Deconstructs the given form bean type to a map of 'FormFields'. 
 	** 
@@ -154,9 +154,10 @@ class FormBean {
 
 		// render any SleepSafe CSRF token
 		if (renderCsrfToken) {
-			csrfToken := _webProxy.csrfToken
-			if (csrfToken != null)
-				html.add("""<input type="hidden" value="${csrfToken.toXml}">\n""")
+			csrfTokenName  := _webProxy.csrfTokenName
+			csrfTokenValue := _webProxy.csrfTokenValue
+			if (csrfTokenName != null && csrfTokenValue != null)
+				html.add("""<input type="hidden" name="${csrfTokenName.toXml}" value="${csrfTokenValue.toXml}">\n""")
 		}
 
 		&formFields.each |formField, field| {
