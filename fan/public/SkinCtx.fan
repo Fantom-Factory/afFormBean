@@ -128,6 +128,7 @@ class SkinCtx {
 		attrs["max"]			= formField.max?.toStr
 		attrs["step"]			= formField.step?.toStr
 		attrs["pattern"]		= formField.pattern?.toStr
+		attrs["disabled"]		= formField.disabled ? "" : null
 		attrs["required"]		= (formField.required ?: false) ? "" : null
 
 		extraAttributes?.each |v, k| {

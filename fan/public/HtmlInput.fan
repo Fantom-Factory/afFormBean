@@ -34,6 +34,11 @@ facet class HtmlInput {
 	** If 'null' then the msg key '<bean>.<field>.css' is used to look for a value. 
 	const Str?	css
 	
+	** If 'true' then a 'disabled' attribute will be rendered on the input.
+	** 
+	** Convenience for 'attributes = "disabled"'
+	const Bool disabled
+	
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	** Example:
 	** 
