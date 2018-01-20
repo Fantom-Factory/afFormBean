@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "Renders Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("1.2.1")
+		version = Version("1.2.2")
 
 		meta = [
 			"pod.dis"			: "Form Bean",	
@@ -24,7 +24,7 @@ class Build : BuildPod {
 			"afIoc        3.0.0  - 3.0",
 
 			// ---- Web -------------------------
-			// removed the hard dependency on BedSheet so FormBean may be used to validate Domain objects
+			// removed the hard dependency on BedSheet and web so FormBean may be used to validate Domain objects
 			// we pretty much only needed the ValueEncoders service anyway!
 //			"afBedSheet   1.5.8  - 1.5"
 		]
