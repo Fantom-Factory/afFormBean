@@ -240,6 +240,8 @@ They're generally a pain to configure, awkward to tweak and don't go anywhere ne
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
+And if can't wait for the future, use [Hyperform]`https://hyperform.js.org/`.
+
 The '@HtmlInput' facet attributes 'required', 'minLength', 'maxLength', 'min', 'max', 'pattern', and 'step' map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
 
 You can, of course, embed and utilise any javascript form validation framework you wish! Using FormBean does not preclude you from using other validation frameworks.
