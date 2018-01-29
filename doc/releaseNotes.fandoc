@@ -4,6 +4,7 @@ v1.2
 v1.2.2
 ======
  - New: [SleepSafe]`pod:afSleepSafe` integration! Forms automatically render hidden inputs with CSRF tokens.
+ - New: Str maps may be contributed to 'Messages'.
  - New: Added 'FormField.disabled' field that just renders the common attribute.
  - Bug: HTML5 validation would pass if a corresponsing validation msg could not be found. (You would need to override 'Messages' to encouter this.)
 
