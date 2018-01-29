@@ -248,6 +248,8 @@ Yes, there are hundreds of javascript form validation frameworks out there, but 
 
 Because life is too short, Alien-Factory takes a no-nonsense approach to HTML form validation and gladly hands it over to the browser. HTML5 form validation is the way of the future.
 
+And if you can't wait for the future, use [Hyperform](https://hyperform.js.org/).
+
 The `@HtmlInput` facet attributes `required`, `minLength`, `maxLength`, `min`, `max`, `pattern`, and `step` map directly HTML5 input attributes and are rendered as such. As far as client side validation goes, this is all FormBean does. It is barebones but browser support for HTML5 validation is getting better every day.
 
 You can, of course, embed and utilise any javascript form validation framework you wish! Using FormBean does not preclude you from using other validation frameworks.
@@ -370,6 +372,18 @@ The advantage of this strategy is that it succinctly groups all the messages for
 You may also manually set messages on a `FormBean` instance:
 
     formBean.messages["username.label"] = "Username:"
+
+The `Messages` service itself also takes contributions of string Maps, should you dislike the idea of `.props` files.
+
+```
+@Contribute { serviceType=Messages# }
+Void contributeMessages(Configuration config) {
+    config.add([
+        "loginDetails.username.label"  : "Username:",
+        "loginDetails.password.label"  : "Password:"
+    ])
+}
+```
 
 In all, FormBean Messages are very versatile.
 
