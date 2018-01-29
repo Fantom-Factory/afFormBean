@@ -268,37 +268,37 @@ class FormField {
 
 		if (required ?: false)
 			if (formValue == null || formValue.isEmpty)
-				return errMsg = msg("required.msg")
+				return errMsg = msg("required.msg") ?: "[required.msg]"
 		
 		if (hasValue && minLength != null)
 			if (formValue.size < minLength)
-				return errMsg = msg("minLength.msg", minLength)
+				return errMsg = msg("minLength.msg", minLength) ?: "[minLength.msg]"
 
 		if (hasValue && maxLength != null)
 			if (formValue.size > maxLength)
-				return errMsg = msg("maxLength.msg", maxLength)
+				return errMsg = msg("maxLength.msg", maxLength) ?: "[maxLength.msg]"
 
 		if (hasValue && type == "number")
 			if (formValue.toInt(10, false) == null)
-				return errMsg = msg("notNum.msg")
+				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
 	
 		if (hasValue && min != null) {
 			if (formValue.toInt(10, false) == null)
-				return errMsg = msg("notNum.msg")
+				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
 			if (formValue.toInt < min)
-				return errMsg = msg("min.msg", min)
+				return errMsg = msg("min.msg", min) ?: "[min.msg]"
 		}
 
 		if (hasValue && max != null) {
 			if (formValue.toInt(10, false) == null)
-				return errMsg = msg("notNum.msg")
+				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
 			if (formValue.toInt > max)
-				return errMsg = msg("max.msg", max)
+				return errMsg = msg("max.msg", max) ?: "[max.msg]"
 		}
 
 		if (hasValue && pattern != null)
 			if (!"^${pattern}\$".toRegex.matches(formValue))
-				return errMsg = msg("pattern.msg", pattern)			
+				return errMsg = msg("pattern.msg", pattern) ?: "[pattern.msg]"		
 	}
 	
 	@NoDoc
