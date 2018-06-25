@@ -390,9 +390,7 @@ class FormBean {
 
 			// other fields that weren't submitted are also null
 			if (formField.formValue != null) {
-				value = (formField.valueEncoder != null)
-					? formField.valueEncoder->toValue(formField.formValue)
-					: _webProxy.toValue(field.type, formField.formValue)
+				value = formField.toValue(formField.formValue)
 				beanProps[field.name] = value
 			}
 		}

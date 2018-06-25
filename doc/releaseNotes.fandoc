@@ -1,6 +1,10 @@
 v1.2
 ****
 
+v1.2.4
+======
+ - New: Exposed 'FormField.toValue()' to convert client values to server side values.
+
 v1.2.2
 ======
  - New: [SleepSafe]`pod:afSleepSafe` integration! Forms automatically render hidden inputs with CSRF tokens.

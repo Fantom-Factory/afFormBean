@@ -243,6 +243,13 @@ class FormField {
 		return strVal.toXml
 	}
 	
+	** Converts the given client value (string) to a server side object using the preferred 'ValueEncoder'.
+	** 
+	** 
+	Obj? toValue(Str clientValue) {
+		((valueEncoder != null) ? valueEncoder->toValue(clientValue) : _webProxy.toValue(field.type, clientValue))
+	}
+	
 	** Validates this form field.
 	** Calls 'doHtmlValidation()' and then any static '@Validate' method that corresponds to this field. 
 	** 
