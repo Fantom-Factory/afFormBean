@@ -15,6 +15,7 @@ const class FormBeanModule {
 	Void contributeInputSkins(Configuration config) {
 		textInputSkin		:= TextInputSkin()
 		config["text"] 		= textInputSkin
+		config["color"]		= textInputSkin
 		config["date"] 		= textInputSkin
 		config["datetime"]	= textInputSkin
 		config["email"]		= textInputSkin
@@ -34,7 +35,6 @@ const class FormBeanModule {
 		config["select"]	= config.build(SelectSkin#)
 		config["radio"]		= config.build(RadioSkin#)
 //		config["button"]	= 
-//		config["color"]		= 
 //		config["image"]		= 
 //		config["reset"]		= 
 //		config["submit"]	= 

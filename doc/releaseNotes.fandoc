@@ -4,6 +4,7 @@ v1.2
 v1.2.4
 ======
  - New: Exposed 'FormField.toValue()' to convert client values to server side values.
+ - Chg: Added 'color' as a text 'InputSkin' type.
 
 v1.2.2
 ======
