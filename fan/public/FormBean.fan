@@ -385,7 +385,7 @@ class FormBean {
 			}
 
 			// fugging checkboxes don't send unchecked data
-			if (formField.formValue == null && formField.type.equalsIgnoreCase("checkbox"))
+			if (formField.formValue == null && formField.type != null && formField.type.equalsIgnoreCase("checkbox"))
 				beanProps[field.name] = false
 
 			// other fields that weren't submitted are also null
