@@ -1,9 +1,9 @@
-#Form Bean v1.2.2
+# Form Bean v1.2.4
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.2.2](http://img.shields.io/badge/pod-v1.2.2-yellow.svg)](http://www.fantomfactory.org/pods/afFormBean)
-![Licence: ISC Licence](http://img.shields.io/badge/licence-ISC Licence-blue.svg)
+[![pod: v1.2.4](http://img.shields.io/badge/pod-v1.2.4-yellow.svg)](http://eggbox.fantomfactory.org/pods/afFormBean)
+[![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
 
