@@ -1,5 +1,8 @@
 v1.2
 ****
+v1.2.6
+======
+ - Bug: Form labels incorrectly rendered the input 'name' as the 'for' attribute instead of the ID.
 
 v1.2.4
 ======

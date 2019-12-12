@@ -8,7 +8,7 @@ abstract const class DefaultInputSkin : InputSkin {
 		errCss	:= skinCtx.fieldInvalid ? " error" : Str.defVal
 		hint	:= skinCtx.formField.hint
 		html	+= """<div class="formBean-row inputRow ${skinCtx.name}${errCss}">"""
-		html	+= """<label for="${skinCtx.name}">${skinCtx.label}</label>"""
+		html	+= """<label for="${skinCtx.id}">${skinCtx.label}</label>"""
 		html	+= renderElement(skinCtx)
 		if (hint != null)
 			html += """<div class="formBean-hint">${hint}</div>"""				
