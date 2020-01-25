@@ -1,8 +1,8 @@
-# Form Bean v1.2.4
+# Form Bean v1.2.6
 ---
 
-[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.2.4](http://img.shields.io/badge/pod-v1.2.4-yellow.svg)](http://eggbox.fantomfactory.org/pods/afFormBean)
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](https://fantom-lang.org/)
+[![pod: v1.2.6](http://img.shields.io/badge/pod-v1.2.6-yellow.svg)](http://eggbox.fantomfactory.org/pods/afFormBean)
 [![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
@@ -11,165 +11,162 @@ FormBean is a means to render Fantom objects as HTML forms, validate submitted v
 
 Features:
 
-- Renders Fantom objects as HTML forms.
-- HTML5 client and server side validation
-- Customise HTML generation with skins
-- Supports multipart forms / file uploads
-- Uses BedSheet `ValueEncoders` for string conversion
-- Versatile means of generating select options
-- Customised (error) messages
+* Renders Fantom objects as HTML forms.
+* HTML5 client and server side validation
+* Customise HTML generation with skins
+* Supports multipart forms / file uploads
+* Uses BedSheet `ValueEncoders` for string conversion
+* Versatile means of generating select options
+* Customised (error) messages
+
 
 Current limitations:
 
-- Maps, Lists and nested objects are not supported.
+* Maps, Lists and nested objects are not supported.
 
-## Install
+
+## <a name="Install"></a>Install
 
 Install `Form Bean` with the Fantom Pod Manager ( [FPM](http://eggbox.fantomfactory.org/pods/afFpm) ):
 
     C:\> fpm install afFormBean
 
-Or install `Form Bean` with [fanr](http://fantom.org/doc/docFanr/Tool.html#install):
+Or install `Form Bean` with [fanr](https://fantom.org/doc/docFanr/Tool.html#install):
 
     C:\> fanr install -r http://eggbox.fantomfactory.org/fanr/ afFormBean
 
-To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
+To use in a [Fantom](https://fantom-lang.org/) project, add a dependency to `build.fan`:
 
     depends = ["sys 1.0", ..., "afFormBean 1.2"]
 
-## Documentation
+## <a name="documentation"></a>Documentation
 
 Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afFormBean/) - the Fantom Pod Repository.
 
 ## Quick Start
 
-1. Create a text file called `Example.fan`
-
-        using afIoc
-        using afBedSheet
-        using afFormBean
-        
-        class ContactUsPage  {
-            @Inject
-            HttpRequest httpRequest
-        
-            @Inject { type=ContactDetails# }
-            FormBean formBean
-        
-            new make(|This|in) { in(this) }
-        
-            Text render() {
-                Text.fromHtml(
-                    "<!DOCTYPE html>
-                     <html>
-                     <head>
-                         <title>FormBean Demo</title>
-                         <link rel='stylesheet' href='/styles.css' >
-                     </head>
-                     <body>
-                         <h2>Contact Us</h2>
-                         <span class='requiredNotification'>* Denotes Required Field</span>
-        
-                         <form class='contactForm' action='/contact' method='POST'>
-                             ${ formBean.renderErrors()   }
-                             ${ formBean.renderBean(null) }
-                             ${ formBean.renderSubmit()   }
-                         </form>
-                     </body>
-                     </html>")
-            }
-        
-            Text onContact() {
-                // perform server side validation
-                // if invalid, re-render the page and show the errors
-                if (!formBean.validateForm(httpRequest.body.form))
-                    return render
-        
-                // create an instance of our form object
-                contactDetails := (ContactDetails) formBean.createBean
-        
-                echo("Contact made!")
-                echo(" - name:    ${contactDetails.name}")
-                echo(" - email:   ${contactDetails.email}")
-                echo(" - website: ${contactDetails.website}")
-                echo(" - message: ${contactDetails.message}")
-        
-                // display a simple message
-                return Text.fromPlain("Thank you ${contactDetails.name}, we'll be in touch.")
-            }
+1. Create a text file called `Example.fan`    using afIoc
+    using afBedSheet
+    using afFormBean
+    
+    class ContactUsPage  {
+        @Inject
+        HttpRequest httpRequest
+    
+        @Inject { type=ContactDetails# }
+        FormBean formBean
+    
+        new make(|This|in) { in(this) }
+    
+        Text render() {
+            Text.fromHtml(
+                "<!DOCTYPE html>
+                 <html>
+                 <head>
+                     <title>FormBean Demo</title>
+                     <link rel='stylesheet' href='/styles.css' >
+                 </head>
+                 <body>
+                     <h2>Contact Us</h2>
+                     <span class='requiredNotification'>* Denotes Required Field</span>
+    
+                     <form class='contactForm' action='/contact' method='POST'>
+                         ${ formBean.renderErrors()   }
+                         ${ formBean.renderBean(null) }
+                         ${ formBean.renderSubmit()   }
+                     </form>
+                 </body>
+                 </html>")
         }
-        
-        class ContactDetails {
-            @HtmlInput { required=true; attributes="placeholder='Fred Bloggs'" }
-            Str name
-        
-            @HtmlInput { type="email"; required=true; placeholder="fred.bloggs@example.com"; hint="Proper format 'name@something.com'" }
-            Uri email
-        
-            @HtmlInput { type="url"; required=true; placeholder="http://www.example.com"; hint="Proper format 'http://someaddress.com'" }
-            Str website
-        
-            @HtmlInput { type="textarea"; required=true; attributes="rows='6'"}
-            Str message
-        
-            new make(|This|in) { in(this) }
-        
-            @Validate { field=#name }
-            static Void validateName(FormField formField) {
-                if (formField.formValue == "Trisha")
-                    formField.errMsg = "Ex-girlfriends not allowed!"
-            }
+    
+        Text onContact() {
+            // perform server side validation
+            // if invalid, re-render the page and show the errors
+            if (!formBean.validateForm(httpRequest.body.form))
+                return render
+    
+            // create an instance of our form object
+            contactDetails := (ContactDetails) formBean.createBean
+    
+            echo("Contact made!")
+            echo(" - name:    ${contactDetails.name}")
+            echo(" - email:   ${contactDetails.email}")
+            echo(" - website: ${contactDetails.website}")
+            echo(" - message: ${contactDetails.message}")
+    
+            // display a simple message
+            return Text.fromPlain("Thank you ${contactDetails.name}, we'll be in touch.")
         }
-        
-        // @SubModule only needed because this example is run as a script
-        @SubModule { modules=[FormBeanModule#] }
-        const class AppModule {
-            @Contribute { serviceType=Routes# }
-            Void contributeRoutes(Configuration conf) {
-                conf.add(Route(`/`, ContactUsPage#render))
-                conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
-        
-                // to save you typing in a stylesheet, we'll just redirect to one I made earlier
-                // conf.add(Route(`/styles.css`, `styles.css`.toFile))
-                conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.css`)))
-            }
+    }
+    
+    class ContactDetails {
+        @HtmlInput { required=true; attributes="placeholder='Fred Bloggs'" }
+        Str name
+    
+        @HtmlInput { type="email"; required=true; placeholder="fred.bloggs@example.com"; hint="Proper format 'name@something.com'" }
+        Uri email
+    
+        @HtmlInput { type="url"; required=true; placeholder="http://www.example.com"; hint="Proper format 'http://someaddress.com'" }
+        Str website
+    
+        @HtmlInput { type="textarea"; required=true; attributes="rows='6'"}
+        Str message
+    
+        new make(|This|in) { in(this) }
+    
+        @Validate { field=#name }
+        static Void validateName(FormField formField) {
+            if (formField.formValue == "Trisha")
+                formField.errMsg = "Ex-girlfriends not allowed!"
         }
-        
-        class Main {
-            Int main() {
-                BedSheetBuilder("Example_0").startWisp(8069)
-            }
+    }
+    
+    // @SubModule only needed because this example is run as a script
+    @SubModule { modules=[FormBeanModule#] }
+    const class AppModule {
+        @Contribute { serviceType=Routes# }
+        Void contributeRoutes(Configuration conf) {
+            conf.add(Route(`/`, ContactUsPage#render))
+            conf.add(Route(`/contact`, ContactUsPage#onContact, "POST"))
+    
+            // to save you typing in a stylesheet, we'll just redirect to one I made earlier
+            // conf.add(Route(`/styles.css`, `styles.css`.toFile))
+            conf.add(Route(`/styles.css`, Redirect.movedTemporarily(`http://pods.fantomfactory.org/pods/afFormBean/doc/quickStart.css`)))
         }
+    }
+    
+    class Main {
+        Int main() {
+            BedSheetBuilder("Example_0").startWisp(8069)
+        }
+    }
 
 
-2. Run `Example.fan` as a Fantom script from the command prompt:
-
-        C:\> fan Example.fan
-        
-        [info] [afBedSheet] Found pod 'Example_0'
-        [info] [afBedSheet] Found mod 'Example_0::AppModule'
-        [info] [afBedSheet] Starting Bed App 'Example_0' on port 8069
-        [info] [afIoc] Adding module definitions from pod 'Example_0'
-        [info] [afIoc] Adding module Example_0::AppModule
-        [info] [afIoc] Adding module afBedSheet::BedSheetModule
-        [info] [afIoc] Adding module afFormBean::FormBeanModule
-        [info] [afIoc] Adding module afIocConfig::IocConfigModule
-        [info] [afIoc] Adding module afBedSheet::BedSheetEnvModule
-        [info] [afIoc] Adding module afConcurrent::ConcurrentModule
-           ___    __                 _____        _
-          / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
-         / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
-        /_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
-                       How do I set a laser pointer to stun? /___/
-        
-        IoC Registry built in 142ms and started up in 139ms
-        
-        Bed App 'Example_0' listening on http://localhost:8069/
+2. Run `Example.fan` as a Fantom script from the command prompt:    C:\> fan Example.fan
+    
+    [info] [afBedSheet] Found pod 'Example_0'
+    [info] [afBedSheet] Found mod 'Example_0::AppModule'
+    [info] [afBedSheet] Starting Bed App 'Example_0' on port 8069
+    [info] [afIoc] Adding module definitions from pod 'Example_0'
+    [info] [afIoc] Adding module Example_0::AppModule
+    [info] [afIoc] Adding module afBedSheet::BedSheetModule
+    [info] [afIoc] Adding module afFormBean::FormBeanModule
+    [info] [afIoc] Adding module afIocConfig::IocConfigModule
+    [info] [afIoc] Adding module afBedSheet::BedSheetEnvModule
+    [info] [afIoc] Adding module afConcurrent::ConcurrentModule
+       ___    __                 _____        _
+      / _ |  / /_____  _____    / ___/__  ___/ /_________  __ __
+     / _  | / // / -_|/ _  /===/ __// _ \/ _/ __/ _  / __|/ // /
+    /_/ |_|/_//_/\__|/_//_/   /_/   \_,_/__/\__/____/_/   \_, /
+                   How do I set a laser pointer to stun? /___/
+    
+    IoC Registry built in 142ms and started up in 139ms
+    
+    Bed App 'Example_0' listening on http://localhost:8069/
 
 
 3. Point your web browser to `http://localhost:8069/` and you'll see a basic HTML contact form:
-
-  ![Screenshot of the afFormBean Quick Start example](http://eggbox.fantomfactory.org/pods/afFormBean/doc/quickStart.png)
+    ![Screenshot of the afFormBean Quick Start example](http://eggbox.fantomfactory.org/pods/afFormBean/doc/quickStart.png)
 
 
 
@@ -177,13 +174,12 @@ Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org
 
 On submitting the HTML form, the form values are validated server side and reconstituted into an instance of `ContactDetails`. The bean is then echo'ed to standard out and a short reply message sent back to the browser.
 
-```
-Contact made!
- - name:    Fred Bloggs
- - email:   fred.bloggs@example.com
- - website: http://www.example.com
- - message: Hello Mum!
-```
+    Contact made!
+     - name:    Fred Bloggs
+     - email:   fred.bloggs@example.com
+     - website: http://www.example.com
+     - message: Hello Mum!
+    
 
 ## To and From HTML Forms
 
@@ -282,33 +278,30 @@ To view the server side error messages (for styling) you may wish to switch off 
 
 As well as the basic HTML5 validation, beans may also provide custom server-side validation. To use, annotate a bean method with `@Validate`. Validate methods should be static and take a single `FormField` parameter. They should inspect the `formField.value` and set an `errMsg` if invalid. Example:
 
-```
-class User {
-    Str? name
-
-    @Validate { field=#name }
-    static Void validateName(FormField formField) {
-        if (formField.formValue == "Trisha")
-            formField.errMsg = "Ex-girlfriends not allowed!"
+    class User {
+        Str? name
+    
+        @Validate { field=#name }
+        static Void validateName(FormField formField) {
+            if (formField.formValue == "Trisha")
+                formField.errMsg = "Ex-girlfriends not allowed!"
+        }
     }
-}
-```
+    
 
 If `@Validate.field` is `null` then the first parameter should be `FormBean`. This allows you to perform bean wide validation.
 
-```
-@Validate
-static Void validateBean(FormBean formBean) { ... }
-```
+    @Validate
+    static Void validateBean(FormBean formBean) { ... }
+    
 
 `FormBean` validation is performed *after* all and any `FormField` validation.
 
 Note that validation methods are called using IoC, so services may be passed in as extra parameters:
 
-```
-@Validate { field=#name }
-static Void validateName(FormField formField, MyService service) { ... }
-```
+    @Validate { field=#name }
+    static Void validateName(FormField formField, MyService service) { ... }
+    
 
 ## Messages
 
@@ -320,17 +313,19 @@ Labels, placeholders, hints and validation messages are all customisable through
 
 Each `FormBean` instance creates its own map of messages by merging together property files. These files are looked for in the following locations:
 
-- `FormBean.props` in pod `afFormBean`
-- `FormBean.props` in pod `<pod>`
-- `<bean>.props` in pod `<pod>`
+* `FormBean.props` in pod `afFormBean`
+* `FormBean.props` in pod `<pod>`
+* `<bean>.props` in pod `<pod>`
+
 
 With messages in each file overriding those defined previously.
 
 For example, if your form bean is of type `acme::UserBean` then the following files are looked up:
 
-- `FormBean.props` in pod `afFormBean`
-- `FormBean.props` in pod `acme`
-- `UserBean.props` in pod `acme`
+* `FormBean.props` in pod `afFormBean`
+* `FormBean.props` in pod `acme`
+* `UserBean.props` in pod `acme`
+
 
 Property files may lie anywhere in your pod, but they *must* be declared as a resource directory in the `build.fan`. This ensures they are included in the pod file. Example:
 
@@ -375,15 +370,14 @@ You may also manually set messages on a `FormBean` instance:
 
 The `Messages` service itself also takes contributions of string Maps, should you dislike the idea of `.props` files.
 
-```
-@Contribute { serviceType=Messages# }
-Void contributeMessages(Configuration config) {
-    config.add([
-        "loginDetails.username.label"  : "Username:",
-        "loginDetails.password.label"  : "Password:"
-    ])
-}
-```
+    @Contribute { serviceType=Messages# }
+    Void contributeMessages(Configuration config) {
+        config.add([
+            "loginDetails.username.label"  : "Username:",
+            "loginDetails.password.label"  : "Password:"
+        ])
+    }
+    
 
 In all, FormBean Messages are very versatile.
 
@@ -425,27 +419,27 @@ Both `<bean>` and `<field>` may be ommitted to provide a default value for all v
 
 > **TIP:** This can be used to set a default max length for all text boxes:
 
+
     maxLength = 512
 
 #### Defaults
 
 The default messages supplied by FormBean are:
 
-```
-errors.msg    = There were problems with the form data:
+    errors.msg    = There were problems with the form data:
+    
+    required.msg  = ${label} is required
+    minLength.msg = ${label} should be at least ${constraint} characters
+    maxLength.msg = ${label} should be at most ${constraint} characters
+    notNum.msg    = ${label} should be a whole number
+    min.msg       = ${label} should be at least ${constraint}
+    max.msg       = ${label} should be at most ${constraint}
+    pattern.msg   = ${label} does not match the pattern ${constraint}
+    
+    submit.label  = Submit
+    
 
-required.msg  = ${label} is required
-minLength.msg = ${label} should be at least ${constraint} characters
-maxLength.msg = ${label} should be at most ${constraint} characters
-notNum.msg    = ${label} should be a whole number
-min.msg       = ${label} should be at least ${constraint}
-max.msg       = ${label} should be at most ${constraint}
-pattern.msg   = ${label} does not match the pattern ${constraint}
-
-submit.label  = Submit
-```
-
-## Skins
+## <a name="skins"></a>Skins
 
 ### Input Skins
 
@@ -469,6 +463,7 @@ Or they may be contributed to the `InputSkins` service where they are used by de
 Skins make it easy to render custom markup for date pickers.
 
 > **TIP:** Use [Duvet](http://eggbox.fantomfactory.org/pods/afDuvet) in your skins to inject field specific javascript.
+
 
 For dates, I personally like to use [Bootstrap Datepicker](https://bootstrap-datepicker.readthedocs.io/en/latest/) - see the [DatePicker for FormBean](http://www.fantomfactory.org/articles/datepicker-for-formbean) article for details.
 
@@ -537,44 +532,40 @@ FormBean can also handle File uploads!
 
 To use, set your form field type to either a `Buf` or a `File`:
 
-```
-class FormDetails {
-    @HtmlInput Buf  uploadedBuf
-    @HtmlInput File uploadedFile
-
-    new make(|This|f) { f(this) }
-}
-```
+    class FormDetails {
+        @HtmlInput Buf  uploadedBuf
+        @HtmlInput File uploadedFile
+    
+        new make(|This|f) { f(this) }
+    }
+    
 
 Render your HTML as normal, just make sure the form element has the correct `enctype` (MUST be `multipart/form-data`) and `method` attributes (MUST be `POST`):
 
-```
-html := "<form action='...' enctype='multipart/form-data' method='POST'>"
-html += formBean.renderErrors()
-html += formBean.renderBean(null)
-html += formBean.renderSubmit()
-html += "<form>"
-```
+    html := "<form action='...' enctype='multipart/form-data' method='POST'>"
+    html += formBean.renderErrors()
+    html += formBean.renderBean(null)
+    html += formBean.renderSubmit()
+    html += "<form>"
+    
 
 When the form is submitted, use `FormBean.validateHttpRequest()` and create your form object as normal:
 
-```
-valid := formBean.validateHttpRequest()
-if (!valid)
-    return render
-
-details := (FormDetails) formBean.createBean
-```
+    valid := formBean.validateHttpRequest()
+    if (!valid)
+        return render
+    
+    details := (FormDetails) formBean.createBean
+    
 
 `Bufs` and `Files` should now be populated on your form. Easy!
 
-```
-echo(details.uploadedFile) // --> myFile.tmp
-```
+    echo(details.uploadedFile) // --> myFile.tmp
+    
 
 By default, FormBean creates in-memory files for uploaded files. This negates the need to use `File.deleteOnExit()` [(which is evil)](https://puneeth.wordpress.com/2006/01/23/filedeleteonexit-is-evil/) and in general, negates all need to delete temp files after use.
 
-To save an uploaded file to a particular file system location, then simply use [File.copyTo()](http://fantom.org/doc/sys/File.html#copyTo).
+To save an uploaded file to a particular file system location, then simply use [File.copyTo()](https://fantom.org/doc/sys/File.html#copyTo).
 
 If validation is required, like enforcing a max file size before it is loaded into memory, then you may provide your own `FormBean.fileUploadHook`.
 
@@ -582,76 +573,75 @@ If validation is required, like enforcing a max file size before it is loaded in
 
 Example messages, explaining where they would be used.
 
-```
-# Message Properties Cheat Sheet
-# ******************************
-#
-# Place global properties in 'FormBean.props'.
-# Place bean specific properties in '#BEAN.props', e.g. 'UserBean.props'
-# Ensure all property files are bundled in your pod via 'resDirs' in 'build.fan'
-
-
-
-# Field Attributes
-# ================
-
-# specific to the field 'UserBean#creditCard'
-userBean.creditCard.label              = Credit Card Type
-userBean.creditCard.minLength          = 16
-userBean.creditCard.maxLength          = 16
-
-# used for any field named creditCard
-creditCard.label                       = Credit Card Type
-creditCard.minLength                   = 16
-creditCard.maxLength                   = 16
-
-
-
-# Validation Messages
-# ===================
-
-# specific to the field 'UserBean#creditCard'
-userBean.creditCard.minLength.msg      = Too few numbers!
-
-# used for any field named 'creditCard'
-creditCard.minLength.msg               = Too few numbers!
-
-# used for *all* 'minLength' validation messages
-minLength.msg                          = Too few numbers!
-
-# also...
-# used for all fields in 'UserBean'
-userBean.minLength.msg                 = Too few numbers!
-
-
-
-# Errors Message
-# ==============
-
-# specific to the 'UserBean' class
-userBean.errors.msg                    = Please fix the errors
-
-# used in all error banners
-errors.msg                             = Please fix the errors
-
-
-
-# Select Option Messages
-# ======================
-
-# specific to the field 'UserBean#creditCard'
-userBean.creditCard.option.visa.label  = Visa
-
-# used for any field named 'creditCard'
-creditCard.option.visa.label           = Visa
-
-# used for any option with the key 'visa'
-option.visa.label                      = Visa
-
-# also...
-# used for all options in 'UserBean'
-userBean.option.visa.label             = Visa
-```
+    # Message Properties Cheat Sheet
+    # ******************************
+    #
+    # Place global properties in 'FormBean.props'.
+    # Place bean specific properties in '#BEAN.props', e.g. 'UserBean.props'
+    # Ensure all property files are bundled in your pod via 'resDirs' in 'build.fan'
+    
+    
+    
+    # Field Attributes
+    # ================
+    
+    # specific to the field 'UserBean#creditCard'
+    userBean.creditCard.label              = Credit Card Type
+    userBean.creditCard.minLength          = 16
+    userBean.creditCard.maxLength          = 16
+    
+    # used for any field named creditCard
+    creditCard.label                       = Credit Card Type
+    creditCard.minLength                   = 16
+    creditCard.maxLength                   = 16
+    
+    
+    
+    # Validation Messages
+    # ===================
+    
+    # specific to the field 'UserBean#creditCard'
+    userBean.creditCard.minLength.msg      = Too few numbers!
+    
+    # used for any field named 'creditCard'
+    creditCard.minLength.msg               = Too few numbers!
+    
+    # used for *all* 'minLength' validation messages
+    minLength.msg                          = Too few numbers!
+    
+    # also...
+    # used for all fields in 'UserBean'
+    userBean.minLength.msg                 = Too few numbers!
+    
+    
+    
+    # Errors Message
+    # ==============
+    
+    # specific to the 'UserBean' class
+    userBean.errors.msg                    = Please fix the errors
+    
+    # used in all error banners
+    errors.msg                             = Please fix the errors
+    
+    
+    
+    # Select Option Messages
+    # ======================
+    
+    # specific to the field 'UserBean#creditCard'
+    userBean.creditCard.option.visa.label  = Visa
+    
+    # used for any field named 'creditCard'
+    creditCard.option.visa.label           = Visa
+    
+    # used for any option with the key 'visa'
+    option.visa.label                      = Visa
+    
+    # also...
+    # used for all options in 'UserBean'
+    userBean.option.visa.label             = Visa
+    
 
 ## Wot No BedSheet!?
 
