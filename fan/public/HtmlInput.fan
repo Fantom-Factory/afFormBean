@@ -38,6 +38,11 @@ facet class HtmlInput {
 	** 
 	** Convenience for 'attributes = "disabled"'
 	const Bool disabled
+
+	** The value to render as the 'autocomplete' attribute on the '<input>'.
+	**  
+	** If 'null' then the msg key '<bean>.<field>.placeholder' is used to look for a value.
+	const Str? autocomplete
 	
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	** Example:

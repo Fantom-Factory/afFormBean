@@ -85,10 +85,18 @@ class FormField {
 	Bool	disabled
 
 	** HTML attribute. 
+	** The value to render as an 'autocomplete' attribute on the '<input>'.
+	** See [autocomplete on whatwg]`https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofilling-form-controls%3A-the-autocomplete-attribute` and [MDN]`https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete` for valid values. 
+	** Example:
+	** 
+	**   autocomplete = "cc-number"
+	Str?	autocomplete
+
+	** HTML attribute. 
 	** Any other miscellaneous attributes that should be rendered on the '<input>'. 
 	** Example:
 	** 
-	**   attributes = "autocomplete='off'"
+	**   attributes = "data-foo='bar'"
 	Str?	attributes
 	
 
@@ -176,6 +184,7 @@ class FormField {
 		hint			= input?.hint			?: msg("hint"		)
 		css				= input?.css			?: msg("css"		)
 		disabled		= (input?.disabled		?: msg("disabled"	)?.toBool) ?: false
+		autocomplete	= input?.autocomplete	?: msg("autocomplete")
 		attributes		= input?.attributes		?: msg("attributes"	)
 		viewOnly		= input?.viewOnly		?: msg("viewOnly"	)?.toBool
 		required		= input?.required		?: msg("required"	)?.toBool

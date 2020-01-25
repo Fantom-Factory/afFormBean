@@ -112,7 +112,7 @@ class SkinCtx {
 	** This allows you to pass in extra css class names.
 	** 
 	**   syntax: fantom
-	**   attrs := skinCtx.renderAttributes(["autocomplete" : "off", "css" : "funkStyle"])
+	**   attrs := skinCtx.renderAttributes(["data-foo" : "bar", "css" : "funkStyle"])
 	** 
 	** Note that empty string values are rendered as HTML5 empty attributes.
 	** e.g. '["disabled":""]' would be rendered as just 'disabled'.
@@ -122,6 +122,7 @@ class SkinCtx {
 		attrs["class"]			= formField.css
 		attrs["name"]			= name
 		attrs["placeholder"]	= formField.placeholder
+		attrs["autocomplete"]	= formField.autocomplete
 		attrs["minlength"]		= formField.minLength?.toStr
 		attrs["maxlength"]		= formField.maxLength?.toStr
 		attrs["min"]			= formField.min?.toStr
