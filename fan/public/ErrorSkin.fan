@@ -22,7 +22,9 @@
 **   </div>
 ** 
 ** To change the banner message, set a message with the key 'errors.<beanType.name>.banner' or 'errors.banner'.
-const mixin ErrorSkin {
+** 
+** 'ErrorSkins' should *usually* be 'const' classes.
+mixin ErrorSkin {
 	
 	** Renders form bean errors to HTML.
 	abstract Str render(FormBean formBean)

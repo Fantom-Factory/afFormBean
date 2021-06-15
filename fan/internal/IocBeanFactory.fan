@@ -1,6 +1,8 @@
 using afBeanUtils
 using afIoc
 
+// meh - if it ain't broke, don't fix it!
+// this is entrenched in the afBeanUtils::BeanPropertyFactory stuff
 internal class IocBeanFactory : BeanFactory {
 	
 	@Inject	private |->Scope|	scope

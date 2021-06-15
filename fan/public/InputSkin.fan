@@ -23,7 +23,8 @@
 **       config.overrideValue("text", MyTextSkin())
 **   }
 ** 
-const mixin InputSkin {
+** 'InputSkins' should *usually* be 'const' classes.
+mixin InputSkin {
 	
 	** Render the input to HTML.
 	abstract Str render(SkinCtx skinCtx)

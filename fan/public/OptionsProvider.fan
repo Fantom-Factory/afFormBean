@@ -14,7 +14,8 @@
 **       config[MyValue#] = MyValueOptionsProvider()
 **   }
 ** 
-const mixin OptionsProvider {
+** 'OptionProviders' should *usually* be 'const' classes.
+mixin OptionsProvider {
 	
 	** Return 'true' if the '<select>' should show a blank value at the start of the options list.
 	** 
