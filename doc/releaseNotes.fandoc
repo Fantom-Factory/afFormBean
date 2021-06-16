@@ -3,6 +3,7 @@ v1.2
 v1.2.8
 ======
  - New: 'FormField.set()' to set form field messages.
+ - New: 'date' and 'datetime-local' default types for 'Date' and 'DateTime' Fantom fields. (Browser 'date' support has improved.)
  - Chg: 'OptionsProvider', 'InputSkin', and 'ErrorSkin' mixins are no-longer 'const', although most implementing classes probably should be (if contributing them to a service).
  - Chg: 'min' and 'max' validation fields in 'HtmlInput' and 'FormField' are now 'Obj' types to cater for 'Date' and 'DateTime'.
  - Bug: 'FormBean.fieldMsg()' was not picking up msgs with bean prefixes.
