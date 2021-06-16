@@ -3,6 +3,7 @@ v1.2
 v1.2.8
 ======
  - Chg: 'OptionsProvider', 'InputSkin', and 'ErrorSkin' mixins are no-longer 'const', although most implementing classes probably should be (if contributing them to a service).
+ - Bug: 'FormBean.fieldMsg()' was not picking up msgs with bean prefixes.
 
 v1.2.6
 ======

@@ -337,16 +337,21 @@ class FormBean {
 	Str? fieldMsg(FormField formField, Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
 
 		// bean messages have already been merged
-		msg		:= messages["${formField.field.name}.${key}"] ?: messages[key]
+		msg		:= null as Str
+		if (msg == null) msg = messages["${beanType.name}.${formField.field.name}.${key}"]
+		if (msg == null) msg = messages["${formField.field.name}.${key}"]
+		if (msg == null) msg = messages[key]
+		if (msg == null) return null
+
 		label	:= formField.label ?: formField.field.name.toDisplayName
 		value	:= formField.formValue ?: ""
 
 		return msg
-			?.replace("\${label}", 	label)
-			?.replace("\${value}",	value)
-			?.replace("\${arg1}",	arg1?.toStr ?: "")
-			?.replace("\${arg2}",	arg2?.toStr ?: "")
-			?.replace("\${arg3}",	arg3?.toStr ?: "")
+			.replace("\${label}", 	label)
+			.replace("\${value}",	value)
+			.replace("\${arg1}",	arg1?.toStr ?: "")
+			.replace("\${arg2}",	arg2?.toStr ?: "")
+			.replace("\${arg3}",	arg3?.toStr ?: "")
 	}
 
 	** Returns a message for the given key. Messages are looked up in the following order:
