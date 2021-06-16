@@ -230,6 +230,43 @@ class FormField {
 		formBean.fieldMsg(this, key, arg1, arg2, arg3)
 	}
 
+	** Convenience for 'msg()'. 
+	** Returns a message for the given field. Messages are looked up in the following order:
+	** 
+	**  - '<bean>.<field>.<key>'
+	**  - '<field>.<key>'
+	**  - '<key>'
+	** 
+	** And the following substitutions are made:
+	** 
+	**  - '${label} -> formField.label'
+	**  - '${value} -> formField.formValue'
+	**  - '${arg1}  -> arg1.toStr'
+	**  - '${arg2}  -> arg2.toStr'
+	**  - '${arg3}  -> arg3.toStr'
+	** 
+	** The form value is substituted for '${value}' because it is intended for use by validation msgs. 
+	** 
+	** Returns 'null' if a msg could not be found.
+	@Operator @NoDoc
+	Str getMsg(Str key, Obj? arg1 := null, Obj? arg2 := null, Obj? arg3 := null) {
+		msg(key, arg1, arg2, arg3)
+	}
+
+	** Sets the given form field message. Messages are stored in the FormBean under the key:
+	** 
+	**  - '<bean>.<field>.<key>'
+	** 
+	** 'null' values are removed from the messges map.
+	@Operator
+	Void set(Str key, Obj? val) {
+		msgKey := "${formBean.beanType.name}.${field.name}.${key}"
+		if (val == null)
+			formBean.messages.remove(msgKey)
+		else
+			formBean.messages.set(msgKey, val.toStr)
+	}
+
 	** Hook to render this field to HTML.
 	** By default this defers rendering to an 'InputSkin'.
 	** 
