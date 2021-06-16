@@ -136,21 +136,21 @@ facet class HtmlInput {
 	** If 'null' then the msg key '<bean>.<field>.maxLength' is used to look for a value. 
 	const Int?	maxLength
 
-	** HTML5 validation. Sets the minimum value (inclusive) an 'Int' should have.
+	** HTML5 validation. Sets the minimum value (inclusive). May be an 'Int', 'Date', 'DateTime', or 'Str'.
 	** 
 	** If 'null' then the msg key '<bean>.<field>.min' is used to look for a value. 
-	const Int?	min
+	const Obj?	min
 	
-	** HTML5 validation. Sets the maximum value (inclusive) an 'Int' should have.
+	** HTML5 validation. Sets the maximum value (inclusive). May be an 'Int', 'Date', 'DateTime', or 'Str'.
 	** 
 	** If 'null' then the msg key '<bean>.<field>.max' is used to look for a value. 
-	const Int?	max
+	const Obj?	max
 	
 	** HTML5 validation. Sets a regular expression that the (stringified) value should match.
 	** Starting '^' and ending '$' characters are implicit and not required.
 	** 
 	** If 'null' then the msg key '<bean>.<field>.pattern' is used to look for a value. 
-	const Regex?	pattern 
+	const Regex? pattern 
 	
 	** HTML5 validation. Defines number intervals for a numeric input.
 	** 

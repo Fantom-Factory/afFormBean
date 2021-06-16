@@ -125,8 +125,29 @@ class SkinCtx {
 		attrs["autocomplete"]	= formField.autocomplete
 		attrs["minlength"]		= formField.minLength?.toStr
 		attrs["maxlength"]		= formField.maxLength?.toStr
-		attrs["min"]			= formField.min?.toStr
-		attrs["max"]			= formField.max?.toStr
+
+		if (formField.max is Int)
+			attrs["max"]		= formField.max.toStr
+		else
+		if (formField.max is Date)
+			attrs["max"]		= ((Date) formField.max).toIso
+		else
+		if (formField.max is DateTime)
+			attrs["max"]		= ((DateTime) formField.max).toLocale("YYYY-MM-DD'T'hh:mm")
+		if (formField.max != null)
+			attrs["max"]		= formField.max.toStr
+		
+		if (formField.min is Int)
+			attrs["min"]		= formField.min.toStr
+		else
+		if (formField.min is Date)
+			attrs["min"]		= ((Date) formField.min).toIso
+		else
+		if (formField.min is DateTime)
+			attrs["min"]		= ((DateTime) formField.min).toLocale("YYYY-MM-DD'T'hh:mm")
+		if (formField.min != null)
+			attrs["min"]		= formField.min.toStr
+		
 		attrs["step"]			= formField.step?.toStr
 		attrs["pattern"]		= formField.pattern?.toStr
 		attrs["disabled"]		= formField.disabled ? "" : null

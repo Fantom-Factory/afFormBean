@@ -113,16 +113,16 @@ class FormField {
 	Int?	minLength
 	
 	** HTML5 validation attribute.
-	** Sets the maximum length (inclusive) a string should be.
+	** Sets the maximum value (inclusive). May be an 'Int', 'Date', 'DateTime', or 'Str'.
 	Int?	maxLength
 
 	** HTML5 validation attribute.
-	** Sets the minimum value (inclusive) an 'Int' should have.
-	Int?	min
+	** Sets the minimum value (inclusive). May be an 'Int', 'Date', 'DateTime', or 'Str'.
+	Obj?	min
 	
 	** HTML5 validation attribute.
-	** Sets the maximum value (inclusive) an 'Int' should have.
-	Int?	max
+	** Sets the maximum value (inclusive) for numbers ('Int') and dates ('Date').
+	Obj?	max
 	
 	** HTML5 validation attribute.
 	** Sets a regular expression that the (stringified) value should match.
@@ -190,8 +190,8 @@ class FormField {
 		required		= input?.required		?: msg("required"	)?.toBool
 		minLength		= input?.minLength		?: msg("minLength"	)?.toInt
 		maxLength		= input?.maxLength		?: msg("maxLength"	)?.toInt
-		min				= input?.min			?: msg("min"		)?.toInt
-		max				= input?.max			?: msg("max"		)?.toInt
+		min				= input?.min			?: msg("min"		)	// don't convert to Int, Date, etc... instead allow values to be passed through to HTML
+		max				= input?.max			?: msg("max"		)	// don't convert to Int, Date, etc... instead allow values to be passed through to HTML
 		pattern			= input?.pattern		?: msg("pattern"	)?.toRegex
 		step			= input?.step			?: msg("step"		)?.toInt
 		showBlank		= input?.showBlank		?: msg("showBlank"	)?.toBool
