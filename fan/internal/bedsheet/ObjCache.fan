@@ -1,5 +1,7 @@
-using afIoc
-using afConcurrent
+using afIoc::Inject
+using afIoc::Scope
+using afConcurrent::AtomicMap
+using afConcurrent::AtomicList
 
 ** Copied over from BedSheet
 internal const class ObjCache {

@@ -1,4 +1,4 @@
-using afConcurrent
+using afConcurrent::AtomicMap
 
 ** (Service) - 
 ** Creates a map of messages by merging together property files. 

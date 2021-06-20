@@ -1,4 +1,5 @@
-using afIoc
+using afIoc::Scope
+using afIoc::Inject
 
 internal const class HtmlInputInspector : FieldInspector {
 	

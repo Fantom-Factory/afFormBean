@@ -1,5 +1,6 @@
-using afBeanUtils
-using afIoc
+using afBeanUtils::BeanFactory
+using afIoc::Inject
+using afIoc::Scope
 
 // meh - if it ain't broke, don't fix it!
 // this is entrenched in the afBeanUtils::BeanPropertyFactory stuff

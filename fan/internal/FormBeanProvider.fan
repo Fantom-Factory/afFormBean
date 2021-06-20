@@ -1,4 +1,7 @@
-using afIoc
+using afIoc::Inject
+using afIoc::Scope
+using afIoc::DependencyProvider
+using afIoc::InjectionCtx
 
 internal const class FormBeanProvider : DependencyProvider {
 	

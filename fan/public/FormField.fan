@@ -1,4 +1,5 @@
-using afIoc
+using afIoc::Inject
+using afIoc::Scope
 
 ** Holds all the meta data required to convert a field on a Fantom object to HTML and back again.
 class FormField {

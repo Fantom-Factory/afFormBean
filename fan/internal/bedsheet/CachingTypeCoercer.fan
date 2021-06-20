@@ -1,5 +1,5 @@
-using afBeanUtils
-using afConcurrent
+using afBeanUtils::TypeCoercer
+using afConcurrent::AtomicMap
 
 ** A 'TypeCoercer' that caches its conversion methods.
 internal const class CachingTypeCoercer : TypeCoercer {
