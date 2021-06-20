@@ -15,13 +15,13 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys          1.0.69 - 1.0",	// 1.0.69 because we make use of in-memory Files
-			"concurrent   1.0.69 - 1.0",
+			"sys          1.0.72 - 1.0",	// 1.0.69 because we make use of in-memory Files
+			"concurrent   1.0.72 - 1.0",
 
 			// ---- Core ------------------------
-			"afBeanUtils  1.0.8  - 1.0",
-			"afConcurrent 1.0.12 - 1.0",	// for Messages.AtomicMap
-			"afIoc        3.0.0  - 3.0",
+			"afBeanUtils  1.0.12 - 1.0",
+			"afConcurrent 1.0.26 - 1.0",	// for Messages.AtomicMap
+			"afIoc        3.0.8  - 3.0",
 
 			// ---- Web -------------------------
 			// removed the hard dependency on BedSheet and web so FormBean may be used to validate Domain objects
