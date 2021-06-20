@@ -335,17 +335,17 @@ class FormField {
 			if (formValue.toInt(10, false) == null)
 				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
 	
-		if (hasValue && min != null) {
+		if (hasValue && min?.toStr?.toInt(10, false) != null) {
 			if (formValue.toInt(10, false) == null)
 				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
-			if (formValue.toInt < min)
+			if (formValue.toInt < min.toStr.toInt)
 				return errMsg = msg("min.msg", min) ?: "[min.msg]"
 		}
 
-		if (hasValue && max != null) {
+		if (hasValue && max?.toStr?.toInt(10, false) != null) {
 			if (formValue.toInt(10, false) == null)
 				return errMsg = msg("notNum.msg") ?: "[notNum.msg]"
-			if (formValue.toInt > max)
+			if (formValue.toInt > max.toStr.toInt)
 				return errMsg = msg("max.msg", max) ?: "[max.msg]"
 		}
 
