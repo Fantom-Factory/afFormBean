@@ -148,7 +148,7 @@ class FormBean {
 	** Do so if you're re-rendering a form with validation errors.
 	** 
 	** See the form field itself to render individual HTML inputs.
-	virtual Str renderBean(Obj? bean) {
+	virtual Str renderBean(Obj? bean := null) {
 		if (bean != null && !bean.typeof.fits(beanType))
 			throw Err("Bean '${bean.typeof.qname}' is not of FormBean type '${beanType.qname}'")
 		inErr	:= hasErrors

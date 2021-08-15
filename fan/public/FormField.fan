@@ -272,7 +272,7 @@ class FormField {
 	** By default this defers rendering to an 'InputSkin'.
 	** 
 	** Override to perform custom field rendering.
-	virtual Str render(Obj? bean) {
+	virtual Str render(Obj? bean := null) {
 		skinCtx := SkinCtx() {
 			it.bean			= bean
 			it.field		= this.field

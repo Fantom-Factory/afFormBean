@@ -1,5 +1,9 @@
 v1.2
 ****
+v1.2.10
+=======
+ - Chg: The bean instance passed to 'render()' methods is now optional.
+
 v1.2.8
 ======
  - New: 'FormField.set()' to set form field messages.
