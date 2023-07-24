@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afFormBean"
 		summary = "Renders Fantom objects as HTML forms complete with client and server side validation"
-		version = Version("1.2.10")
+		version = Version("1.2.11")
 
 		meta = [
 			"pod.dis"			: "Form Bean",	
